@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RentingApp — Design Direction Mockups</title>
+<style>
+  :root {
+    --primary: #E87B35;
+    --primary-dark: #C45A2D;
+    --primary-light: #F5C4A1;
+    --secondary: #4A6178;
+    --secondary-dark: #2E3E50;
+    --secondary-light: #D5DEE8;
+    --success: #3D9A5F;
+    --warning: #D4952B;
+    --error: #C4392E;
+    --neutral-900: #1A1A1A;
+    --neutral-700: #4A4A4A;
+    --neutral-500: #7A7A7A;
+    --neutral-300: #D1D1D1;
+    --neutral-100: #F5F5F5;
+    --white: #FFFFFF;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--neutral-100); color: var(--neutral-900); }
+
+  /* Navigation */
+  .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--secondary-dark); padding: 12px 24px; display: flex; align-items: center; gap: 16px; overflow-x: auto; }
+  .nav h1 { color: var(--white); font-size: 16px; font-weight: 700; white-space: nowrap; margin-right: 8px; }
+  .nav-btn { background: transparent; border: 2px solid rgba(255,255,255,0.3); color: var(--white); padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; font-weight: 500; white-space: nowrap; transition: all 0.2s; }
+  .nav-btn:hover, .nav-btn.active { background: var(--primary); border-color: var(--primary); }
+  .nav-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.2); flex-shrink: 0; }
+
+  /* Sections */
+  .section { display: none; padding: 72px 24px 24px; min-height: 100vh; }
+  .section.active { display: block; }
+  .section-title { font-size: 28px; font-weight: 700; margin-bottom: 8px; color: var(--neutral-900); }
+  .section-subtitle { font-size: 16px; color: var(--neutral-500); margin-bottom: 32px; line-height: 1.5; }
+
+  /* Mockup Frame */
+  .mockup-row { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 48px; }
+  .mockup-col { }
+  .mockup-label { font-size: 14px; font-weight: 600; color: var(--neutral-500); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .phone-frame { width: 375px; max-width: 100%; margin: 0 auto; background: var(--white); border-radius: 32px; overflow: hidden; box-shadow: var(--shadow-lg); border: 8px solid var(--neutral-900); }
+  .phone-screen { overflow-y: auto; max-height: 700px; position: relative; }
+  .desktop-frame { width: 100%; background: var(--white); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-lg); border: 2px solid var(--neutral-300); }
+  .desktop-screen { overflow-y: auto; max-height: 600px; }
+
+  /* Comparison grid */
+  .compare-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 32px; }
+  .compare-card { background: var(--white); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-md); }
+  .compare-card h3 { font-size: 18px; margin-bottom: 4px; }
+  .compare-card .tag { display: inline-block; background: var(--primary-light); color: var(--primary-dark); font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 99px; margin-bottom: 16px; }
+  .compare-card p { font-size: 14px; color: var(--neutral-700); line-height: 1.5; margin-bottom: 16px; }
+  .traits { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  .trait { background: var(--neutral-100); color: var(--neutral-700); font-size: 12px; padding: 4px 10px; border-radius: 99px; }
+
+  /* ===== DIRECTION A: Clean & Confident ===== */
+  .da-header { background: linear-gradient(135deg, #FFF7F0, #FFFFFF); padding: 20px 16px 0; }
+  .da-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .da-logo { font-size: 16px; font-weight: 700; color: var(--primary-dark); }
+  .da-badge { background: var(--success); color: white; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 99px; }
+  .da-hero-img { width: 100%; height: 220px; background: linear-gradient(135deg, #D4A87C, #B8704A); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 500; }
+  .da-dots { display: flex; gap: 6px; justify-content: center; margin-top: 10px; padding-bottom: 16px; }
+  .da-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--neutral-300); }
+  .da-dot.active { background: var(--primary); }
+  .da-content { padding: 20px 16px; }
+  .da-title { font-size: 24px; font-weight: 700; color: var(--neutral-900); margin-bottom: 4px; }
+  .da-price { font-size: 22px; font-weight: 700; color: var(--primary); }
+  .da-price span { font-size: 14px; font-weight: 400; color: var(--neutral-500); }
+  .da-desc { font-size: 15px; color: var(--neutral-700); line-height: 1.5; margin: 12px 0 20px; }
+  .da-divider { height: 1px; background: var(--neutral-100); margin: 16px 0; }
+  .da-section-label { font-size: 13px; font-weight: 600; color: var(--neutral-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .da-calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 20px; }
+  .da-cal-head { font-size: 11px; font-weight: 600; color: var(--neutral-500); text-align: center; padding: 4px 0; }
+  .da-cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 13px; border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; position: relative; }
+  .da-cal-day.available { color: var(--neutral-900); background: var(--white); }
+  .da-cal-day.available:hover { background: var(--primary-light); }
+  .da-cal-day.selected { background: var(--primary); color: white; font-weight: 600; }
+  .da-cal-day.unavailable { color: var(--neutral-300); background: var(--neutral-100); cursor: default; }
+  .da-cal-day.today { font-weight: 700; box-shadow: inset 0 0 0 2px var(--primary); }
+  .da-sticky { position: sticky; bottom: 0; background: var(--white); border-top: 1px solid var(--neutral-100); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; }
+  .da-sticky-info { }
+  .da-sticky-dates { font-size: 13px; color: var(--neutral-500); }
+  .da-sticky-total { font-size: 20px; font-weight: 700; color: var(--neutral-900); }
+  .da-btn { background: var(--primary); color: white; border: none; padding: 14px 28px; border-radius: var(--radius-md); font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+  .da-btn:hover { background: var(--primary-dark); }
+
+  /* ===== DIRECTION B: Bold & Immersive ===== */
+  .db-header { position: relative; }
+  .db-hero-img { width: 100%; height: 280px; background: linear-gradient(180deg, #B8704A 0%, #D4A87C 50%, #E8C4A0 100%); display: flex; align-items: flex-end; }
+  .db-hero-overlay { width: 100%; padding: 20px 16px 16px; background: linear-gradient(transparent, rgba(0,0,0,0.7)); }
+  .db-hero-title { font-size: 26px; font-weight: 700; color: white; }
+  .db-hero-price { font-size: 20px; font-weight: 700; color: var(--primary-light); margin-top: 4px; }
+  .db-hero-price span { font-size: 14px; color: rgba(255,255,255,0.7); }
+  .db-back { position: absolute; top: 16px; left: 16px; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.4); color: white; display: flex; align-items: center; justify-content: center; font-size: 18px; backdrop-filter: blur(4px); }
+  .db-content { padding: 20px 16px; }
+  .db-chips { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .db-chip { background: var(--primary-light); color: var(--primary-dark); font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 99px; }
+  .db-desc { font-size: 15px; color: var(--neutral-700); line-height: 1.6; margin-bottom: 20px; }
+  .db-section-title { font-size: 17px; font-weight: 700; margin-bottom: 12px; }
+  .db-calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 16px; }
+  .db-cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 13px; border-radius: 50%; cursor: pointer; transition: all 0.15s; }
+  .db-cal-day.available { color: var(--neutral-900); }
+  .db-cal-day.available:hover { background: var(--primary-light); }
+  .db-cal-day.selected { background: var(--primary); color: white; font-weight: 700; }
+  .db-cal-day.range { background: var(--primary-light); color: var(--primary-dark); }
+  .db-cal-day.unavailable { color: var(--neutral-300); }
+  .db-sticky { position: sticky; bottom: 0; background: var(--primary); padding: 16px; display: flex; align-items: center; justify-content: space-between; }
+  .db-sticky-info { color: white; }
+  .db-sticky-total { font-size: 22px; font-weight: 700; }
+  .db-sticky-dates { font-size: 13px; opacity: 0.85; }
+  .db-btn-white { background: white; color: var(--primary-dark); border: none; padding: 14px 28px; border-radius: var(--radius-md); font-size: 16px; font-weight: 700; cursor: pointer; }
+
+  /* ===== DIRECTION C: Minimal & Structured ===== */
+  .dc-topbar { background: var(--white); padding: 14px 16px; border-bottom: 1px solid var(--neutral-100); display: flex; justify-content: space-between; align-items: center; }
+  .dc-logo { font-size: 15px; font-weight: 700; color: var(--secondary-dark); letter-spacing: -0.3px; }
+  .dc-content { padding: 16px; }
+  .dc-img { width: 100%; height: 200px; background: linear-gradient(135deg, #C9A88A, #A07558); border-radius: var(--radius-sm); margin-bottom: 16px; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; }
+  .dc-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+  .dc-title { font-size: 20px; font-weight: 700; }
+  .dc-price { font-size: 20px; font-weight: 700; color: var(--primary); }
+  .dc-meta { display: flex; gap: 16px; margin-bottom: 16px; }
+  .dc-meta-item { font-size: 13px; color: var(--neutral-500); display: flex; align-items: center; gap: 4px; }
+  .dc-meta-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .dc-section { background: var(--neutral-100); border-radius: var(--radius-md); padding: 16px; margin-bottom: 12px; }
+  .dc-section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .dc-section-title { font-size: 14px; font-weight: 600; }
+  .dc-section-action { font-size: 13px; color: var(--primary); font-weight: 500; cursor: pointer; }
+  .dc-cal-mini { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .dc-cal-d { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; border-radius: 4px; }
+  .dc-cal-d.sel { background: var(--primary); color: white; font-weight: 600; }
+  .dc-cal-d.avail { color: var(--neutral-700); }
+  .dc-cal-d.off { color: var(--neutral-300); }
+  .dc-summary { background: var(--white); border: 1px solid var(--neutral-300); border-radius: var(--radius-md); padding: 16px; margin-bottom: 16px; }
+  .dc-sum-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; }
+  .dc-sum-row.total { font-weight: 700; font-size: 16px; border-top: 1px solid var(--neutral-100); padding-top: 8px; margin-bottom: 0; }
+  .dc-btn { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; cursor: pointer; }
+
+  /* ===== DIRECTION D: Card-Forward ===== */
+  .dd-bg { background: var(--neutral-100); padding: 0; }
+  .dd-header { background: var(--white); padding: 16px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm); }
+  .dd-logo { font-size: 16px; font-weight: 700; color: var(--primary); }
+  .dd-content { padding: 12px; }
+  .dd-card { background: var(--white); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); margin-bottom: 12px; }
+  .dd-card-img { height: 180px; background: linear-gradient(135deg, #C09070, #D4A87C); display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; position: relative; }
+  .dd-card-badge { position: absolute; top: 12px; right: 12px; background: var(--success); color: white; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 99px; }
+  .dd-card-body { padding: 16px; }
+  .dd-card-title { font-size: 20px; font-weight: 700; margin-bottom: 2px; }
+  .dd-card-price { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 8px; }
+  .dd-card-price span { font-size: 13px; color: var(--neutral-500); font-weight: 400; }
+  .dd-card-desc { font-size: 14px; color: var(--neutral-700); line-height: 1.5; margin-bottom: 12px; }
+  .dd-card2 { background: var(--white); border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--shadow-md); margin-bottom: 12px; }
+  .dd-card2-title { font-size: 15px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .dd-card2-icon { width: 28px; height: 28px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .dd-mini-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-bottom: 12px; }
+  .dd-cal-d { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; border-radius: var(--radius-sm); }
+  .dd-cal-d.sel { background: var(--primary); color: white; font-weight: 600; }
+  .dd-cal-d.avail { color: var(--neutral-700); background: var(--neutral-100); }
+  .dd-cal-d.off { color: var(--neutral-300); }
+  .dd-total-bar { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: var(--radius-lg); padding: 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .dd-total-info { color: white; }
+  .dd-total-amt { font-size: 24px; font-weight: 700; }
+  .dd-total-label { font-size: 13px; opacity: 0.85; }
+  .dd-btn-light { background: white; color: var(--primary-dark); border: none; padding: 12px 24px; border-radius: var(--radius-md); font-size: 15px; font-weight: 700; cursor: pointer; }
+
+  /* ===== OPERATOR DASHBOARD DIRECTIONS ===== */
+  .op-frame { display: flex; height: 500px; }
+  .op-sidebar { width: 220px; background: var(--secondary-dark); padding: 16px 0; flex-shrink: 0; }
+  .op-sidebar-logo { color: var(--white); font-size: 18px; font-weight: 700; padding: 0 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 12px; }
+  .op-sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: rgba(255,255,255,0.6); font-size: 14px; cursor: pointer; transition: all 0.15s; }
+  .op-sidebar-item:hover { color: white; background: rgba(255,255,255,0.05); }
+  .op-sidebar-item.active { color: white; background: rgba(255,255,255,0.1); border-left: 3px solid var(--primary); }
+  .op-sidebar-icon { width: 20px; text-align: center; }
+  .op-main { flex: 1; padding: 20px; overflow-y: auto; background: var(--neutral-100); }
+  .op-page-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .op-page-sub { font-size: 14px; color: var(--neutral-500); margin-bottom: 20px; }
+  .op-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .op-stat { background: var(--white); border-radius: var(--radius-md); padding: 14px; box-shadow: var(--shadow-sm); }
+  .op-stat-label { font-size: 12px; color: var(--neutral-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .op-stat-value { font-size: 24px; font-weight: 700; }
+  .op-stat-value.green { color: var(--success); }
+  .op-stat-value.amber { color: var(--primary); }
+  .op-bookings { background: var(--white); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden; }
+  .op-bookings-head { padding: 14px 16px; border-bottom: 1px solid var(--neutral-100); display: flex; justify-content: space-between; align-items: center; }
+  .op-bookings-title { font-size: 15px; font-weight: 600; }
+  .op-booking-row { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--neutral-100); gap: 12px; font-size: 14px; }
+  .op-booking-row:last-child { border-bottom: none; }
+  .op-booking-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: var(--primary-dark); flex-shrink: 0; }
+  .op-booking-info { flex: 1; }
+  .op-booking-name { font-weight: 600; font-size: 14px; }
+  .op-booking-detail { font-size: 12px; color: var(--neutral-500); }
+  .op-booking-status { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 99px; white-space: nowrap; }
+  .op-booking-status.confirmed { background: rgba(61,154,95,0.1); color: var(--success); }
+  .op-booking-status.active { background: var(--primary-light); color: var(--primary-dark); }
+  .op-booking-status.returning { background: rgba(212,149,43,0.1); color: var(--warning); }
+  .op-booking-amt { font-weight: 600; white-space: nowrap; }
+
+  /* Operator Direction B — Warm sidebar */
+  .op2-sidebar { background: linear-gradient(180deg, var(--primary-dark) 0%, var(--secondary-dark) 100%); }
+  .op2-sidebar-item.active { border-left-color: var(--primary-light); background: rgba(255,255,255,0.15); }
+
+  /* ===== SMS MOCKUP ===== */
+  .sms-frame { width: 340px; max-width: 100%; margin: 0 auto; }
+  .sms-bubble-in { background: var(--neutral-100); padding: 10px 14px; border-radius: 16px 16px 16px 4px; font-size: 14px; line-height: 1.5; margin-bottom: 8px; max-width: 85%; color: var(--neutral-900); }
+  .sms-bubble-out { background: var(--primary); color: white; padding: 10px 14px; border-radius: 16px 16px 4px 16px; font-size: 14px; line-height: 1.5; margin-bottom: 8px; max-width: 85%; margin-left: auto; }
+  .sms-time { font-size: 11px; color: var(--neutral-500); text-align: center; margin: 12px 0; }
+  .sms-link { color: var(--primary-light); text-decoration: underline; }
+
+  /* ===== MANAGE RENTAL ===== */
+  .mr-header { background: var(--white); padding: 16px; text-align: center; border-bottom: 1px solid var(--neutral-100); }
+  .mr-logo { font-size: 15px; font-weight: 700; color: var(--primary-dark); }
+  .mr-content { padding: 16px; }
+  .mr-card { background: var(--white); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md); margin-bottom: 16px; }
+  .mr-card-top { display: flex; gap: 12px; padding: 16px; }
+  .mr-card-thumb { width: 64px; height: 64px; border-radius: var(--radius-sm); background: linear-gradient(135deg, #C09070, #D4A87C); flex-shrink: 0; }
+  .mr-card-info { flex: 1; }
+  .mr-card-equip { font-size: 16px; font-weight: 700; }
+  .mr-card-dates { font-size: 13px; color: var(--neutral-500); margin-top: 2px; }
+  .mr-card-status { margin-top: 6px; }
+  .mr-card-actions { display: flex; gap: 8px; padding: 0 16px 16px; }
+  .mr-btn-primary { flex: 1; background: var(--primary); color: white; border: none; padding: 12px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; }
+  .mr-btn-secondary { flex: 1; background: var(--neutral-100); color: var(--neutral-700); border: none; padding: 12px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; cursor: pointer; text-align: center; }
+
+  /* Color Palette Display */
+  .palette { display: flex; gap: 4px; margin-bottom: 24px; border-radius: var(--radius-md); overflow: hidden; }
+  .palette-swatch { flex: 1; height: 60px; display: flex; align-items: flex-end; padding: 6px; }
+  .palette-swatch span { font-size: 10px; font-weight: 600; background: rgba(255,255,255,0.9); padding: 2px 6px; border-radius: 4px; }
+
+  @media (max-width: 900px) {
+    .mockup-row { grid-template-columns: 1fr; }
+    .op-stats { grid-template-columns: repeat(2, 1fr); }
+    .compare-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <h1>🎨 RentingApp</h1>
+  <button class="nav-btn active" onclick="show('overview')">Overview</button>
+  <div class="nav-divider"></div>
+  <button class="nav-btn" onclick="show('da')">A: Clean</button>
+  <button class="nav-btn" onclick="show('db')">B: Bold</button>
+  <button class="nav-btn" onclick="show('dc')">C: Minimal</button>
+  <button class="nav-btn" onclick="show('dd')">D: Cards</button>
+  <div class="nav-divider"></div>
+  <button class="nav-btn" onclick="show('operator')">Operator</button>
+  <button class="nav-btn" onclick="show('sms')">SMS & Comms</button>
+  <button class="nav-btn" onclick="show('manage')">Manage Rental</button>
+</nav>
+
+<!-- OVERVIEW -->
+<section id="overview" class="section active">
+  <h2 class="section-title">Design Direction Exploration</h2>
+  <p class="section-subtitle">Four visual directions for the renter booking page, plus operator dashboard, SMS communication, and manage-my-rental mockups. All use the Desert Sunset palette with Tailwind + shadcn/ui patterns.</p>
+
+  <div class="palette">
+    <div class="palette-swatch" style="background: var(--primary-light)"><span>#F5C4A1</span></div>
+    <div class="palette-swatch" style="background: var(--primary)"><span>#E87B35</span></div>
+    <div class="palette-swatch" style="background: var(--primary-dark)"><span>#C45A2D</span></div>
+    <div class="palette-swatch" style="background: var(--secondary)"><span>#4A6178</span></div>
+    <div class="palette-swatch" style="background: var(--secondary-dark)"><span>#2E3E50</span></div>
+    <div class="palette-swatch" style="background: var(--success)"><span style="color:white">#3D9A5F</span></div>
+    <div class="palette-swatch" style="background: var(--warning)"><span>#D4952B</span></div>
+    <div class="palette-swatch" style="background: var(--error)"><span style="color:white">#C4392E</span></div>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-card">
+      <h3>Direction A: Clean & Confident</h3>
+      <span class="tag">Recommended</span>
+      <p>White canvas with warm amber accents. Professional and trustworthy. Photo hero with clear info hierarchy below. Sticky bottom bar with running total and CTA. Most aligned with "booking a hotel room" mental model.</p>
+      <div class="traits">
+        <span class="trait">Generous whitespace</span>
+        <span class="trait">Warm but restrained</span>
+        <span class="trait">Trust-forward</span>
+        <span class="trait">Airbnb-like clarity</span>
+      </div>
+    </div>
+    <div class="compare-card">
+      <h3>Direction B: Bold & Immersive</h3>
+      <span class="tag">High Impact</span>
+      <p>Full-bleed hero with text overlay. Equipment photo dominates. Warm amber sticky bar at bottom. More emotional and visual-forward. Great for making equipment feel exciting and premium.</p>
+      <div class="traits">
+        <span class="trait">Photo-dominant</span>
+        <span class="trait">Immersive</span>
+        <span class="trait">Amber-forward</span>
+        <span class="trait">Uber-like feel</span>
+      </div>
+    </div>
+    <div class="compare-card">
+      <h3>Direction C: Minimal & Structured</h3>
+      <span class="tag">Efficient</span>
+      <p>Information-dense with clear sections. Everything visible at once. Sectioned cards for calendar and pricing. Most efficient for repeat users. Stripe checkout influence.</p>
+      <div class="traits">
+        <span class="trait">Information-first</span>
+        <span class="trait">Compact sections</span>
+        <span class="trait">Quick decisions</span>
+        <span class="trait">Checkout-like</span>
+      </div>
+    </div>
+    <div class="compare-card">
+      <h3>Direction D: Card-Forward</h3>
+      <span class="tag">Modular</span>
+      <p>Everything in cards on a tinted background. Each section is a distinct, elevated card. Gradient total bar. Most app-like feel. Great modularity for complex flows.</p>
+      <div class="traits">
+        <span class="trait">Card-based</span>
+        <span class="trait">App-like</span>
+        <span class="trait">Colorful accents</span>
+        <span class="trait">DoorDash-like</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIRECTION A -->
+<section id="da" class="section">
+  <h2 class="section-title">Direction A: Clean & Confident</h2>
+  <p class="section-subtitle">White canvas, warm amber accents, professional and trustworthy. The "booking a hotel room" experience.</p>
+  <div style="display: flex; justify-content: center;">
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div class="da-header">
+          <div class="da-topbar">
+            <span class="da-logo">RentingApp</span>
+            <span class="da-badge">✓ Verified</span>
+          </div>
+          <div class="da-hero-img">📷 Mini Excavator — Hero Photo</div>
+          <div class="da-dots">
+            <div class="da-dot active"></div>
+            <div class="da-dot"></div>
+            <div class="da-dot"></div>
+            <div class="da-dot"></div>
+          </div>
+        </div>
+        <div class="da-content">
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <div class="da-title">Mini Excavator</div>
+            <div class="da-price">$350<span>/day</span></div>
+          </div>
+          <div class="da-desc">CAT 303.5 Mini Excavator. Perfect for trenching, landscaping, and small excavation projects. Includes bucket attachment.</div>
+          <div class="da-divider"></div>
+          <div class="da-section-label">Select Dates</div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 15px; font-weight: 600;">April 2026</span>
+            <span style="font-size: 13px; color: var(--neutral-500);">▸</span>
+          </div>
+          <div class="da-calendar">
+            <div class="da-cal-head">S</div><div class="da-cal-head">M</div><div class="da-cal-head">T</div><div class="da-cal-head">W</div><div class="da-cal-head">T</div><div class="da-cal-head">F</div><div class="da-cal-head">S</div>
+            <div class="da-cal-day unavailable"></div><div class="da-cal-day unavailable"></div><div class="da-cal-day unavailable">1</div><div class="da-cal-day unavailable">2</div><div class="da-cal-day unavailable">3</div><div class="da-cal-day unavailable">4</div><div class="da-cal-day available">5</div>
+            <div class="da-cal-day available">6</div><div class="da-cal-day available">7</div><div class="da-cal-day available">8</div><div class="da-cal-day available">9</div><div class="da-cal-day available">10</div><div class="da-cal-day selected">11</div><div class="da-cal-day selected">12</div>
+            <div class="da-cal-day unavailable">13</div><div class="da-cal-day unavailable">14</div><div class="da-cal-day unavailable">15</div><div class="da-cal-day available">16</div><div class="da-cal-day available">17</div><div class="da-cal-day available">18</div><div class="da-cal-day available">19</div>
+            <div class="da-cal-day available">20</div><div class="da-cal-day available">21</div><div class="da-cal-day available today">22</div><div class="da-cal-day available">23</div><div class="da-cal-day available">24</div><div class="da-cal-day available">25</div><div class="da-cal-day available">26</div>
+            <div class="da-cal-day available">27</div><div class="da-cal-day available">28</div><div class="da-cal-day available">29</div><div class="da-cal-day available">30</div><div class="da-cal-day"></div><div class="da-cal-day"></div><div class="da-cal-day"></div>
+          </div>
+        </div>
+        <div class="da-sticky">
+          <div class="da-sticky-info">
+            <div class="da-sticky-dates">Apr 11 – Apr 12 (2 days)</div>
+            <div class="da-sticky-total">$700</div>
+          </div>
+          <button class="da-btn">Book Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIRECTION B -->
+<section id="db" class="section">
+  <h2 class="section-title">Direction B: Bold & Immersive</h2>
+  <p class="section-subtitle">Full-bleed hero, photo-dominant, warm amber bottom bar. The "this equipment looks premium" experience.</p>
+  <div style="display: flex; justify-content: center;">
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div class="db-header">
+          <div class="db-hero-img">
+            <div class="db-back">←</div>
+            <div class="db-hero-overlay">
+              <div class="db-hero-title">Mini Excavator</div>
+              <div class="db-hero-price">$350<span> / day</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="db-content">
+          <div class="db-chips">
+            <span class="db-chip">🏗 Excavation</span>
+            <span class="db-chip">📍 Salt Lake City</span>
+            <span class="db-chip">✓ Verified</span>
+          </div>
+          <div class="db-desc">CAT 303.5 Mini Excavator. Perfect for trenching, landscaping, and small excavation projects. Includes bucket attachment.</div>
+          <div class="db-section-title">Pick Your Dates</div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; color: var(--neutral-500);">
+            <span>April 2026</span>
+            <span>▸</span>
+          </div>
+          <div class="db-calendar">
+            <div class="db-cal-day" style="font-size:11px;color:var(--neutral-500)">S</div><div class="db-cal-day" style="font-size:11px;color:var(--neutral-500)">M</div><div class="db-cal-day" style="font-size:11px;color:var(--neutral-500)">T</div><div class="db-cal-day" style="font-size:11px;color:var(--neutral-500)">W</div><div class="db-cal-day" style="font-size:11px;color:var(--neutral-500)">T</div><div class="db-cal-day" style="font-size:11px;color:var(--neutral-500)">F</div><div class="db-cal-day" style="font-size:11px;color:var(--neutral-500)">S</div>
+            <div class="db-cal-day"></div><div class="db-cal-day"></div><div class="db-cal-day unavailable">1</div><div class="db-cal-day unavailable">2</div><div class="db-cal-day unavailable">3</div><div class="db-cal-day unavailable">4</div><div class="db-cal-day available">5</div>
+            <div class="db-cal-day available">6</div><div class="db-cal-day available">7</div><div class="db-cal-day available">8</div><div class="db-cal-day available">9</div><div class="db-cal-day available">10</div><div class="db-cal-day selected">11</div><div class="db-cal-day range">12</div>
+            <div class="db-cal-day selected">13</div><div class="db-cal-day unavailable">14</div><div class="db-cal-day unavailable">15</div><div class="db-cal-day available">16</div><div class="db-cal-day available">17</div><div class="db-cal-day available">18</div><div class="db-cal-day available">19</div>
+            <div class="db-cal-day available">20</div><div class="db-cal-day available">21</div><div class="db-cal-day available">22</div><div class="db-cal-day available">23</div><div class="db-cal-day available">24</div><div class="db-cal-day available">25</div><div class="db-cal-day available">26</div>
+            <div class="db-cal-day available">27</div><div class="db-cal-day available">28</div><div class="db-cal-day available">29</div><div class="db-cal-day available">30</div><div class="db-cal-day"></div><div class="db-cal-day"></div><div class="db-cal-day"></div>
+          </div>
+        </div>
+        <div class="db-sticky">
+          <div class="db-sticky-info">
+            <div class="db-sticky-dates">Apr 11 ��� Apr 13 · 3 days</div>
+            <div class="db-sticky-total">$1,050</div>
+          </div>
+          <button class="db-btn-white">Book Now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIRECTION C -->
+<section id="dc" class="section">
+  <h2 class="section-title">Direction C: Minimal & Structured</h2>
+  <p class="section-subtitle">Information-dense, sectioned layout, checkout-like efficiency. Everything visible, nothing wasted.</p>
+  <div style="display: flex; justify-content: center;">
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div class="dc-topbar">
+          <span class="dc-logo">RentingApp</span>
+          <span style="font-size: 13px; color: var(--neutral-500);">Equipment Rental</span>
+        </div>
+        <div class="dc-content">
+          <div class="dc-img">📷 Mini Excavator</div>
+          <div class="dc-row">
+            <span class="dc-title">Mini Excavator</span>
+            <span class="dc-price">$350/day</span>
+          </div>
+          <div class="dc-meta">
+            <div class="dc-meta-item"><div class="dc-meta-dot" style="background:var(--success)"></div> Available</div>
+            <div class="dc-meta-item">📍 Salt Lake City</div>
+            <div class="dc-meta-item">✓ Verified</div>
+          </div>
+          <div class="dc-section">
+            <div class="dc-section-head">
+              <span class="dc-section-title">📅 Select Dates — April 2026</span>
+              <span class="dc-section-action">Next ▸</span>
+            </div>
+            <div class="dc-cal-mini">
+              <div class="dc-cal-d" style="font-size:10px;color:var(--neutral-500)">S</div><div class="dc-cal-d" style="font-size:10px;color:var(--neutral-500)">M</div><div class="dc-cal-d" style="font-size:10px;color:var(--neutral-500)">T</div><div class="dc-cal-d" style="font-size:10px;color:var(--neutral-500)">W</div><div class="dc-cal-d" style="font-size:10px;color:var(--neutral-500)">T</div><div class="dc-cal-d" style="font-size:10px;color:var(--neutral-500)">F</div><div class="dc-cal-d" style="font-size:10px;color:var(--neutral-500)">S</div>
+              <div class="dc-cal-d off"></div><div class="dc-cal-d off"></div><div class="dc-cal-d off">1</div><div class="dc-cal-d off">2</div><div class="dc-cal-d off">3</div><div class="dc-cal-d off">4</div><div class="dc-cal-d avail">5</div>
+              <div class="dc-cal-d avail">6</div><div class="dc-cal-d avail">7</div><div class="dc-cal-d avail">8</div><div class="dc-cal-d avail">9</div><div class="dc-cal-d avail">10</div><div class="dc-cal-d sel">11</div><div class="dc-cal-d sel">12</div>
+              <div class="dc-cal-d off">13</div><div class="dc-cal-d off">14</div><div class="dc-cal-d off">15</div><div class="dc-cal-d avail">16</div><div class="dc-cal-d avail">17</div><div class="dc-cal-d avail">18</div><div class="dc-cal-d avail">19</div>
+              <div class="dc-cal-d avail">20</div><div class="dc-cal-d avail">21</div><div class="dc-cal-d avail">22</div><div class="dc-cal-d avail">23</div><div class="dc-cal-d avail">24</div><div class="dc-cal-d avail">25</div><div class="dc-cal-d avail">26</div>
+              <div class="dc-cal-d avail">27</div><div class="dc-cal-d avail">28</div><div class="dc-cal-d avail">29</div><div class="dc-cal-d avail">30</div><div class="dc-cal-d"></div><div class="dc-cal-d"></div><div class="dc-cal-d"></div>
+            </div>
+          </div>
+          <div class="dc-summary">
+            <div class="dc-sum-row"><span>Daily rate</span><span>$350.00</span></div>
+            <div class="dc-sum-row"><span>Duration</span><span>2 days</span></div>
+            <div class="dc-sum-row"><span>Dates</span><span>Apr 11 – 12</span></div>
+            <div class="dc-sum-row total"><span>Total</span><span>$700.00</span></div>
+          </div>
+          <button class="dc-btn">Book Now — $700</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIRECTION D -->
+<section id="dd" class="section">
+  <h2 class="section-title">Direction D: Card-Forward</h2>
+  <p class="section-subtitle">Everything in cards on a warm-tinted background. App-like modularity. DoorDash-inspired.</p>
+  <div style="display: flex; justify-content: center;">
+    <div class="phone-frame">
+      <div class="phone-screen dd-bg">
+        <div class="dd-header">
+          <span class="dd-logo">RentingApp</span>
+          <span style="font-size: 12px; color: var(--neutral-500);">✓ Verified Listing</span>
+        </div>
+        <div class="dd-content">
+          <div class="dd-card">
+            <div class="dd-card-img">
+              📷 Mini Excavator
+              <span class="dd-card-badge">Available</span>
+            </div>
+            <div class="dd-card-body">
+              <div class="dd-card-title">Mini Excavator</div>
+              <div class="dd-card-price">$350 <span>/ day</span></div>
+              <div class="dd-card-desc">CAT 303.5 Mini Excavator. Perfect for trenching, landscaping, and small projects.</div>
+            </div>
+          </div>
+          <div class="dd-card2">
+            <div class="dd-card2-title"><span class="dd-card2-icon">📅</span> Select Dates</div>
+            <div class="dd-mini-cal">
+              <div class="dd-cal-d" style="font-size:10px;color:var(--neutral-500)">S</div><div class="dd-cal-d" style="font-size:10px;color:var(--neutral-500)">M</div><div class="dd-cal-d" style="font-size:10px;color:var(--neutral-500)">T</div><div class="dd-cal-d" style="font-size:10px;color:var(--neutral-500)">W</div><div class="dd-cal-d" style="font-size:10px;color:var(--neutral-500)">T</div><div class="dd-cal-d" style="font-size:10px;color:var(--neutral-500)">F</div><div class="dd-cal-d" style="font-size:10px;color:var(--neutral-500)">S</div>
+              <div class="dd-cal-d off"></div><div class="dd-cal-d off"></div><div class="dd-cal-d off">1</div><div class="dd-cal-d off">2</div><div class="dd-cal-d off">3</div><div class="dd-cal-d off">4</div><div class="dd-cal-d avail">5</div>
+              <div class="dd-cal-d avail">6</div><div class="dd-cal-d avail">7</div><div class="dd-cal-d avail">8</div><div class="dd-cal-d avail">9</div><div class="dd-cal-d avail">10</div><div class="dd-cal-d sel">11</div><div class="dd-cal-d sel">12</div>
+              <div class="dd-cal-d off">13</div><div class="dd-cal-d off">14</div><div class="dd-cal-d off">15</div><div class="dd-cal-d avail">16</div><div class="dd-cal-d avail">17</div><div class="dd-cal-d avail">18</div><div class="dd-cal-d avail">19</div>
+              <div class="dd-cal-d avail">20</div><div class="dd-cal-d avail">21</div><div class="dd-cal-d avail">22</div><div class="dd-cal-d avail">23</div><div class="dd-cal-d avail">24</div><div class="dd-cal-d avail">25</div><div class="dd-cal-d avail">26</div>
+              <div class="dd-cal-d avail">27</div><div class="dd-cal-d avail">28</div><div class="dd-cal-d avail">29</div><div class="dd-cal-d avail">30</div><div class="dd-cal-d"></div><div class="dd-cal-d"></div><div class="dd-cal-d"></div>
+            </div>
+          </div>
+          <div class="dd-total-bar">
+            <div class="dd-total-info">
+              <div class="dd-total-label">Apr 11 – 12 · 2 days</div>
+              <div class="dd-total-amt">$700</div>
+            </div>
+            <button class="dd-btn-light">Book Now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OPERATOR DASHBOARD -->
+<section id="operator" class="section">
+  <h2 class="section-title">Operator Dashboard Directions</h2>
+  <p class="section-subtitle">Two variations: cool slate sidebar (professional) vs warm gradient sidebar (brand-forward). Both functional and compact.</p>
+
+  <div style="margin-bottom: 32px;">
+    <div class="mockup-label">Direction 1 — Cool Slate Sidebar (Stripe-like)</div>
+    <div class="desktop-frame">
+      <div class="desktop-screen">
+        <div class="op-frame">
+          <div class="op-sidebar">
+            <div class="op-sidebar-logo">🔧 RentingApp</div>
+            <div class="op-sidebar-item active"><span class="op-sidebar-icon">📊</span> Dashboard</div>
+            <div class="op-sidebar-item"><span class="op-sidebar-icon">📋</span> Listings</div>
+            <div class="op-sidebar-item"><span class="op-sidebar-icon">📅</span> Bookings</div>
+            <div class="op-sidebar-item"><span class="op-sidebar-icon">💬</span> Messages <span style="background:var(--primary);color:white;font-size:10px;padding:2px 6px;border-radius:99px;margin-left:auto;">3</span></div>
+            <div class="op-sidebar-item"><span class="op-sidebar-icon">📄</span> Contracts</div>
+            <div class="op-sidebar-item"><span class="op-sidebar-icon">⚙️</span> Settings</div>
+          </div>
+          <div class="op-main">
+            <div class="op-page-title">Dashboard</div>
+            <div class="op-page-sub">Welcome back, Clint. Here's what's happening.</div>
+            <div class="op-stats">
+              <div class="op-stat">
+                <div class="op-stat-label">Active Rentals</div>
+                <div class="op-stat-value amber">2</div>
+              </div>
+              <div class="op-stat">
+                <div class="op-stat-label">This Month</div>
+                <div class="op-stat-value">$3,150</div>
+              </div>
+              <div class="op-stat">
+                <div class="op-stat-label">Upcoming</div>
+                <div class="op-stat-value">4</div>
+              </div>
+              <div class="op-stat">
+                <div class="op-stat-label">Utilization</div>
+                <div class="op-stat-value green">68%</div>
+              </div>
+            </div>
+            <div class="op-bookings">
+              <div class="op-bookings-head">
+                <span class="op-bookings-title">Recent Bookings</span>
+                <span style="font-size:13px;color:var(--primary);cursor:pointer">View All</span>
+              </div>
+              <div class="op-booking-row">
+                <div class="op-booking-avatar">MR</div>
+                <div class="op-booking-info">
+                  <div class="op-booking-name">Marcus Rodriguez</div>
+                  <div class="op-booking-detail">Mini Excavator · Apr 11–12</div>
+                </div>
+                <span class="op-booking-status confirmed">Confirmed</span>
+                <span class="op-booking-amt">$700</span>
+              </div>
+              <div class="op-booking-row">
+                <div class="op-booking-avatar">JT</div>
+                <div class="op-booking-info">
+                  <div class="op-booking-name">Jake Thompson</div>
+                  <div class="op-booking-detail">Mini Excavator · Apr 7–9</div>
+                </div>
+                <span class="op-booking-status active">Active</span>
+                <span class="op-booking-amt">$1,050</span>
+              </div>
+              <div class="op-booking-row">
+                <div class="op-booking-avatar">SL</div>
+                <div class="op-booking-info">
+                  <div class="op-booking-name">Sarah Lopez</div>
+                  <div class="op-booking-detail">Mini Excavator · Apr 16–18</div>
+                </div>
+                <span class="op-booking-status confirmed">Confirmed</span>
+                <span class="op-booking-amt">$1,050</span>
+              </div>
+              <div class="op-booking-row">
+                <div class="op-booking-avatar">DW</div>
+                <div class="op-booking-info">
+                  <div class="op-booking-name">David Wilson</div>
+                  <div class="op-booking-detail">Mini Excavator · Apr 5–6</div>
+                </div>
+                <span class="op-booking-status returning">Return Due</span>
+                <span class="op-booking-amt">$700</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="mockup-label">Direction 2 — Warm Gradient Sidebar (Brand-forward)</div>
+    <div class="desktop-frame">
+      <div class="desktop-screen">
+        <div class="op-frame">
+          <div class="op-sidebar op2-sidebar">
+            <div class="op-sidebar-logo">🔧 RentingApp</div>
+            <div class="op-sidebar-item op2-sidebar-item active"><span class="op-sidebar-icon">📊</span> Dashboard</div>
+            <div class="op-sidebar-item"><span class="op-sidebar-icon">📋</span> Listings</div>
+            <div class="op-sidebar-item"><span class="op-sidebar-icon">📅</span> Bookings</div>
+            <div class="op-sidebar-item"><span class="op-sidebar-icon">💬</span> Messages <span style="background:var(--primary-light);color:var(--primary-dark);font-size:10px;padding:2px 6px;border-radius:99px;margin-left:auto;">3</span></div>
+            <div class="op-sidebar-item"><span class="op-sidebar-icon">📄</span> Contracts</div>
+            <div class="op-sidebar-item"><span class="op-sidebar-icon">⚙️</span> Settings</div>
+          </div>
+          <div class="op-main">
+            <div class="op-page-title">Dashboard</div>
+            <div class="op-page-sub">Welcome back, Clint. Here's what's happening.</div>
+            <div class="op-stats">
+              <div class="op-stat">
+                <div class="op-stat-label">Active Rentals</div>
+                <div class="op-stat-value amber">2</div>
+              </div>
+              <div class="op-stat">
+                <div class="op-stat-label">This Month</div>
+                <div class="op-stat-value">$3,150</div>
+              </div>
+              <div class="op-stat">
+                <div class="op-stat-label">Upcoming</div>
+                <div class="op-stat-value">4</div>
+              </div>
+              <div class="op-stat">
+                <div class="op-stat-label">Utilization</div>
+                <div class="op-stat-value green">68%</div>
+              </div>
+            </div>
+            <div class="op-bookings">
+              <div class="op-bookings-head">
+                <span class="op-bookings-title">Recent Bookings</span>
+                <span style="font-size:13px;color:var(--primary);cursor:pointer">View All</span>
+              </div>
+              <div class="op-booking-row">
+                <div class="op-booking-avatar">MR</div>
+                <div class="op-booking-info">
+                  <div class="op-booking-name">Marcus Rodriguez</div>
+                  <div class="op-booking-detail">Mini Excavator · Apr 11–12</div>
+                </div>
+                <span class="op-booking-status confirmed">Confirmed</span>
+                <span class="op-booking-amt">$700</span>
+              </div>
+              <div class="op-booking-row">
+                <div class="op-booking-avatar">JT</div>
+                <div class="op-booking-info">
+                  <div class="op-booking-name">Jake Thompson</div>
+                  <div class="op-booking-detail">Mini Excavator · Apr 7–9</div>
+                </div>
+                <span class="op-booking-status active">Active</span>
+                <span class="op-booking-amt">$1,050</span>
+              </div>
+              <div class="op-booking-row">
+                <div class="op-booking-avatar">SL</div>
+                <div class="op-booking-info">
+                  <div class="op-booking-name">Sarah Lopez</div>
+                  <div class="op-booking-detail">Mini Excavator · Apr 16–18</div>
+                </div>
+                <span class="op-booking-status confirmed">Confirmed</span>
+                <span class="op-booking-amt">$1,050</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SMS COMMUNICATION -->
+<section id="sms" class="section">
+  <h2 class="section-title">SMS Communication Flow</h2>
+  <p class="section-subtitle">How automated SMS messages feel to renters throughout the booking lifecycle.</p>
+
+  <div class="compare-grid">
+    <div class="compare-card">
+      <h3>Booking Confirmation</h3>
+      <span class="tag">Instant</span>
+      <div class="sms-frame" style="margin-top: 16px;">
+        <div class="sms-time">Today, 2:34 PM</div>
+        <div class="sms-bubble-in">
+          ✅ <strong>Booking Confirmed!</strong><br><br>
+          Mini Excavator<br>
+          📅 Apr 11–12 (2 days)<br>
+          💰 $700 hold placed<br><br>
+          📍 Pickup: 1234 Industrial Way, SLC<br>
+          ⏰ Available from 7:00 AM<br><br>
+          Manage your rental: <span class="sms-link" style="color:var(--primary)">rent.app/my</span>
+        </div>
+      </div>
+    </div>
+    <div class="compare-card">
+      <h3>Return Reminder</h3>
+      <span class="tag">Day-of</span>
+      <div class="sms-frame" style="margin-top: 16px;">
+        <div class="sms-time">Apr 12, 8:00 AM</div>
+        <div class="sms-bubble-in">
+          📋 <strong>Return Reminder</strong><br><br>
+          Your Mini Excavator rental ends today.<br><br>
+          Return to: 1234 Industrial Way, SLC<br>
+          By: 6:00 PM<br><br>
+          Need more time? Extend up to 4 days: <span class="sms-link" style="color:var(--primary)">rent.app/my</span>
+        </div>
+      </div>
+    </div>
+    <div class="compare-card">
+      <h3>Extension Confirmed</h3>
+      <span class="tag">Self-service</span>
+      <div class="sms-frame" style="margin-top: 16px;">
+        <div class="sms-time">Apr 12, 9:15 AM</div>
+        <div class="sms-bubble-in">
+          ✅ <strong>Rental Extended!</strong><br><br>
+          Mini Excavator<br>
+          📅 New return: Apr 13<br>
+          💰 Updated hold: $1,050<br><br>
+          Manage your rental: <span class="sms-link" style="color:var(--primary)">rent.app/my</span>
+        </div>
+      </div>
+    </div>
+    <div class="compare-card">
+      <h3>Operator Notification</h3>
+      <span class="tag">Real-time</span>
+      <div class="sms-frame" style="margin-top: 16px;">
+        <div class="sms-time">Today, 2:34 PM</div>
+        <div class="sms-bubble-in">
+          🎉 <strong>New Booking!</strong><br><br>
+          Mini Excavator<br>
+          Renter: Marcus R.<br>
+          📅 Apr 11–12<br>
+          💰 $700 held<br>
+          📄 Contract signed<br><br>
+          View details: <span class="sms-link" style="color:var(--primary)">rent.app/dash</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MANAGE MY RENTAL -->
+<section id="manage" class="section">
+  <h2 class="section-title">Manage My Rental Dashboard</h2>
+  <p class="section-subtitle">The renter's self-service portal accessed via SMS links. View rentals, extend, cancel, check-in equipment.</p>
+  <div style="display: flex; justify-content: center;">
+    <div class="phone-frame">
+      <div class="phone-screen" style="background: var(--neutral-100);">
+        <div class="mr-header">
+          <div class="mr-logo">RentingApp</div>
+          <div style="font-size: 13px; color: var(--neutral-500); margin-top: 2px;">My Rentals</div>
+        </div>
+        <div class="mr-content">
+          <div class="mr-card">
+            <div class="mr-card-top">
+              <div class="mr-card-thumb"></div>
+              <div class="mr-card-info">
+                <div class="mr-card-equip">Mini Excavator</div>
+                <div class="mr-card-dates">Apr 11–12 · 2 days · $700</div>
+                <div class="mr-card-status">
+                  <span class="op-booking-status active">Active — Return Today</span>
+                </div>
+              </div>
+            </div>
+            <div class="mr-card-actions">
+              <button class="mr-btn-primary">Extend Rental</button>
+              <button class="mr-btn-secondary">Check In</button>
+            </div>
+          </div>
+          <div class="mr-card">
+            <div class="mr-card-top">
+              <div class="mr-card-thumb"></div>
+              <div class="mr-card-info">
+                <div class="mr-card-equip">Mini Excavator</div>
+                <div class="mr-card-dates">Mar 20–21 · 2 days · $700</div>
+                <div class="mr-card-status">
+                  <span class="op-booking-status" style="background: var(--neutral-100); color: var(--neutral-500);">Completed</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>

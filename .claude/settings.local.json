@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(bd version:*)",
+      "Bash(export PATH=\"$PATH:/c/Users/clint/AppData/Local/Programs/bd\")",
+      "Bash(bd init:*)",
+      "Bash(where dolt:*)",
+      "Bash(dolt version:*)",
+      "Bash(choco install:*)",
+      "Bash(curl -s https://registry.npmjs.org/next/latest)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d.get\\(''''version'''',''''unknown''''\\)\\)\")",
+      "Bash(curl -s https://registry.npmjs.org/create-next-app/latest)",
+      "Bash(npx create-next-app@latest --help)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "Read(//c/Users/clint/OneDrive/Documents/Code/**)",
+      "Bash(npx create-next-app@latest rentingapp-temp -e with-supabase --use-npm)",
+      "Bash(npm install:*)",
+      "Bash(find C:/Users/clint/OneDrive/Documents/Code/rentingapp/node_modules -name *env-spec* -type d)",
+      "Bash(npm test:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)",
+      "Bash(NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder-anon-key npm run build)",
+      "Bash(npx varlock:*)"
+    ]
+  }
+}

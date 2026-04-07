@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+
+# Environment variables
+.env
+.env.local
+.env*.local
+
+# Supabase local
+supabase/.temp/
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Beads / Dolt files
+.dolt/
+*.db
+.beads-credential-key
+
+# IDE
+.vscode/
+.idea/

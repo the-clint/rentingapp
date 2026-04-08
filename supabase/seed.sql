@@ -1,0 +1,2 @@
+-- RentingApp dev seed data
+-- Add seed data for local development here

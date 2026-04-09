@@ -2,22 +2,52 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { hasEnvVars } from "../utils";
 
+function copyCookies(from: NextResponse, to: NextResponse): void {
+  from.cookies.getAll().forEach(({ name, value, ...options }) => {
+    to.cookies.set(name, value, options);
+  });
+}
+
+const PUBLIC_ROUTES = ["/", "/auth", "/book"];
+
+function isPublicRoute(pathname: string): boolean {
+  return PUBLIC_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`),
+  );
+}
+
+function isOperatorRoute(pathname: string): boolean {
+  // Next.js route groups like (operator) resolve to their child paths.
+  // Operator routes: /dashboard, /listings, /bookings, /messages, /settings
+  const operatorPrefixes = [
+    "/dashboard",
+    "/listings",
+    "/bookings",
+    "/messages",
+    "/settings",
+  ];
+  return operatorPrefixes.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+}
+
+function isAuthRoute(pathname: string): boolean {
+  return pathname.startsWith("/auth");
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   });
 
-  // If the env vars are not set, skip proxy check. You can remove this
-  // once you setup the project.
+  // If the env vars are not set, skip proxy check.
   if (!hasEnvVars) {
     return supabaseResponse;
   }
 
-  // With Fluid compute, don't put this client in a global environment
-  // variable. Always create a new one on each request.
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
     {
       cookies: {
         getAll() {
@@ -41,36 +71,52 @@ export async function updateSession(request: NextRequest) {
   // Do not run code between createServerClient and
   // supabase.auth.getClaims(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
-
-  // IMPORTANT: If you remove getClaims() and you use server-side rendering
-  // with the Supabase client, your users may be randomly logged out.
   const { data } = await supabase.auth.getClaims();
-  const user = data?.claims;
+  const claims = data?.claims;
+  const pathname = request.nextUrl.pathname;
 
-  if (
-    request.nextUrl.pathname !== "/" &&
-    !user &&
-    !request.nextUrl.pathname.startsWith("/login") &&
-    !request.nextUrl.pathname.startsWith("/auth")
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
+  // Public routes: always accessible
+  if (isPublicRoute(pathname)) {
+    // Authenticated operators on auth pages → redirect to dashboard
+    if (isAuthRoute(pathname) && claims) {
+      const role =
+        (claims as Record<string, unknown>).user_role ??
+        ((claims as Record<string, unknown>).app_metadata as Record<string, unknown> | undefined)?.role;
+      if (role === "operator") {
+        const url = request.nextUrl.clone();
+        url.pathname = "/dashboard";
+        const redirectResponse = NextResponse.redirect(url);
+        copyCookies(supabaseResponse, redirectResponse);
+        return redirectResponse;
+      }
+    }
+    return supabaseResponse;
+  }
+
+  // Protected routes: require authentication
+  if (!claims) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
-    return NextResponse.redirect(url);
+    const redirectResponse = NextResponse.redirect(url);
+    copyCookies(supabaseResponse, redirectResponse);
+    return redirectResponse;
+  }
+
+  // Role-based protection for operator routes
+  if (isOperatorRoute(pathname)) {
+    const role =
+      (claims as Record<string, unknown>).user_role ??
+      ((claims as Record<string, unknown>).app_metadata as Record<string, unknown> | undefined)?.role;
+    if (role !== "operator") {
+      // Non-operator users cannot access operator routes
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      const redirectResponse = NextResponse.redirect(url);
+      copyCookies(supabaseResponse, redirectResponse);
+      return redirectResponse;
+    }
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.
-  // If you're creating a new response object with NextResponse.next() make sure to:
-  // 1. Pass the request in it, like so:
-  //    const myNewResponse = NextResponse.next({ request })
-  // 2. Copy over the cookies, like so:
-  //    myNewResponse.cookies.setAll(supabaseResponse.cookies.getAll())
-  // 3. Change the myNewResponse object to fit your needs, but avoid changing
-  //    the cookies!
-  // 4. Finally:
-  //    return myNewResponse
-  // If this is not done, you may be causing the browser and server to go out
-  // of sync and terminate the user's session prematurely!
-
   return supabaseResponse;
 }

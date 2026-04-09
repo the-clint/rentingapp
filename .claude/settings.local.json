@@ -22,7 +22,9 @@
       "Bash(npx tsc:*)",
       "Bash(npm run:*)",
       "Bash(NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder-anon-key npm run build)",
-      "Bash(npx varlock:*)"
+      "Bash(npx varlock:*)",
+      "Bash(npx next:*)",
+      "Bash(npx vitest:*)"
     ]
   }
 }

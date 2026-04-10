@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-06
-last_updated: 2026-04-09
+last_updated: 2026-04-10
 project: rentingapp
 # Updated: story 1-1 moved to ready-for-dev, epic-1 moved to in-progress
 project_key: NOKEY
@@ -61,8 +61,8 @@ development_status:
   epic-2-retrospective: optional
 
   # Epic 3: Renter Booking Flow
-  epic-3: backlog
-  3-1-renter-listing-page-and-photo-carousel: backlog
+  epic-3: in-progress
+  3-1-renter-listing-page-and-photo-carousel: done
   3-2-availability-calendar-renter-mode-and-date-selection: backlog
   3-3-renter-phone-otp-authentication: backlog
   3-4-digital-contract-signing: backlog

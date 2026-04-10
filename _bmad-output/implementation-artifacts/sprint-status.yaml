@@ -37,7 +37,7 @@
 generated: 2026-04-06
 last_updated: 2026-04-10
 project: rentingapp
-# Updated: story 3-4 moved to done (digital contract signing)
+# Updated: story 3-5 moved to done (Stripe payment hold & booking confirmation)
 project_key: NOKEY
 tracking_system: file-system
 story_location: "{project-root}/_bmad-output/implementation-artifacts"
@@ -66,7 +66,7 @@ development_status:
   3-2-availability-calendar-renter-mode-and-date-selection: done
   3-3-renter-phone-otp-authentication: done
   3-4-digital-contract-signing: done
-  3-5-stripe-payment-hold-and-booking-confirmation: backlog
+  3-5-stripe-payment-hold-and-booking-confirmation: done
   3-6-booking-flow-state-persistence: backlog
   epic-3-retrospective: optional
 

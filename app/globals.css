@@ -135,3 +135,18 @@
     outline-color: hsl(var(--primary-dark));
   }
 }
+
+@layer utilities {
+  /* Diagonal hatch pattern for `operator_block` cells in the availability
+     calendar. Complements the text color / label so the state is
+     distinguishable without relying on color alone (Story 2.2 a11y). */
+  .availability-hatch {
+    background-image: repeating-linear-gradient(
+      135deg,
+      hsl(var(--primary-dark) / 0.18) 0,
+      hsl(var(--primary-dark) / 0.18) 4px,
+      transparent 4px,
+      transparent 8px
+    );
+  }
+}

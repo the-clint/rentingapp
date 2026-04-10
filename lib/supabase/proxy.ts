@@ -8,31 +8,42 @@ function copyCookies(from: NextResponse, to: NextResponse): void {
   });
 }
 
-const PUBLIC_ROUTES = ["/", "/auth", "/book"];
+export const PUBLIC_ROUTES = ["/", "/auth", "/book"] as const;
 
-function isPublicRoute(pathname: string): boolean {
+// Operator routes (Next.js route groups like (operator) resolve to their child paths).
+export const OPERATOR_PREFIXES = [
+  "/dashboard",
+  "/listings",
+  "/bookings",
+  "/messages",
+  "/settings",
+  "/more",
+] as const;
+
+export function isPublicRoute(pathname: string): boolean {
   return PUBLIC_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`),
   );
 }
 
-function isOperatorRoute(pathname: string): boolean {
-  // Next.js route groups like (operator) resolve to their child paths.
-  // Operator routes: /dashboard, /listings, /bookings, /messages, /settings
-  const operatorPrefixes = [
-    "/dashboard",
-    "/listings",
-    "/bookings",
-    "/messages",
-    "/settings",
-  ];
-  return operatorPrefixes.some(
+export function isOperatorRoute(pathname: string): boolean {
+  return OPERATOR_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
 }
 
-function isAuthRoute(pathname: string): boolean {
+export function isAuthRoute(pathname: string): boolean {
   return pathname.startsWith("/auth");
+}
+
+interface JwtClaims {
+  user_role?: string;
+}
+
+function getUserRole(claims: unknown): string | undefined {
+  if (!claims || typeof claims !== "object") return undefined;
+  const role = (claims as JwtClaims).user_role;
+  return typeof role === "string" ? role : undefined;
 }
 
 export async function updateSession(request: NextRequest) {
@@ -79,10 +90,7 @@ export async function updateSession(request: NextRequest) {
   if (isPublicRoute(pathname)) {
     // Authenticated operators on auth pages → redirect to dashboard
     if (isAuthRoute(pathname) && claims) {
-      const role =
-        (claims as Record<string, unknown>).user_role ??
-        ((claims as Record<string, unknown>).app_metadata as Record<string, unknown> | undefined)?.role;
-      if (role === "operator") {
+      if (getUserRole(claims) === "operator") {
         const url = request.nextUrl.clone();
         url.pathname = "/dashboard";
         const redirectResponse = NextResponse.redirect(url);
@@ -104,10 +112,7 @@ export async function updateSession(request: NextRequest) {
 
   // Role-based protection for operator routes
   if (isOperatorRoute(pathname)) {
-    const role =
-      (claims as Record<string, unknown>).user_role ??
-      ((claims as Record<string, unknown>).app_metadata as Record<string, unknown> | undefined)?.role;
-    if (role !== "operator") {
+    if (getUserRole(claims) !== "operator") {
       // Non-operator users cannot access operator routes
       const url = request.nextUrl.clone();
       url.pathname = "/";

@@ -1,7 +1,6 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { ok, err, type Result } from "@/lib/utils/result";
 import {
   signUpSchema,
@@ -51,19 +50,17 @@ export async function signUp(formData: FormData): Promise<Result<{ userId: strin
     return err("SIGNUP_ERROR", "Failed to create user");
   }
 
-  // Set app_metadata.role via admin client (cannot be set client-side)
-  const admin = createAdminClient();
-  const { error: adminError } = await admin.auth.admin.updateUserById(
-    data.user.id,
-    { app_metadata: { role: "operator" } },
-  );
-
-  if (adminError) {
-    // Clean up the orphaned auth user to prevent inconsistent state
-    await admin.auth.admin.deleteUser(data.user.id);
-    return err("ROLE_ASSIGNMENT_ERROR", adminError.message);
-  }
-
+  // Role assignment: handled entirely in Postgres.
+  //   1. The `on_auth_user_created` trigger inserts a `public.profiles` row
+  //      with role='operator' (see migration 00002_profiles-and-auth.sql).
+  //   2. The `custom_access_token_hook` reads `profiles.role` and injects it
+  //      as the `user_role` JWT claim on every token issuance — including
+  //      this signup's initial token, since the hook runs after the trigger.
+  //
+  // DEPLOYMENT PREREQUISITE: the custom access token hook MUST be enabled in
+  // Supabase Dashboard > Authentication > Hooks, pointing at
+  // `public.custom_access_token_hook`. Without it, no token will carry a role
+  // claim and `proxy.ts` will reject every operator-route request.
   return ok({ userId: data.user.id });
 }
 

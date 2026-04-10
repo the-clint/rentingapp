@@ -37,7 +37,7 @@
 generated: 2026-04-06
 last_updated: 2026-04-10
 project: rentingapp
-# Updated: story 3-3 moved to done (renter phone OTP authentication)
+# Updated: story 3-4 moved to done (digital contract signing)
 project_key: NOKEY
 tracking_system: file-system
 story_location: "{project-root}/_bmad-output/implementation-artifacts"
@@ -65,7 +65,7 @@ development_status:
   3-1-renter-listing-page-and-photo-carousel: done
   3-2-availability-calendar-renter-mode-and-date-selection: done
   3-3-renter-phone-otp-authentication: done
-  3-4-digital-contract-signing: backlog
+  3-4-digital-contract-signing: done
   3-5-stripe-payment-hold-and-booking-confirmation: backlog
   3-6-booking-flow-state-persistence: backlog
   epic-3-retrospective: optional

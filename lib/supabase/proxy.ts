@@ -8,7 +8,7 @@ function copyCookies(from: NextResponse, to: NextResponse): void {
   });
 }
 
-export const PUBLIC_ROUTES = ["/", "/auth", "/book"] as const;
+export const PUBLIC_ROUTES = ["/", "/auth", "/book", "/rentals/verify"] as const;
 
 // Operator routes (Next.js route groups like (operator) resolve to their child paths).
 export const OPERATOR_PREFIXES = [
@@ -46,10 +46,24 @@ export function isRenterProtectedBookingRoute(pathname: string): boolean {
   );
 }
 
+/**
+ * Manage-my-rental dashboard (Story 4-1). `/rentals` and everything
+ * under it require a renter session — EXCEPT `/rentals/verify`, which
+ * is the OTP entry point and is listed in `PUBLIC_ROUTES` above.
+ */
+export function isRenterDashboardRoute(pathname: string): boolean {
+  if (pathname === "/rentals/verify") return false;
+  if (pathname.startsWith("/rentals/verify/")) return false;
+  return pathname === "/rentals" || pathname.startsWith("/rentals/");
+}
+
 export function isPublicRoute(pathname: string): boolean {
   // Renter-protected booking sub-paths are NOT public even though `/book` is
   // in the public allowlist. Check the exclusion first.
   if (isRenterProtectedBookingRoute(pathname)) return false;
+  // Similarly, `/rentals` and its sub-paths are renter-gated even though
+  // `/rentals/verify` is public (Story 4-1).
+  if (isRenterDashboardRoute(pathname)) return false;
   return PUBLIC_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`),
   );
@@ -156,6 +170,20 @@ export async function updateSession(request: NextRequest) {
   // `user_role = 'renter'` (set by the custom access token hook in migration
   // 00006 for phone-only auth.users rows).
   if (isRenterProtectedBookingRoute(pathname)) {
+    if (getUserRole(claims) !== "renter") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      const redirectResponse = NextResponse.redirect(url);
+      copyCookies(supabaseResponse, redirectResponse);
+      return redirectResponse;
+    }
+  }
+
+  // Story 4-1: manage-my-rental dashboard (`/rentals` + sub-paths other
+  // than `/rentals/verify`) is renter-only. Unauthenticated callers are
+  // caught by the `!claims` branch above and redirected to `/auth/login`;
+  // authenticated non-renters are bounced home.
+  if (isRenterDashboardRoute(pathname)) {
     if (getUserRole(claims) !== "renter") {
       const url = request.nextUrl.clone();
       url.pathname = "/";

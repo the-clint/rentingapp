@@ -2,8 +2,11 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { MapPin } from "lucide-react";
 
+import { BookingFlow } from "@/components/booking/booking-flow";
 import { ListingPhotoCarousel } from "@/components/booking/listing-photo-carousel";
+import { fetchPublicAvailability } from "@/lib/services/public-availability";
 import { fetchPublicListing } from "@/lib/services/public-listing";
+import { toDateKey } from "@/lib/utils/date-range";
 
 interface BookingPageProps {
   params: Promise<{ listingId: string }>;
@@ -25,6 +28,21 @@ async function BookingPageBody({ params }: BookingPageProps) {
 
   const listing = result.data;
   const photos = listing.photos.map((p) => ({ path: p.path, url: p.url }));
+
+  // Current-month window for the initial server-rendered availability paint.
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const monthZeroIndexed = now.getUTCMonth();
+  const startKey = toDateKey(new Date(Date.UTC(year, monthZeroIndexed, 1)));
+  const endKey = toDateKey(new Date(Date.UTC(year, monthZeroIndexed + 1, 0)));
+  const availabilityResult = await fetchPublicAvailability({
+    listingId: listing.id,
+    startDate: startKey,
+    endDate: endKey,
+  });
+  const initialAvailability = availabilityResult.success
+    ? availabilityResult.data
+    : [];
 
   return (
     <div className="mx-auto flex max-w-[480px] flex-col gap-space-5 px-space-4 py-space-6">
@@ -52,6 +70,14 @@ async function BookingPageBody({ params }: BookingPageProps) {
           {listing.description}
         </p>
       </div>
+
+      <BookingFlow
+        listingId={listing.id}
+        dailyRateCents={listing.dailyRateCents}
+        initialAvailability={initialAvailability}
+        initialYear={year}
+        initialMonthZeroIndexed={monthZeroIndexed}
+      />
     </div>
   );
 }

@@ -63,7 +63,7 @@ development_status:
   # Epic 3: Renter Booking Flow
   epic-3: in-progress
   3-1-renter-listing-page-and-photo-carousel: done
-  3-2-availability-calendar-renter-mode-and-date-selection: backlog
+  3-2-availability-calendar-renter-mode-and-date-selection: done
   3-3-renter-phone-otp-authentication: backlog
   3-4-digital-contract-signing: backlog
   3-5-stripe-payment-hold-and-booking-confirmation: backlog

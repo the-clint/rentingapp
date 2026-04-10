@@ -149,4 +149,35 @@
       transparent 8px
     );
   }
+
+  /* 400ms horizontal shake for invalid OTP entry (Story 3.3). Used by the
+     renter OTP flow error path. Only runs when the user does not have
+     `prefers-reduced-motion` set. */
+  @keyframes otp-shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20% {
+      transform: translateX(-6px);
+    }
+    40% {
+      transform: translateX(6px);
+    }
+    60% {
+      transform: translateX(-4px);
+    }
+    80% {
+      transform: translateX(4px);
+    }
+  }
+
+  .animate-otp-shake {
+    animation: otp-shake 400ms ease-in-out;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-otp-shake {
+      animation: none;
+    }
+  }
 }

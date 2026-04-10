@@ -21,6 +21,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import {
   BookingStickyBar,
@@ -157,6 +158,7 @@ export function BookingFlow({
   availabilityRef.current = availability;
 
   const selection = useBookingDateSelection();
+  const router = useRouter();
 
   const minMonthKey = useMemo(() => computeMinMonthKey(), []);
 
@@ -350,8 +352,14 @@ export function BookingFlow({
         totalCents={totalCents}
         isVisible={selection.startDate != null}
         onBookNow={() => {
-          // Story 3-3 hookup — for now, no-op. The button being enabled is
-          // what Story 3-2 asserts; the actual navigation target is Story 3-3.
+          // Story 3-3 hookup: navigate to the phone-OTP verify step,
+          // carrying the selected start/end dates through the URL so
+          // the downstream flow (contract, payment) can pick them up.
+          if (!selection.startDate || !selection.endDate) return;
+          const params = new URLSearchParams();
+          params.set("start", selection.startDate);
+          params.set("end", selection.endDate);
+          router.push(`/book/${listingId}/verify?${params.toString()}`);
         }}
       />
     </div>

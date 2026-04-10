@@ -115,6 +115,36 @@ describe("PaymentHoldForm", () => {
     expect(pushMock).not.toHaveBeenCalled();
   });
 
+  it("routes to /verify?returnTo=... on SESSION_EXPIRED from the Server Action", async () => {
+    confirmBookingAfterPaymentMock.mockResolvedValueOnce({
+      success: false,
+      error: { code: "SESSION_EXPIRED", message: "expired" },
+    });
+    const originalLocation = window.location;
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      value: {
+        ...originalLocation,
+        origin: "http://localhost",
+        pathname: "/book/listing-1/payment",
+        search: "?bookingId=booking-1",
+      },
+    });
+
+    renderForm();
+    fireEvent.click(screen.getByTestId("confirm-hold-button"));
+    await waitFor(() =>
+      expect(pushMock).toHaveBeenCalledWith(
+        `/book/listing-1/verify?returnTo=${encodeURIComponent("/book/listing-1/payment?bookingId=booking-1")}`,
+      ),
+    );
+
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      value: originalLocation,
+    });
+  });
+
   it("surfaces BOOKING_CONFLICT error from the Server Action", async () => {
     confirmBookingAfterPaymentMock.mockResolvedValueOnce({
       success: false,

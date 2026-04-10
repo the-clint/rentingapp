@@ -3,7 +3,10 @@ import { redirect } from "next/navigation";
 
 import { BookingStepIndicator } from "@/components/booking/booking-step-indicator";
 import { ContractSigningFlow } from "@/components/booking/contract-signing-flow";
+import { ResumeBanner } from "@/components/booking/resume-banner";
 import { createContractDraft } from "@/lib/actions/contract-actions";
+import { getBookingFlowResumePoint } from "@/lib/services/booking-flow-state";
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * Renter contract step (Story 3-4).
@@ -25,15 +28,50 @@ import { createContractDraft } from "@/lib/actions/contract-actions";
 
 interface ContractPageProps {
   params: Promise<{ listingId: string }>;
-  searchParams: Promise<{ start?: string; end?: string }>;
+  searchParams: Promise<{ start?: string; end?: string; resumed?: string }>;
 }
 
 async function ContractPageBody({ params, searchParams }: ContractPageProps) {
   const { listingId } = await params;
-  const { start, end } = await searchParams;
+  const { start, end, resumed } = await searchParams;
 
   if (!start || !end) {
     redirect(`/book/${listingId}`);
+  }
+
+  // Story 3-6: if the renter has already moved past the contract step
+  // (pending_payment or confirmed booking for these exact dates), jump
+  // them forward. If their OTP session has expired, bounce through
+  // verify with a signed returnTo.
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    const returnTo = `/book/${listingId}/contract?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
+    redirect(
+      `/book/${listingId}/verify?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}&returnTo=${encodeURIComponent(returnTo)}`,
+    );
+  }
+
+  const resume = await getBookingFlowResumePoint({
+    renterId: user.id,
+    listingId,
+    startDate: start,
+    endDate: end,
+  });
+  if (resume.success) {
+    if (resume.data.step === "confirmed" && resume.data.bookingId) {
+      redirect(
+        `/book/${listingId}/confirmed?bookingId=${encodeURIComponent(resume.data.bookingId)}&resumed=1`,
+      );
+    }
+    if (resume.data.step === "payment" && resume.data.bookingId) {
+      redirect(
+        `/book/${listingId}/payment?bookingId=${encodeURIComponent(resume.data.bookingId)}&resumed=1`,
+      );
+    }
   }
 
   const draft = await createContractDraft({
@@ -42,9 +80,17 @@ async function ContractPageBody({ params, searchParams }: ContractPageProps) {
     endDate: end,
   });
 
+  const preservedQuery = `start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
+
   return (
     <div className="mx-auto flex max-w-[560px] flex-col gap-space-6 px-space-4 py-space-6">
       <BookingStepIndicator currentStep="contract" />
+      {resumed === "1" ? (
+        <ResumeBanner
+          pathname={`/book/${listingId}/contract`}
+          preservedQuery={preservedQuery}
+        />
+      ) : null}
       {draft.success ? (
         <ContractSigningFlow
           listingId={listingId}

@@ -37,7 +37,7 @@
 generated: 2026-04-06
 last_updated: 2026-04-10
 project: rentingapp
-# Updated: story 3-5 moved to done (Stripe payment hold & booking confirmation)
+# Updated: story 3-6 done, epic 3 done (booking flow state persistence)
 project_key: NOKEY
 tracking_system: file-system
 story_location: "{project-root}/_bmad-output/implementation-artifacts"
@@ -61,13 +61,13 @@ development_status:
   epic-2-retrospective: optional
 
   # Epic 3: Renter Booking Flow
-  epic-3: in-progress
+  epic-3: done
   3-1-renter-listing-page-and-photo-carousel: done
   3-2-availability-calendar-renter-mode-and-date-selection: done
   3-3-renter-phone-otp-authentication: done
   3-4-digital-contract-signing: done
   3-5-stripe-payment-hold-and-booking-confirmation: done
-  3-6-booking-flow-state-persistence: backlog
+  3-6-booking-flow-state-persistence: done
   epic-3-retrospective: optional
 
   # Epic 4: Renter Self-Service (Manage-My-Rental)

@@ -41,6 +41,7 @@ import { ok, err, type Result } from "@/lib/utils/result";
 export type ContractError =
   | { code: "CONTRACT_INVALID_INPUT"; message: string }
   | { code: "CONTRACT_UNAUTHENTICATED"; message: string }
+  | { code: "SESSION_EXPIRED"; message: string }
   | { code: "CONTRACT_FORBIDDEN"; message: string }
   | { code: "CONTRACT_LISTING_NOT_FOUND"; message: string }
   | { code: "CONTRACT_NOT_FOUND"; message: string }
@@ -266,9 +267,13 @@ export async function signContract(
 
   const session = await getRenterSession();
   if (!session) {
+    // Story 3-6: the contract-signing client entered this action from
+    // an authenticated screen — an unauthenticated response here means
+    // the Supabase session expired mid-flow. Surface a distinct code
+    // so the client can bounce the renter through /verify?returnTo=...
     return err(
-      "CONTRACT_UNAUTHENTICATED",
-      "You must verify your phone before signing a contract",
+      "SESSION_EXPIRED",
+      "Your session expired. Please re-verify your phone to continue.",
     );
   }
 

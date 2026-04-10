@@ -138,6 +138,37 @@ describe("ContractSigningFlow", () => {
     expect(pushMock).not.toHaveBeenCalled();
   });
 
+  it("routes to /verify?returnTo=... on SESSION_EXPIRED", async () => {
+    signContractMock.mockResolvedValue({
+      success: false,
+      error: { code: "SESSION_EXPIRED", message: "expired" },
+    });
+    const originalLocation = window.location;
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      value: {
+        ...originalLocation,
+        pathname: "/book/listing-1/contract",
+        search: "?start=2026-05-01&end=2026-05-03",
+      },
+    });
+
+    renderFlow();
+    fireEvent.click(screen.getByTestId("agree-checkbox"));
+    fireEvent.click(screen.getByTestId("sign-button"));
+
+    await waitFor(() =>
+      expect(pushMock).toHaveBeenCalledWith(
+        `/book/listing-1/verify?returnTo=${encodeURIComponent("/book/listing-1/contract?start=2026-05-01&end=2026-05-03")}`,
+      ),
+    );
+
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      value: originalLocation,
+    });
+  });
+
   it("renders a generic error on other failures", async () => {
     signContractMock.mockResolvedValue({
       success: false,

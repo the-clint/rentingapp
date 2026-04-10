@@ -34,6 +34,7 @@ import { ok, err, type Result } from "@/lib/utils/result";
 
 export type PaymentError =
   | { code: "PAYMENT_UNAUTHENTICATED"; message: string }
+  | { code: "SESSION_EXPIRED"; message: string }
   | { code: "PAYMENT_FORBIDDEN"; message: string }
   | { code: "PAYMENT_BOOKING_NOT_FOUND"; message: string }
   | { code: "PAYMENT_INVALID_STATUS"; message: string }
@@ -296,9 +297,14 @@ export async function confirmBookingAfterPayment(
 
   const session = await getRenterSession();
   if (!session) {
+    // Story 3-6: the PaymentHoldForm client entered this action from
+    // a page that required a session. Losing it here means the
+    // Supabase cookie expired while the renter was on the Stripe
+    // Elements screen. Return a distinct code the client can map to
+    // a /verify?returnTo=... bounce.
     return err(
-      "PAYMENT_UNAUTHENTICATED",
-      "You must verify your phone to confirm this booking",
+      "SESSION_EXPIRED",
+      "Your session expired. Please re-verify your phone to continue.",
     );
   }
 

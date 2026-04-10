@@ -433,7 +433,7 @@ describe("signContract", () => {
     expect(mockState.insertedBooking).toBeNull();
   });
 
-  it("rejects when the renter has no active session", async () => {
+  it("returns SESSION_EXPIRED when the renter session dropped mid-flow (Story 3-6)", async () => {
     mockState.currentUser = null;
     const result = await signContract({
       contractId: VALID_CONTRACT_ID,
@@ -441,7 +441,7 @@ describe("signContract", () => {
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.code).toBe("CONTRACT_UNAUTHENTICATED");
+      expect(result.error.code).toBe("SESSION_EXPIRED");
     }
   });
 });

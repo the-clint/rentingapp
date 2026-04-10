@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 
 import { BookingStepIndicator } from "@/components/booking/booking-step-indicator";
+import { ResumeBanner } from "@/components/booking/resume-banner";
 import { Button } from "@/components/ui/button";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -22,7 +23,7 @@ import { createClient } from "@/lib/supabase/server";
 
 interface ConfirmedPageProps {
   params: Promise<{ listingId: string }>;
-  searchParams: Promise<{ bookingId?: string }>;
+  searchParams: Promise<{ bookingId?: string; resumed?: string }>;
 }
 
 function formatUsd(cents: number): string {
@@ -31,7 +32,7 @@ function formatUsd(cents: number): string {
 
 async function ConfirmedPageBody({ params, searchParams }: ConfirmedPageProps) {
   const { listingId } = await params;
-  const { bookingId } = await searchParams;
+  const { bookingId, resumed } = await searchParams;
 
   if (!bookingId) {
     redirect(`/book/${listingId}`);
@@ -62,6 +63,12 @@ async function ConfirmedPageBody({ params, searchParams }: ConfirmedPageProps) {
     redirect(`/book/${listingId}`);
   }
 
+  // Story 3-6: if the booking exists but isn't confirmed yet, bounce
+  // back to the listing (the renter likely landed here via a stale URL).
+  if (booking.status !== "confirmed") {
+    redirect(`/book/${listingId}`);
+  }
+
   const { data: listing } = await admin
     .from("listings")
     .select("id, name, pickup_location, pickup_instructions")
@@ -71,6 +78,12 @@ async function ConfirmedPageBody({ params, searchParams }: ConfirmedPageProps) {
   return (
     <div className="mx-auto flex max-w-[560px] flex-col gap-space-6 px-space-4 py-space-6">
       <BookingStepIndicator currentStep="confirmed" />
+      {resumed === "1" ? (
+        <ResumeBanner
+          pathname={`/book/${listingId}/confirmed`}
+          preservedQuery={`bookingId=${encodeURIComponent(bookingId)}`}
+        />
+      ) : null}
 
       <div className="flex flex-col items-center gap-space-3 text-center">
         <svg

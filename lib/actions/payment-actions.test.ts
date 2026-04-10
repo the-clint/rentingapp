@@ -258,12 +258,11 @@ describe("confirmBookingAfterPayment", () => {
     };
   });
 
-  it("rejects when no renter session", async () => {
+  it("returns SESSION_EXPIRED when the renter session dropped mid-flow (Story 3-6)", async () => {
     mockState.currentUser = null;
     const result = await confirmBookingAfterPayment(BOOKING_ID);
     expect(result.success).toBe(false);
-    if (!result.success)
-      expect(result.error.code).toBe("PAYMENT_UNAUTHENTICATED");
+    if (!result.success) expect(result.error.code).toBe("SESSION_EXPIRED");
   });
 
   it("rejects when booking owned by another renter", async () => {

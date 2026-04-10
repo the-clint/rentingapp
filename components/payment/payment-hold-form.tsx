@@ -136,6 +136,15 @@ function InnerPaymentHoldForm({
 
     const confirmResult = await confirmBookingAfterPayment(bookingId);
     if (!confirmResult.success) {
+      if (confirmResult.error.code === "SESSION_EXPIRED") {
+        // Story 3-6: Supabase cookie expired mid-flow. Bounce the
+        // renter through the OTP re-verify screen and back to this
+        // payment page with a whitelisted returnTo.
+        const currentPath = window.location.pathname + window.location.search;
+        const returnTo = encodeURIComponent(currentPath);
+        router.push(`/book/${listingId}/verify?returnTo=${returnTo}`);
+        return;
+      }
       if (confirmResult.error.code === "BOOKING_CONFLICT") {
         setError(
           "Sorry, these dates were just booked. Please select different dates.",

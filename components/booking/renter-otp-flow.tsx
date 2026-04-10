@@ -52,6 +52,15 @@ export interface RenterOtpFlowProps {
   listingId: string;
   start?: string;
   end?: string;
+  /**
+   * Optional safe return path (Story 3-6). When the renter's OTP
+   * session expires mid-booking, the contract/payment pages bounce
+   * them to `/book/[id]/verify?returnTo=...`. The caller has already
+   * validated this path against the same-listing whitelist in
+   * `lib/utils/safe-redirect.ts` — we trust it here and push on
+   * successful verify. Omitted → default to the contract step.
+   */
+  returnTo?: string;
 }
 
 type UiStep = "phone" | "otp";
@@ -68,7 +77,12 @@ function buildNextHref(
   return `/book/${listingId}/contract${qs ? `?${qs}` : ""}`;
 }
 
-export function RenterOtpFlow({ listingId, start, end }: RenterOtpFlowProps) {
+export function RenterOtpFlow({
+  listingId,
+  start,
+  end,
+  returnTo,
+}: RenterOtpFlowProps) {
   const router = useRouter();
   const [step, setStep] = useState<UiStep>("phone");
   const [phoneRaw, setPhoneRaw] = useState("");
@@ -175,10 +189,10 @@ export function RenterOtpFlow({ listingId, start, end }: RenterOtpFlowProps) {
       setOtpError(null);
       // Give the success flash a beat before navigating.
       window.setTimeout(() => {
-        router.push(buildNextHref(listingId, start, end));
+        router.push(returnTo ?? buildNextHref(listingId, start, end));
       }, 400);
     },
-    [phoneE164, router, listingId, start, end],
+    [phoneE164, router, listingId, start, end, returnTo],
   );
 
   const otpDigitsRef = useRef(otpDigits);

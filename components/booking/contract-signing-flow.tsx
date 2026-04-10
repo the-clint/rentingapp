@@ -82,6 +82,14 @@ export function ContractSigningFlow({
     setIsSubmitting(false);
 
     if (!result.success) {
+      if (result.error.code === "SESSION_EXPIRED") {
+        // Story 3-6: bounce through /verify with a returnTo so the
+        // renter lands back on this contract screen after re-verify.
+        const currentPath = window.location.pathname + window.location.search;
+        const returnTo = encodeURIComponent(currentPath);
+        router.push(`/book/${listingId}/verify?returnTo=${returnTo}`);
+        return;
+      }
       if (result.error.code === "BOOKING_CONFLICT") {
         setErrorMessage(
           "These dates were just booked. Please pick different dates.",

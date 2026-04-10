@@ -1,23 +1,27 @@
 import { Suspense } from "react";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { MapPin } from "lucide-react";
 
 import { BookingFlow } from "@/components/booking/booking-flow";
 import { ListingPhotoCarousel } from "@/components/booking/listing-photo-carousel";
 import { fetchPublicAvailability } from "@/lib/services/public-availability";
 import { fetchPublicListing } from "@/lib/services/public-listing";
+import { getBookingFlowResumePoint } from "@/lib/services/booking-flow-state";
+import { createClient } from "@/lib/supabase/server";
 import { toDateKey } from "@/lib/utils/date-range";
 
 interface BookingPageProps {
   params: Promise<{ listingId: string }>;
+  searchParams: Promise<{ start?: string; end?: string }>;
 }
 
 function formatDailyRate(cents: number): string {
   return `$${(cents / 100).toFixed(2)}`;
 }
 
-async function BookingPageBody({ params }: BookingPageProps) {
+async function BookingPageBody({ params, searchParams }: BookingPageProps) {
   const { listingId } = await params;
+  const { start, end } = await searchParams;
   const result = await fetchPublicListing(listingId);
 
   // Collapse "query error" and "not visible" into 404 so the URL does not
@@ -27,6 +31,41 @@ async function BookingPageBody({ params }: BookingPageProps) {
   }
 
   const listing = result.data;
+
+  // Story 3-6: if the renter has already made progress on this listing for
+  // the dates in the URL, short-circuit them forward to the right step.
+  // Gated on having both dates AND a renter session — without those we
+  // can't meaningfully resume.
+  if (start && end) {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (user) {
+      const resume = await getBookingFlowResumePoint({
+        renterId: user.id,
+        listingId: listing.id,
+        startDate: start,
+        endDate: end,
+      });
+      if (resume.success) {
+        const qs = `start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}&resumed=1`;
+        if (resume.data.step === "confirmed" && resume.data.bookingId) {
+          redirect(
+            `/book/${listing.id}/confirmed?bookingId=${encodeURIComponent(resume.data.bookingId)}&resumed=1`,
+          );
+        }
+        if (resume.data.step === "payment" && resume.data.bookingId) {
+          redirect(
+            `/book/${listing.id}/payment?bookingId=${encodeURIComponent(resume.data.bookingId)}&resumed=1`,
+          );
+        }
+        if (resume.data.step === "contract") {
+          redirect(`/book/${listing.id}/contract?${qs}`);
+        }
+      }
+    }
+  }
   const photos = listing.photos.map((p) => ({ path: p.path, url: p.url }));
 
   // Current-month window for the initial server-rendered availability paint.
@@ -82,10 +121,10 @@ async function BookingPageBody({ params }: BookingPageProps) {
   );
 }
 
-export function BookingPage({ params }: BookingPageProps) {
+export function BookingPage({ params, searchParams }: BookingPageProps) {
   return (
     <Suspense fallback={null}>
-      <BookingPageBody params={params} />
+      <BookingPageBody params={params} searchParams={searchParams} />
     </Suspense>
   );
 }

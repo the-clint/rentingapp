@@ -6,9 +6,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 RentingApp is a web-based rental operations platform for independent equipment rental operators in the Utah market. Operators create listings, generate classifieds ad copy (KSL, Facebook Marketplace, Craigslist), and funnel all renter interactions into a single management hub. Renters book through shareable links with real-time availability, digital contracts, and Stripe payment holds.
 
-**Status:** Pre-development (planning phase complete, no source code yet). Architecture, UX spec, and epics/stories have not been created yet.
+**Status:** MVP implementation complete. All 7 epics and 32 stories are `done` (see `_bmad-output/implementation-artifacts/sprint-status.yaml`). Current branch `yolo-attempt` is expanding end-to-end test coverage. Epic retrospectives are still optional/pending.
 
 **Owner:** Solo developer (Clint) building for his own equipment rental use case first.
+
+## Tech Stack
+
+- **Framework:** Next.js 15 (App Router) + React 19, TypeScript strict
+- **Backend:** Supabase (Postgres, Auth, Storage, Realtime) via `@supabase/ssr` + `@supabase/supabase-js`
+- **Styling:** Tailwind CSS + shadcn/ui (Radix primitives), `next-themes`, `lucide-react`
+- **Payments:** Stripe (`stripe`, `@stripe/stripe-js`, `@stripe/react-stripe-js`)
+- **Validation:** Zod
+- **Secrets:** Varlock (`varlock`, `@varlock/nextjs-integration`, `@varlock/bitwarden-plugin`) — e2e and scripts run via `varlock run --`
+- **Testing:** Vitest + Testing Library (unit/component), Playwright (e2e)
 
 ## Methodology
 
@@ -17,14 +27,20 @@ This project follows the [BMad Method](https://github.com/bmad-code-org). Use BM
 ## Repository Layout
 
 ```
+app/                            # Next.js App Router routes (operator + renter)
+components/                     # Shared UI components (shadcn/ui in components/ui)
+lib/                            # Domain logic, Supabase clients, Stripe helpers, utilities
+stores/                         # Client-side state
+supabase/                       # Migrations, seed data, generated types
+tests/e2e/                      # Playwright specs + shared helpers
+scripts/                        # Dev/build utility scripts
+docs/                           # Project documentation
 _bmad/                          # BMad Method modules and config (DO NOT EDIT)
 _bmad-output/
-  planning-artifacts/           # PRD, product brief, UX design spec
-  implementation-artifacts/     # Architecture, epics, stories (not yet created)
-  test-artifacts/               # Test plans, traceability (not yet created)
-.pi/                            # Pi agent skills (DO NOT EDIT)
+  planning-artifacts/           # PRD, product brief, UX spec, architecture, epics
+  implementation-artifacts/     # Per-story specs + sprint-status.yaml
+  test-artifacts/               # Test plans, traceability
 .claude/                        # Claude Code settings (DO NOT EDIT)
-docs/                           # Project documentation
 AGENTS.md                       # Agent behavior rules and conventions
 ```
 
@@ -33,7 +49,10 @@ AGENTS.md                       # Agent behavior rules and conventions
 - `_bmad-output/planning-artifacts/prd.md` — Full PRD with 45 functional requirements across 9 capability areas
 - `_bmad-output/planning-artifacts/product-brief-rentingapp.md` — Product brief
 - `_bmad-output/planning-artifacts/ux-design-specification.md` — UX design spec
-- `_bmad-output/planning-artifacts/implementation-readiness-report-2026-03-28.md` — Readiness assessment (architecture, UX, and epics still needed)
+- `_bmad-output/planning-artifacts/architecture.md` — Technical architecture
+- `_bmad-output/planning-artifacts/epics.md` — Epic/story breakdown
+- `_bmad-output/planning-artifacts/implementation-readiness-report-2026-04-04.md` — Latest readiness assessment
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` — Source of truth for story status
 
 ## Code Conventions (from AGENTS.md)
 
@@ -57,8 +76,8 @@ AGENTS.md                       # Agent behavior rules and conventions
 
 ## Architecture Decisions (from PRD)
 
-- SPA with client-side rendering (no SSR needed — renters arrive via direct classifieds links, not search)
-- Operator auth: standard login. Renter auth: phone + SMS OTP only (no passwords)
+- Next.js App Router on Supabase (Postgres + Auth + Storage); renters arrive via direct classifieds links rather than search
+- Operator auth: Supabase email/password. Renter auth: phone + SMS OTP only (no passwords)
 - Single universal manage-my-rental URL behind OTP auth
 - Category-agnostic data model from day one, but MVP is equipment-only in Utah
 - 5-day post-rental buffer: 4 days renter extension window + 1 mandatory maintenance day

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
+  sendBookingCancellationSms,
   sendBookingConfirmationSms,
   sendBookingExtensionSms,
 } from "./notifications";
@@ -26,6 +27,39 @@ describe("sendBookingConfirmationSms (stub)", () => {
     vi.spyOn(console, "info").mockImplementation(() => undefined);
     await expect(
       sendBookingConfirmationSms({ phone: "+1", body: "x" }),
+    ).resolves.toBeTruthy();
+  });
+});
+
+describe("sendBookingCancellationSms (stub)", () => {
+  it("resolves with delivered=true and logs the outcome", async () => {
+    const infoSpy = vi.spyOn(console, "info").mockImplementation(() => undefined);
+    const result = await sendBookingCancellationSms({
+      phone: "+18015551234",
+      outcome: "refund",
+    });
+    expect(result).toEqual({ delivered: true, stub: true });
+    expect(infoSpy).toHaveBeenCalled();
+    const logged = infoSpy.mock.calls[0]?.[1] ?? "";
+    expect(String(logged)).toContain("+18015551234");
+    expect(String(logged)).toContain("refund");
+  });
+
+  it("handles the hold_captured outcome", async () => {
+    const infoSpy = vi.spyOn(console, "info").mockImplementation(() => undefined);
+    const result = await sendBookingCancellationSms({
+      phone: "+18015550000",
+      outcome: "hold_captured",
+    });
+    expect(result.delivered).toBe(true);
+    const logged = infoSpy.mock.calls[0]?.[1] ?? "";
+    expect(String(logged)).toContain("hold_captured");
+  });
+
+  it("does not throw", async () => {
+    vi.spyOn(console, "info").mockImplementation(() => undefined);
+    await expect(
+      sendBookingCancellationSms({ phone: "+1", outcome: "refund" }),
     ).resolves.toBeTruthy();
   });
 });

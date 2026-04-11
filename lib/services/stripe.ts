@@ -211,6 +211,35 @@ export async function cancelExtensionIntent(
 }
 
 /**
+ * Capture a previously-authorized manual-capture PaymentIntent (Story 4-3).
+ *
+ * Used by the cancellation flow when the renter cancels WITHIN 48 hours
+ * of the rental start. Per the published cancellation policy (Story 3-4
+ * contract + epic 4), within-48h cancellations forfeit the hold — so
+ * instead of releasing it via `paymentIntents.cancel`, we capture it
+ * (charge the card) for the full amount originally authorized.
+ *
+ * Swallows `StripeInvalidRequestError` (already captured / already
+ * canceled) so the caller's retry path is idempotent — the outer Server
+ * Action is designed to be re-runnable on transient RPC failures after
+ * a successful Stripe capture.
+ */
+export async function capturePaymentIntent(
+  paymentIntentId: string,
+  depsStripe?: Stripe,
+): Promise<void> {
+  const client = depsStripe ?? getStripeServerClient();
+  try {
+    await client.paymentIntents.capture(paymentIntentId);
+  } catch (error) {
+    if (error instanceof Stripe.errors.StripeInvalidRequestError) {
+      return;
+    }
+    throw error;
+  }
+}
+
+/**
  * Verify a webhook request against the shared webhook secret and return
  * the parsed event. Caller is responsible for reading the raw body as a
  * string before passing it here — Next.js route handlers must use

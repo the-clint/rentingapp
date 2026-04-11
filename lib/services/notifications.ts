@@ -37,6 +37,32 @@ export async function sendBookingConfirmationSms(
   return { delivered: true, stub: true };
 }
 
+export type BookingCancellationOutcome = "refund" | "hold_captured";
+
+export interface BookingCancellationSmsInput {
+  phone: string;
+  outcome: BookingCancellationOutcome;
+}
+
+/**
+ * Send a booking cancellation confirmation SMS to the renter (Story 4-3).
+ * Stub — same contract and TODO as `sendBookingConfirmationSms`. The
+ * real Twilio delivery ships in Story 6-4.
+ *
+ * `outcome` is a structured enum instead of a free-form body so this
+ * stub can grow into a templating layer in Story 6-4 without the
+ * callers having to care about the copy.
+ */
+export async function sendBookingCancellationSms(
+  input: BookingCancellationSmsInput,
+): Promise<NotificationResult> {
+  console.info(
+    "[notifications:stub] sendBookingCancellationSms",
+    JSON.stringify({ phone: input.phone, outcome: input.outcome }),
+  );
+  return { delivered: true, stub: true };
+}
+
 export interface BookingExtensionSmsInput {
   phone: string;
   body: string;

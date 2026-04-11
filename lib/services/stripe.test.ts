@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   cancelExtensionIntent,
   cancelPaymentIntent,
+  capturePaymentIntent,
   createBookingHoldIntent,
   createExtensionHoldIntent,
   getStripeServerClient,
@@ -14,6 +15,7 @@ interface FakeStripeShape {
   paymentIntents: {
     create: ReturnType<typeof vi.fn>;
     cancel: ReturnType<typeof vi.fn>;
+    capture: ReturnType<typeof vi.fn>;
   };
   webhooks: {
     constructEvent: ReturnType<typeof vi.fn>;
@@ -25,6 +27,7 @@ function makeFakeStripe(): FakeStripeShape {
     paymentIntents: {
       create: vi.fn(),
       cancel: vi.fn(),
+      capture: vi.fn(),
     },
     webhooks: {
       constructEvent: vi.fn(),
@@ -206,6 +209,38 @@ describe("cancelPaymentIntent", () => {
     await expect(cancelPaymentIntent("pi_1", fake as never)).rejects.toThrow(
       /network/,
     );
+  });
+});
+
+describe("capturePaymentIntent", () => {
+  it("delegates to paymentIntents.capture", async () => {
+    const fake = makeFakeStripe();
+    fake.paymentIntents.capture.mockResolvedValue({ id: "pi_1" });
+    await capturePaymentIntent("pi_1", fake as never);
+    expect(fake.paymentIntents.capture).toHaveBeenCalledWith("pi_1");
+  });
+
+  it("swallows StripeInvalidRequestError (already captured / already canceled)", async () => {
+    const fake = makeFakeStripe();
+    const StripeModule = await import("stripe");
+    const stripeDefault = (StripeModule as { default: unknown }).default as {
+      errors: { StripeInvalidRequestError: new (m: { message: string }) => Error };
+    };
+    const invalid = new stripeDefault.errors.StripeInvalidRequestError({
+      message: "already captured",
+    });
+    fake.paymentIntents.capture.mockRejectedValue(invalid);
+    await expect(
+      capturePaymentIntent("pi_1", fake as never),
+    ).resolves.toBeUndefined();
+  });
+
+  it("propagates other errors", async () => {
+    const fake = makeFakeStripe();
+    fake.paymentIntents.capture.mockRejectedValue(new Error("network"));
+    await expect(
+      capturePaymentIntent("pi_1", fake as never),
+    ).rejects.toThrow(/network/);
   });
 });
 

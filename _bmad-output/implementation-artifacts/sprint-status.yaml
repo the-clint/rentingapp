@@ -89,12 +89,12 @@ development_status:
   epic-5-retrospective: optional
 
   # Epic 6: Communication Hub & Notifications
-  epic-6: backlog
-  6-1-twilio-webhook-and-inbound-sms-handling: backlog
-  6-2-operator-message-hub-conversation-list-and-thread-view: backlog
-  6-3-operator-sends-reply-via-hub: backlog
-  6-4-automated-lifecycle-sms-notifications: backlog
-  6-5-real-time-operator-notifications: backlog
+  epic-6: done
+  6-1-twilio-webhook-and-inbound-sms-handling: done
+  6-2-operator-message-hub-conversation-list-and-thread-view: done
+  6-3-operator-sends-reply-via-hub: done
+  6-4-automated-lifecycle-sms-notifications: done
+  6-5-real-time-operator-notifications: done
   epic-6-retrospective: optional
 
   # Epic 7: Renter Identity & Data Management

@@ -42,7 +42,7 @@ describe("sendBookingCancellationSms (stub)", () => {
     expect(infoSpy).toHaveBeenCalled();
     const logged = infoSpy.mock.calls[0]?.[1] ?? "";
     expect(String(logged)).toContain("+18015551234");
-    expect(String(logged)).toContain("refund");
+    expect(String(logged)).toContain("released");
   });
 
   it("handles the hold_captured outcome", async () => {
@@ -53,7 +53,7 @@ describe("sendBookingCancellationSms (stub)", () => {
     });
     expect(result.delivered).toBe(true);
     const logged = infoSpy.mock.calls[0]?.[1] ?? "";
-    expect(String(logged)).toContain("hold_captured");
+    expect(String(logged)).toContain("captured");
   });
 
   it("does not throw", async () => {

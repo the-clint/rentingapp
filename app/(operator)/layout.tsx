@@ -2,6 +2,7 @@ import { Suspense } from "react";
 
 import { OperatorShell } from "@/components/operator/operator-shell";
 import { OperatorUserEmail } from "@/components/operator/operator-user-email";
+import { RealtimeNotificationsHost } from "@/components/operator/realtime-notifications-host";
 
 // Auth + role check is handled by lib/supabase/proxy.ts middleware — by the
 // time this layout runs, the request is guaranteed to be an operator.
@@ -34,6 +35,9 @@ export default function OperatorLayout({
       >
         {children}
       </OperatorShell>
+      <Suspense fallback={null}>
+        <RealtimeNotificationsHost />
+      </Suspense>
     </Suspense>
   );
 }

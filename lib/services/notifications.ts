@@ -1,40 +1,105 @@
 /**
- * Notification service stubs (Story 3-5).
+ * Notification service (Stories 3-5 / 4-2 / 4-3 / 4-4 / 4-5 / 6-4 / 6-5).
  *
- * Story 3-5 needs to "send an SMS confirmation on successful booking"
- * per the AC. We ship a no-op stub here so Story 3-5 can land without
- * pulling Twilio client code — that surface is owned by Story 6-4
- * ("Automated lifecycle SMS notifications").
+ * Story 6-4 swaps the original no-op stubs for real Twilio sendSms
+ * calls routed through `lib/services/twilio.ts`. The Twilio facade
+ * falls back to a logging stub when `TWILIO_*` env vars are not
+ * configured, so every function here remains safe to call from any
+ * environment. Failures are LOGGED but not thrown — callers must
+ * never roll back a successful booking event on a notification
+ * delivery failure.
  *
- * TODO(Story 6-4): swap this stub for a real Twilio client call. The
- * call sites in `payment-actions.ts` already pass the correct
- * `{ phone, body }` shape, so only this file needs to change.
+ * Every send is also mirrored into `sms_log` for the audit trail +
+ * operator notification badge (Story 6-5).
  */
+
+import { createAdminClient } from "@/lib/supabase/admin";
+import { sendSms } from "@/lib/services/twilio";
+
+export interface NotificationResult {
+  delivered: boolean;
+  stub: boolean;
+}
+
+interface LifecycleSmsInput {
+  bookingId?: string;
+  listingId?: string | null;
+  operatorId?: string | null;
+  phone: string;
+  purpose: string;
+  body: string;
+}
+
+function safeAdminClient(): ReturnType<typeof createAdminClient> | null {
+  try {
+    return createAdminClient();
+  } catch {
+    return null;
+  }
+}
+
+async function logSmsRow(
+  admin: ReturnType<typeof createAdminClient> | null,
+  input: LifecycleSmsInput,
+  status: "sent" | "failed",
+  error?: string,
+): Promise<void> {
+  if (!admin) return;
+  try {
+    await admin.from("sms_log").insert({
+      direction: "outbound",
+      purpose: input.purpose,
+      phone: input.phone,
+      body: input.body,
+      status,
+      error: error ?? null,
+      booking_id: input.bookingId ?? null,
+      listing_id: input.listingId ?? null,
+      operator_id: input.operatorId ?? null,
+    });
+  } catch {
+    // Swallow — notifications must never roll back a successful event.
+  }
+}
+
+async function sendAndLog(input: LifecycleSmsInput): Promise<NotificationResult> {
+  const admin = safeAdminClient();
+  try {
+    const result = await sendSms({ to: input.phone, body: input.body });
+    console.info(
+      "[notifications]",
+      input.purpose,
+      JSON.stringify({
+        phone: input.phone,
+        bodyPreview: input.body.slice(0, 80),
+        stub: result.stub,
+      }),
+    );
+    await logSmsRow(admin, input, "sent");
+    return { delivered: true, stub: result.stub };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "unknown sms error";
+    console.error("[notifications] sms send failed", input.purpose, message);
+    await logSmsRow(admin, input, "failed", message);
+    return { delivered: false, stub: false };
+  }
+}
 
 export interface BookingConfirmationSmsInput {
   phone: string;
   body: string;
+  bookingId?: string;
 }
 
-export interface NotificationResult {
-  delivered: boolean;
-  stub: true;
-}
-
-/**
- * Send a booking confirmation SMS to the renter. Currently logs and
- * returns a resolved "stub delivered" result. Never throws — a failure
- * to send an SMS should not roll back a successful booking
- * confirmation.
- */
 export async function sendBookingConfirmationSms(
   input: BookingConfirmationSmsInput,
 ): Promise<NotificationResult> {
-  console.info(
-    "[notifications:stub] sendBookingConfirmationSms",
-    JSON.stringify({ phone: input.phone, bodyPreview: input.body.slice(0, 80) }),
-  );
-  return { delivered: true, stub: true };
+  return sendAndLog({
+    phone: input.phone,
+    purpose: "booking-confirmation",
+    body: input.body,
+    bookingId: input.bookingId,
+  });
 }
 
 export type BookingCancellationOutcome = "refund" | "hold_captured";
@@ -42,84 +107,103 @@ export type BookingCancellationOutcome = "refund" | "hold_captured";
 export interface BookingCancellationSmsInput {
   phone: string;
   outcome: BookingCancellationOutcome;
+  bookingId?: string;
 }
 
-/**
- * Send a booking cancellation confirmation SMS to the renter (Story 4-3).
- * Stub — same contract and TODO as `sendBookingConfirmationSms`. The
- * real Twilio delivery ships in Story 6-4.
- *
- * `outcome` is a structured enum instead of a free-form body so this
- * stub can grow into a templating layer in Story 6-4 without the
- * callers having to care about the copy.
- */
 export async function sendBookingCancellationSms(
   input: BookingCancellationSmsInput,
 ): Promise<NotificationResult> {
-  console.info(
-    "[notifications:stub] sendBookingCancellationSms",
-    JSON.stringify({ phone: input.phone, outcome: input.outcome }),
-  );
-  return { delivered: true, stub: true };
+  const body =
+    input.outcome === "refund"
+      ? "Booking cancelled. Your hold will be released. Details: /rentals"
+      : "Booking cancelled. Per the 48-hour policy, your hold was captured. Details: /rentals";
+  return sendAndLog({
+    phone: input.phone,
+    purpose: "booking-cancellation",
+    body,
+    bookingId: input.bookingId,
+  });
 }
 
 export interface BookingExtensionSmsInput {
   phone: string;
   body: string;
+  bookingId?: string;
 }
 
-/**
- * Send a booking extension confirmation SMS to the renter (Story 4-2).
- * Stub — same contract and TODO as `sendBookingConfirmationSms`. The
- * real Twilio delivery ships in Story 6-4.
- */
 export async function sendBookingExtensionSms(
   input: BookingExtensionSmsInput,
 ): Promise<NotificationResult> {
-  console.info(
-    "[notifications:stub] sendBookingExtensionSms",
-    JSON.stringify({ phone: input.phone, bodyPreview: input.body.slice(0, 80) }),
-  );
-  return { delivered: true, stub: true };
+  return sendAndLog({
+    phone: input.phone,
+    purpose: "booking-extension",
+    body: input.body,
+    bookingId: input.bookingId,
+  });
 }
 
 export interface CheckInOperatorNotificationInput {
   bookingId: string;
   listingName: string;
   condition: "good" | "damage" | "issue";
+  operatorPhone?: string;
+  operatorId?: string;
 }
 
-/**
- * Notify the operator that a renter submitted a check-in (Story 4-4).
- * Stub — the real Twilio SMS + Supabase Realtime fan-out land in
- * Stories 6-4 / 6-5.
- */
 export async function notifyOperatorCheckInSubmitted(
   input: CheckInOperatorNotificationInput,
 ): Promise<NotificationResult> {
-  console.info(
-    "[notifications:stub] notifyOperatorCheckInSubmitted",
-    JSON.stringify(input),
-  );
-  return { delivered: true, stub: true };
+  if (!input.operatorPhone) {
+    console.info(
+      "[notifications] operator check-in notification skipped (no phone)",
+      JSON.stringify({ bookingId: input.bookingId, condition: input.condition }),
+    );
+    return { delivered: true, stub: true };
+  }
+  const body = `📬 New check-in: ${input.listingName} · condition ${input.condition}. Review in your bookings.`;
+  return sendAndLog({
+    phone: input.operatorPhone,
+    purpose: "operator-check-in",
+    body,
+    bookingId: input.bookingId,
+    operatorId: input.operatorId,
+  });
 }
 
 export interface ReturnReminderSmsInput {
   phone: string;
   listingName: string;
   manageUrl: string;
+  bookingId?: string;
 }
 
-/**
- * Send the day-of return reminder SMS (Story 4-5). Stub — the real
- * Twilio delivery lands in Story 6-4.
- */
 export async function sendReturnReminderSms(
   input: ReturnReminderSmsInput,
 ): Promise<NotificationResult> {
-  console.info(
-    "[notifications:stub] sendReturnReminderSms",
-    JSON.stringify(input),
-  );
-  return { delivered: true, stub: true };
+  const body = `📦 Your ${input.listingName} rental return is today. Manage: ${input.manageUrl}`;
+  return sendAndLog({
+    phone: input.phone,
+    purpose: "return-reminder",
+    body,
+    bookingId: input.bookingId,
+  });
+}
+
+export interface NoShowCaptureSmsInput {
+  phone: string;
+  listingName: string;
+  amountCents: number;
+  bookingId?: string;
+}
+
+export async function sendNoShowCaptureSms(
+  input: NoShowCaptureSmsInput,
+): Promise<NotificationResult> {
+  const body = `Your booking for ${input.listingName} was marked as a no-show. $${(input.amountCents / 100).toFixed(2)} captured per your signed contract.`;
+  return sendAndLog({
+    phone: input.phone,
+    purpose: "no-show-capture",
+    body,
+    bookingId: input.bookingId,
+  });
 }

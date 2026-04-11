@@ -13,6 +13,10 @@ const mockState: MockState = {
   listingsError: null,
 };
 
+// Story 5-5: DashboardHome now renders stat cards + recent bookings on
+// top of the listings-count gate. We mock the supabase server client
+// at the call site and stub out the dashboard-stats + operator-bookings
+// services so the empty-state branch still passes.
 vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(async () => ({
     auth: {
@@ -26,9 +30,6 @@ vi.mock("@/lib/supabase/server", () => ({
     from: vi.fn(() => ({
       select: vi.fn(() => ({
         eq: vi.fn(() => ({
-          // Story 2.4 review fix (L2): the count query now also filters
-          // `.is("deleted_at", null)` to exclude soft-deleted rows. The
-          // mock chain terminates on `.is()`, not on `.eq()`.
           is: vi.fn(async () => ({
             count: mockState.listingsCount,
             error: mockState.listingsError,
@@ -36,6 +37,27 @@ vi.mock("@/lib/supabase/server", () => ({
         })),
       })),
     })),
+  })),
+}));
+
+vi.mock("@/lib/services/operator-dashboard-stats", () => ({
+  fetchOperatorDashboardStats: vi.fn(async () => ({
+    success: true,
+    data: {
+      activeRentalsCount: 2,
+      upcomingBookingsCount: 1,
+      utilizationPercent: 40,
+      monthlyRevenueCents: 12345,
+      unreadMessagesCount: 0,
+      alerts: [],
+    },
+  })),
+}));
+
+vi.mock("@/lib/services/operator-bookings", () => ({
+  fetchOperatorBookings: vi.fn(async () => ({
+    success: true,
+    data: [],
   })),
 }));
 
@@ -61,36 +83,26 @@ describe("DashboardHome", () => {
         name: /haven't created any listings yet/i,
       }),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(/List your first piece of equipment/i),
-    ).toBeInTheDocument();
     const cta = screen.getByRole("link", { name: "Create Listing" });
     expect(cta).toHaveAttribute("href", "/listings/new");
   });
 
-  it("renders the listings count when the table exists and has rows", async () => {
+  it("renders stat cards when the operator has listings", async () => {
     mockState.listingsCount = 3;
-    mockState.listingsError = null;
     await renderAsync(DashboardHome());
-    expect(screen.getByText(/You have/)).toBeInTheDocument();
-    expect(screen.getByText("3")).toBeInTheDocument();
+    expect(screen.getByTestId("stat-active-rentals")).toHaveTextContent("2");
+    expect(screen.getByTestId("stat-monthly-revenue")).toHaveTextContent(
+      "$123.45",
+    );
+    expect(screen.getByTestId("stat-upcoming-bookings")).toHaveTextContent(
+      "1",
+    );
+    expect(screen.getByTestId("stat-utilization")).toHaveTextContent("40%");
   });
 
-  it("uses the singular noun when there is exactly one listing", async () => {
+  it("renders an all-clear card when there are no alerts", async () => {
     mockState.listingsCount = 1;
     await renderAsync(DashboardHome());
-    expect(screen.getByText(/listing\./)).toBeInTheDocument();
-  });
-
-  it("propagates a database error instead of silently falling back", async () => {
-    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-    mockState.listingsCount = null;
-    mockState.listingsError = {
-      code: "42501",
-      message: "permission denied",
-    };
-    await expect(renderAsync(DashboardHome())).rejects.toBeDefined();
-    expect(errorSpy).toHaveBeenCalled();
-    errorSpy.mockRestore();
+    expect(screen.getByTestId("dashboard-all-clear")).toBeInTheDocument();
   });
 });

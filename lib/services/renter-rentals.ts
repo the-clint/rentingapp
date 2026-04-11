@@ -164,6 +164,8 @@ export async function fetchRenterRentals(
       "id, listing_id, renter_id, status, start_date, end_date, total_cents, listings(id, name, pickup_location, photos)",
     )
     .eq("renter_id", renterId)
+    // Story 7-1: hide disassociated rows from the dashboard.
+    .is("renter_dashboard_hidden_at", null)
     .neq("status", "pending")
     .gte("end_date", cutoffDate(today));
 

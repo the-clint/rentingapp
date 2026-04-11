@@ -1,10 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Chainable Supabase query builder mock. The query used by
-// `fetchRenterRentals` is: from().select().eq().neq().gte()  — the final
-// `gte` returns the rows. We mock each step to return the same chain and
-// let the test force the terminal `gte` resolution.
+// `fetchRenterRentals` is:
+//   from().select().eq().is().neq().gte()
+// where the final `.gte()` resolves the rows. (Story 7-1 added the
+// `.is("renter_dashboard_hidden_at", null)` filter between `.eq`
+// and `.neq`.) We mock each step to return the same chain.
 const gteMock = vi.fn();
+const isMock = vi.fn();
 const neqMock = vi.fn();
 const eqMock = vi.fn();
 const selectMock = vi.fn();
@@ -16,11 +19,13 @@ function buildChain() {
   const chain = {
     select: selectMock,
     eq: eqMock,
+    is: isMock,
     neq: neqMock,
     gte: gteMock,
   };
   selectMock.mockReturnValue(chain);
   eqMock.mockReturnValue(chain);
+  isMock.mockReturnValue(chain);
   neqMock.mockReturnValue(chain);
   return chain;
 }

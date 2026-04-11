@@ -98,7 +98,7 @@ development_status:
   epic-6-retrospective: optional
 
   # Epic 7: Renter Identity & Data Management
-  epic-7: backlog
-  7-1-renter-phone-number-disassociation: backlog
-  7-2-data-retention-policy-enforcement: backlog
+  epic-7: done
+  7-1-renter-phone-number-disassociation: done
+  7-2-data-retention-policy-enforcement: done
   epic-7-retrospective: optional

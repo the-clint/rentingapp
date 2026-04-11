@@ -16,6 +16,7 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 
+import { DisassociateHistoryButton } from "@/components/rentals/disassociate-history-button";
 import { RentalsEmptyState } from "@/components/rentals/rentals-empty-state";
 import { RentalsList } from "@/components/rentals/rentals-list";
 import { fetchRenterRentals } from "@/lib/services/renter-rentals";
@@ -55,7 +56,10 @@ async function RentalsPageBody() {
       ) : result.data.length === 0 ? (
         <RentalsEmptyState />
       ) : (
-        <RentalsList rentals={result.data} />
+        <>
+          <RentalsList rentals={result.data} />
+          <DisassociateHistoryButton />
+        </>
       )}
     </div>
   );

@@ -27,7 +27,11 @@
       "Bash(npx vitest:*)",
       "Bash(xargs ls:*)",
       "Bash(npx playwright:*)",
-      "Bash(varlock run:*)"
+      "Bash(varlock run:*)",
+      "Bash(node -e ':*)",
+      "Bash(cat .eslintrc*)",
+      "Bash(npm view:*)",
+      "Bash(git -C \"C:/Users/clint/OneDrive/Documents/Code/rentingapp\" status --short lib/supabase/)"
     ]
   }
 }

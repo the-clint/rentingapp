@@ -82,3 +82,44 @@ export async function sendBookingExtensionSms(
   );
   return { delivered: true, stub: true };
 }
+
+export interface CheckInOperatorNotificationInput {
+  bookingId: string;
+  listingName: string;
+  condition: "good" | "damage" | "issue";
+}
+
+/**
+ * Notify the operator that a renter submitted a check-in (Story 4-4).
+ * Stub — the real Twilio SMS + Supabase Realtime fan-out land in
+ * Stories 6-4 / 6-5.
+ */
+export async function notifyOperatorCheckInSubmitted(
+  input: CheckInOperatorNotificationInput,
+): Promise<NotificationResult> {
+  console.info(
+    "[notifications:stub] notifyOperatorCheckInSubmitted",
+    JSON.stringify(input),
+  );
+  return { delivered: true, stub: true };
+}
+
+export interface ReturnReminderSmsInput {
+  phone: string;
+  listingName: string;
+  manageUrl: string;
+}
+
+/**
+ * Send the day-of return reminder SMS (Story 4-5). Stub — the real
+ * Twilio delivery lands in Story 6-4.
+ */
+export async function sendReturnReminderSms(
+  input: ReturnReminderSmsInput,
+): Promise<NotificationResult> {
+  console.info(
+    "[notifications:stub] sendReturnReminderSms",
+    JSON.stringify(input),
+  );
+  return { delivered: true, stub: true };
+}

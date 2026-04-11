@@ -1,54 +1,68 @@
 /**
- * Check-in rental placeholder (Story 4-1).
+ * Check-in rental page (Story 4-4).
  *
- * Story 4-4 will flesh this out with the condition radio cards, damage
- * description, photo upload, and check-in Server Action. For now we
- * render a simple heading + back link so the `RentalCard` Check In
- * button has a valid destination.
+ * Server Component. Verifies the renter session, loads booking + listing
+ * via `previewCheckIn`, and hands the result to `CheckInFlow`. Ineligible
+ * or unauthenticated visitors bounce to `/rentals/verify` or `/rentals`
+ * respectively — matching the pattern established in the cancel page.
  */
 
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import Link from "next/link";
 
-async function CheckInRentalPageBody({
-  params,
-}: {
+import { CheckInFlow } from "@/components/rentals/check-in-flow";
+import { previewCheckIn } from "@/lib/actions/check-in-actions";
+import { createClient } from "@/lib/supabase/server";
+
+interface CheckInRentalPageParams {
   params: Promise<{ bookingId: string }>;
-}) {
+}
+
+async function CheckInRentalPageBody({ params }: CheckInRentalPageParams) {
   const { bookingId } = await params;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect(
+      `/rentals/verify?returnTo=${encodeURIComponent(`/rentals/${bookingId}/check-in`)}`,
+    );
+  }
+
+  const preview = await previewCheckIn(bookingId);
+  if (!preview.success) {
+    redirect("/rentals");
+  }
+
+  const data = preview.data;
 
   return (
     <div className="mx-auto flex max-w-[480px] flex-col gap-space-6 px-space-4 py-space-6">
       <header className="flex flex-col gap-space-1">
         <p className="text-small font-medium uppercase tracking-wide text-neutral-600">
-          Step &mdash; Story 4-4
+          RentingApp
         </p>
-        <h1 className="text-h2 font-semibold text-neutral-900">
-          Check in
-        </h1>
+        <h1 className="text-h2 font-semibold text-neutral-900">Check in</h1>
       </header>
-      <p className="text-small text-neutral-700">
-        The check-in flow lands in Story 4-4. Booking ID:{" "}
-        <code className="rounded bg-neutral-100 px-1 py-0.5">{bookingId}</code>.
-      </p>
-      <Link
-        href="/rentals"
-        className="text-small font-medium text-primary-dark underline"
-      >
-        &larr; Back to My Rentals
-      </Link>
+      <CheckInFlow
+        bookingId={data.bookingId}
+        listingName={data.listingName}
+        heroPhotoUrl={data.heroPhotoUrl}
+        pickupLocation={data.pickupLocation}
+        startDate={data.startDate}
+        endDate={data.endDate}
+      />
     </div>
   );
 }
 
-export default function CheckInRentalPage({
-  params,
-}: {
-  params: Promise<{ bookingId: string }>;
-}) {
+export default function CheckInRentalPage(props: CheckInRentalPageParams) {
   return (
     <Suspense fallback={null}>
-      <CheckInRentalPageBody params={params} />
+      <CheckInRentalPageBody {...props} />
     </Suspense>
   );
 }

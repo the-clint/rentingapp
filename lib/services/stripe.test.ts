@@ -1,8 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  cancelExtensionIntent,
   cancelPaymentIntent,
   createBookingHoldIntent,
+  createExtensionHoldIntent,
   getStripeServerClient,
   resetStripeClientForTests,
   verifyWebhookSignature,
@@ -105,6 +107,74 @@ describe("createBookingHoldIntent", () => {
         stripe: fake as never,
       }),
     ).rejects.toThrow(/client_secret/);
+  });
+});
+
+describe("createExtensionHoldIntent", () => {
+  it("creates a manual-capture delta PaymentIntent with extension metadata", async () => {
+    const fake = makeFakeStripe();
+    fake.paymentIntents.create.mockResolvedValue({
+      id: "pi_ext_1",
+      client_secret: "pi_ext_1_secret_zzz",
+    });
+
+    const result = await createExtensionHoldIntent({
+      bookingId: "b-1",
+      amountCents: 5000,
+      metadata: { listing_id: "L-1", renter_id: "R-1" },
+      stripe: fake as never,
+    });
+
+    expect(result).toEqual({
+      clientSecret: "pi_ext_1_secret_zzz",
+      paymentIntentId: "pi_ext_1",
+    });
+
+    const args = fake.paymentIntents.create.mock.calls[0][0];
+    expect(args.amount).toBe(5000);
+    expect(args.capture_method).toBe("manual");
+    expect(args.automatic_payment_methods).toEqual({ enabled: true });
+    expect(args.metadata).toMatchObject({
+      booking_id: "b-1",
+      listing_id: "L-1",
+      renter_id: "R-1",
+      story: "4-2",
+      kind: "extension",
+    });
+  });
+
+  it("rejects a non-positive amount", async () => {
+    const fake = makeFakeStripe();
+    await expect(
+      createExtensionHoldIntent({
+        bookingId: "b-1",
+        amountCents: 0,
+        metadata: {},
+        stripe: fake as never,
+      }),
+    ).rejects.toThrow(/positive integer/);
+  });
+
+  it("throws when Stripe omits the client_secret", async () => {
+    const fake = makeFakeStripe();
+    fake.paymentIntents.create.mockResolvedValue({ id: "pi_x", client_secret: null });
+    await expect(
+      createExtensionHoldIntent({
+        bookingId: "b-1",
+        amountCents: 100,
+        metadata: {},
+        stripe: fake as never,
+      }),
+    ).rejects.toThrow(/client_secret/);
+  });
+});
+
+describe("cancelExtensionIntent", () => {
+  it("delegates to paymentIntents.cancel", async () => {
+    const fake = makeFakeStripe();
+    fake.paymentIntents.cancel.mockResolvedValue({ id: "pi_ext_1" });
+    await cancelExtensionIntent("pi_ext_1", fake as never);
+    expect(fake.paymentIntents.cancel).toHaveBeenCalledWith("pi_ext_1");
   });
 });
 

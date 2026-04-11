@@ -136,6 +136,80 @@ export async function cancelPaymentIntent(
   }
 }
 
+export interface CreateExtensionHoldIntentInput {
+  bookingId: string;
+  amountCents: number;
+  /** Metadata stamped on the extension PaymentIntent. */
+  metadata: Record<string, string>;
+  stripe?: Stripe;
+}
+
+/**
+ * Create a Stripe PaymentIntent that holds the *delta* amount for an
+ * extended rental (Story 4-2).
+ *
+ * Why a separate PaymentIntent instead of
+ * `paymentIntents.incrementAuthorization`? Stripe supports
+ * `incrementAuthorization` only on certain card networks (Visa and
+ * Mastercard commercial, plus some eligible flows) and the eligibility
+ * is not known up front for a given customer. A brand-new manual-capture
+ * PaymentIntent works for every card Stripe accepts, and Story 5-4 can
+ * simply capture both intents at completion time. The tradeoff is an
+ * extra intent id on the booking row (`stripe_extension_intent_id`) and
+ * two capture calls — a small price for predictable reliability.
+ *
+ * The intent uses `capture_method: 'manual'` (same as the original
+ * booking hold), an automatic payment methods configuration, and a
+ * metadata block that lets the webhook + audit code correlate it back
+ * to the booking.
+ */
+export async function createExtensionHoldIntent(
+  input: CreateExtensionHoldIntentInput,
+): Promise<CreatedBookingHoldIntent> {
+  const client = input.stripe ?? getStripeServerClient();
+  if (!Number.isInteger(input.amountCents) || input.amountCents <= 0) {
+    throw new Error(
+      `createExtensionHoldIntent: amountCents must be a positive integer, got ${input.amountCents}`,
+    );
+  }
+
+  const intent = await client.paymentIntents.create({
+    amount: input.amountCents,
+    currency: "usd",
+    capture_method: "manual",
+    automatic_payment_methods: { enabled: true },
+    metadata: {
+      ...input.metadata,
+      booking_id: input.bookingId,
+      story: "4-2",
+      kind: "extension",
+    },
+  });
+
+  if (!intent.client_secret) {
+    throw new Error(
+      `Stripe returned an extension PaymentIntent without client_secret (id=${intent.id})`,
+    );
+  }
+
+  return {
+    clientSecret: intent.client_secret,
+    paymentIntentId: intent.id,
+  };
+}
+
+/**
+ * Cancel an extension PaymentIntent. Thin alias around
+ * `cancelPaymentIntent` kept separate so the call-site intent is
+ * self-documenting in `extension-actions.ts`.
+ */
+export async function cancelExtensionIntent(
+  paymentIntentId: string,
+  depsStripe?: Stripe,
+): Promise<void> {
+  await cancelPaymentIntent(paymentIntentId, depsStripe);
+}
+
 /**
  * Verify a webhook request against the shared webhook secret and return
  * the parsed event. Caller is responsible for reading the raw body as a

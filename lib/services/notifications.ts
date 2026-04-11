@@ -36,3 +36,23 @@ export async function sendBookingConfirmationSms(
   );
   return { delivered: true, stub: true };
 }
+
+export interface BookingExtensionSmsInput {
+  phone: string;
+  body: string;
+}
+
+/**
+ * Send a booking extension confirmation SMS to the renter (Story 4-2).
+ * Stub — same contract and TODO as `sendBookingConfirmationSms`. The
+ * real Twilio delivery ships in Story 6-4.
+ */
+export async function sendBookingExtensionSms(
+  input: BookingExtensionSmsInput,
+): Promise<NotificationResult> {
+  console.info(
+    "[notifications:stub] sendBookingExtensionSms",
+    JSON.stringify({ phone: input.phone, bodyPreview: input.body.slice(0, 80) }),
+  );
+  return { delivered: true, stub: true };
+}

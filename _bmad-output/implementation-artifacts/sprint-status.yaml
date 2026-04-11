@@ -71,12 +71,12 @@ development_status:
   epic-3-retrospective: optional
 
   # Epic 4: Renter Self-Service (Manage-My-Rental)
-  epic-4: in-progress
+  epic-4: done
   4-1-manage-my-rental-dashboard-and-rental-cards: done
   4-2-extend-rental: done
   4-3-cancel-booking: done
   4-4-equipment-check-in: done
-  4-5-sms-return-reminder: backlog
+  4-5-sms-return-reminder: done
   epic-4-retrospective: optional
 
   # Epic 5: Operator Dashboard & Business Operations

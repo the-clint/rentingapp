@@ -1,43 +1,17 @@
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
-import { signOut } from "@/lib/actions/auth-actions";
 import { Suspense } from "react";
 
-async function DashboardContent() {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getUser();
+import { DashboardHome } from "@/components/operator/dashboard-home";
+import { DashboardSkeleton } from "@/components/operator/dashboard-skeleton";
 
-  if (error || !data?.user) {
-    redirect("/auth/login");
-  }
-
+export function DashboardPage() {
   return (
-    <>
-      <p className="text-muted-foreground">
-        Welcome, {data.user.email}
-      </p>
-      <p className="text-sm text-muted-foreground">
-        Dashboard content will be built in Story 1.4.
-      </p>
-      <form action={signOut}>
-        <button
-          type="submit"
-          className="text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground"
-        >
-          Sign out
-        </button>
-      </form>
-    </>
-  );
-}
-
-export default function DashboardPage() {
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-6">
-      <h1 className="text-3xl font-bold">Operator Dashboard</h1>
-      <Suspense fallback={<p className="text-muted-foreground">Loading...</p>}>
-        <DashboardContent />
+    <div className="flex flex-col gap-space-6">
+      <h1 className="text-h1 lg:text-h1-lg">Dashboard</h1>
+      <Suspense fallback={<DashboardSkeleton />}>
+        <DashboardHome />
       </Suspense>
     </div>
   );
 }
+
+export default DashboardPage;

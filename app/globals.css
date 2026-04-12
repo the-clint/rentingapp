@@ -135,3 +135,87 @@
     outline-color: hsl(var(--primary-dark));
   }
 }
+
+@layer utilities {
+  /* Diagonal hatch pattern for `operator_block` cells in the availability
+     calendar. Complements the text color / label so the state is
+     distinguishable without relying on color alone (Story 2.2 a11y). */
+  .availability-hatch {
+    background-image: repeating-linear-gradient(
+      135deg,
+      hsl(var(--primary-dark) / 0.18) 0,
+      hsl(var(--primary-dark) / 0.18) 4px,
+      transparent 4px,
+      transparent 8px
+    );
+  }
+
+  /* 400ms horizontal shake for invalid OTP entry (Story 3.3). Used by the
+     renter OTP flow error path. Only runs when the user does not have
+     `prefers-reduced-motion` set. */
+  @keyframes otp-shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20% {
+      transform: translateX(-6px);
+    }
+    40% {
+      transform: translateX(6px);
+    }
+    60% {
+      transform: translateX(-4px);
+    }
+    80% {
+      transform: translateX(4px);
+    }
+  }
+
+  .animate-otp-shake {
+    animation: otp-shake 400ms ease-in-out;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-otp-shake {
+      animation: none;
+    }
+  }
+
+  /* 600ms green checkmark draw-on for the booking confirmation screen
+     (Story 3.5). The circle traces first, then the check path. Respects
+     `prefers-reduced-motion` — reduced-motion users see the full check
+     immediately with no animation. */
+  @keyframes checkmark-circle-draw {
+    from {
+      stroke-dashoffset: 166;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes checkmark-path-draw {
+    from {
+      stroke-dashoffset: 48;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  .booking-confirmed-check__circle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 0;
+    animation: checkmark-circle-draw 600ms ease-out forwards;
+  }
+  .booking-confirmed-check__path {
+    stroke-dasharray: 48;
+    stroke-dashoffset: 0;
+    animation: checkmark-path-draw 300ms 300ms ease-out forwards;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .booking-confirmed-check__circle,
+    .booking-confirmed-check__path {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+  }
+}

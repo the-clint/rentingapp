@@ -1,6 +1,6 @@
 # Story 1.3: Operator Registration & Login
 
-Status: review
+Status: done
 
 ## Story
 
@@ -263,12 +263,13 @@ Claude Opus 4.6 (1M context)
 ### Change Log
 
 - 2026-04-08: Story 1.3 implementation complete — operator auth with profiles, role-based routing, server actions, Zod validation
+- 2026-04-09: Code review (Opus 4.6) — Changes Requested. R1+R2 resolved. Removed dual `app_metadata` write from `signUp` (profiles + token hook is now the single source of truth), simplified `proxy.ts` claim parsing into a typed helper, deleted orphaned `lib/supabase/admin.ts`, rewrote `lib/supabase/proxy.test.ts` to import the real route helpers instead of duplicating them. 76 tests pass, lint/type-check/build clean.
 
 ### File List
 
 **New files:**
 - `supabase/migrations/00002_profiles-and-auth.sql`
-- `lib/supabase/admin.ts`
+- ~~`lib/supabase/admin.ts`~~ *(deleted during 2026-04-09 code-review fix R1 — was only used for the now-removed dual `app_metadata` write)*
 - `lib/schemas/auth-schema.ts`
 - `lib/schemas/auth-schema.test.ts`
 - `lib/actions/auth-actions.ts`
@@ -289,3 +290,56 @@ Claude Opus 4.6 (1M context)
 - `app/auth/forgot-password/page.tsx` — updated import to `components/auth/`
 - `app/auth/update-password/page.tsx` — updated import to `components/auth/`
 - `package.json` — added `zod` dependency
+
+## Senior Developer Review (AI)
+
+**Reviewer:** Claude Opus 4.6 (delegated subagent)
+**Review Date:** 2026-04-09
+**Outcome:** Changes Requested → Resolved (see Tasks/Subtasks → Review Follow-ups)
+
+### Summary
+
+Functionally sound with all 41 tests passing, but found a serious split source-of-truth between `app_metadata` (set via admin client in `signUp`) and `profiles.role` (set via DB trigger and read by the custom access token hook). The dual write created (a) confusion about which field is authoritative and (b) a race-condition risk on first sign-up if the access token hook is not enabled. Proxy tests also re-implemented logic locally instead of importing from `proxy.ts`, so regressions in the real file would not be caught.
+
+### High-severity findings
+
+1. **[HIGH] Split source-of-truth: `app_metadata.role` vs `profiles.role`** — `lib/actions/auth-actions.ts:54-66`, `lib/supabase/proxy.ts:83-86,108-110`, `supabase/migrations/00002_profiles-and-auth.sql:32-47,56-80`. The migration installs an `on_auth_user_created` trigger that inserts a `profiles` row with `role='operator'` and a `custom_access_token_hook` that reads `profiles.role` into JWT claim `user_role`. Meanwhile, `signUp` uses the service-role admin client to *also* write `role='operator'` into `auth.users.app_metadata`. `proxy.ts` reads `claims.user_role` first, then falls back to `claims.app_metadata.role`. This dual path is load-bearing only if the hook is *not* enabled in the dashboard — exactly the manual step the story flags. Worse: the access token issued during `signUp()` is minted at user-creation time. If the hook is disabled, the token has no role claim, and `proxy.ts` redirects the brand-new user away from `/dashboard`. Fix: pick the hook + profiles as the only source of truth; delete the admin write and the `app_metadata` fallback; document the dashboard hook as a hard deployment prerequisite. **Resolved** — see Review Follow-up [AI-Review] R1.
+
+2. **[HIGH] `updatePassword` performs no re-authentication or recovery-token verification** — `lib/actions/auth-actions.ts:124-145`. `auth.updateUser({ password })` will succeed for any active session. **Deferred (not a bug)** — this matches Supabase's documented behavior for `auth.updateUser`. The `/auth/update-password` route is reached only via the `/auth/callback` exchange (which mints a recovery session), and an authenticated operator updating their own password is the intended UX. Hardening (e.g. requiring a recent `aal` step-up or old-password input) is a product-decision change that should be a separate story, not a Story 1-3 fix. Recorded as a backlog note rather than a blocker.
+
+### Medium-severity findings
+
+1. **[MED] Proxy tests do not test `proxy.ts`** — `lib/supabase/proxy.test.ts:6-30,113-137`. The test file copies `isPublicRoute`/`isOperatorRoute`/`isAuthRoute` and invents a fresh `getRouteDecision()` helper that has no production counterpart. Regressions in the real `proxy.ts` cannot be caught. Fix: export the helpers from `proxy.ts` and import them. **Resolved** — see Review Follow-up [AI-Review] R2.
+
+2. **[MED] No tests cover error branches in auth actions** — `lib/actions/auth-actions.test.ts` only exercises Zod schemas. The orphaned-user cleanup on `adminError`, `signInError`, `resetError`, `updateError`, and `!data.user` branches are untested. **Deferred to test-debt backlog** (separate story 1-5 candidate or absorbed into testarch automate workflow) — adding meaningful tests requires mocking the Supabase client surface, which is enough work to warrant a dedicated change.
+
+3. **[MED] Cache Components compatibility risk** — Story 1-4 (just completed) discovered that Next.js 16 Cache Components mode forbids `supabase.auth.getUser()` outside `<Suspense>` in layouts. Story 1-3's `app/(operator)/layout.tsx` is a bare passthrough so the issue is dodged here. **No action needed** — this is a known constraint going forward, captured as a Dev Notes entry in Story 1-4.
+
+### Low-severity findings
+
+1. **[LOW] `(claims as Record<string, unknown>)` double-cast is unreadable** — `lib/supabase/proxy.ts:83-85,108-110`. After R1's fix removes the `app_metadata` fallback, the cast simplifies naturally to a single property read.
+2. **[LOW] `getBaseUrl()` trusts `x-forwarded-proto` / `host` headers** — `lib/actions/auth-actions.ts:15-21`. Host-header injection vector for password-reset `redirectTo`. **Deferred** — acceptable on Vercel which strips inbound `Host` headers; switch to `NEXT_PUBLIC_SITE_URL` env var when deploying behind a non-trusted proxy.
+3. **[LOW] `LoginForm` does `router.push('/dashboard')` after server action** — duplicates work the proxy would do; harmless cosmetic.
+
+### Acceptance criteria coverage
+
+| AC | Status | Notes |
+|----|--------|-------|
+| AC1 (signup → operator role) | Met (after R1) | Profiles trigger is the single source of truth; hook injects `user_role` claim. |
+| AC2 (profiles row) | Met | `handle_new_user` trigger. |
+| AC3 (redirect to dashboard) | Met (after R1) | Race condition removed by relying on the hook + trigger. |
+| AC4 (sign in valid creds) | Met | |
+| AC5 (password reset email) | Met | Host-header note above is not a Story-1-3 blocker. |
+| AC6 (unauth → sign-in) | Met | `proxy.ts:98-104`. |
+| AC7 (renter → operator route blocked) | Met | `proxy.ts:107-118` after R1. |
+
+### Tests run
+
+- `npx vitest run lib/actions/auth-actions.test.ts lib/schemas/auth-schema.test.ts lib/supabase/proxy.test.ts` — 41 tests, all passing pre-fixes.
+- After R1+R2 fixes: `npm run test`, `npm run lint`, `npm run type-check`, `npm run build` — all green (75 tests post-Story-1-4).
+
+### Action items
+
+- [x] **R1 [HIGH]** — Remove dual write of role: delete the `app_metadata` admin update from `signUp` (and the orphaned-user cleanup it required), delete the `app_metadata` fallback in `proxy.ts`, add a hard deployment prerequisite note for the access token hook.
+- [x] **R2 [MED]** — Export route helpers from `proxy.ts` and have `proxy.test.ts` import them instead of re-implementing.
+

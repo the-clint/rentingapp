@@ -24,7 +24,14 @@
       "Bash(NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=placeholder-publishable-key npm run build)",
       "Bash(npx varlock:*)",
       "Bash(npx next:*)",
-      "Bash(npx vitest:*)"
+      "Bash(npx vitest:*)",
+      "Bash(xargs ls:*)",
+      "Bash(npx playwright:*)",
+      "Bash(varlock run:*)",
+      "Bash(node -e ':*)",
+      "Bash(cat .eslintrc*)",
+      "Bash(npm view:*)",
+      "Bash(git -C \"C:/Users/clint/OneDrive/Documents/Code/rentingapp\" status --short lib/supabase/)"
     ]
   }
 }

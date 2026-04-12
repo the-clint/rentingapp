@@ -1,32 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-// Test the route classification logic from proxy.ts
-// We extract and test the pure logic functions separately
-
-const PUBLIC_ROUTES = ["/", "/auth", "/book"];
-
-function isPublicRoute(pathname: string): boolean {
-  return PUBLIC_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`),
-  );
-}
-
-function isOperatorRoute(pathname: string): boolean {
-  const operatorPrefixes = [
-    "/dashboard",
-    "/listings",
-    "/bookings",
-    "/messages",
-    "/settings",
-  ];
-  return operatorPrefixes.some(
-    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
-  );
-}
-
-function isAuthRoute(pathname: string): boolean {
-  return pathname.startsWith("/auth");
-}
+import {
+  isAuthRoute,
+  isOperatorRoute,
+  isPublicRoute,
+  isRenterDashboardRoute,
+  isRenterProtectedBookingRoute,
+} from "./proxy";
 
 describe("Route classification", () => {
   describe("isPublicRoute", () => {
@@ -41,8 +21,22 @@ describe("Route classification", () => {
       expect(isPublicRoute("/auth/callback")).toBe(true);
     });
 
-    it("treats booking routes as public", () => {
+    it("treats booking listing + verify routes as public", () => {
       expect(isPublicRoute("/book/some-listing-id")).toBe(true);
+      expect(isPublicRoute("/book/some-listing-id/verify")).toBe(true);
+    });
+
+    it("does not treat renter-protected booking steps as public", () => {
+      expect(isPublicRoute("/book/some-listing-id/contract")).toBe(false);
+      expect(isPublicRoute("/book/some-listing-id/payment")).toBe(false);
+      expect(isPublicRoute("/book/some-listing-id/confirmed")).toBe(false);
+    });
+
+    it("treats /rentals/verify as public but /rentals itself as non-public", () => {
+      expect(isPublicRoute("/rentals/verify")).toBe(true);
+      expect(isPublicRoute("/rentals")).toBe(false);
+      expect(isPublicRoute("/rentals/some-booking")).toBe(false);
+      expect(isPublicRoute("/rentals/some-booking/extend")).toBe(false);
     });
 
     it("treats operator routes as non-public", () => {
@@ -77,6 +71,11 @@ describe("Route classification", () => {
       expect(isOperatorRoute("/settings")).toBe(true);
     });
 
+    it("identifies more as operator route", () => {
+      expect(isOperatorRoute("/more")).toBe(true);
+      expect(isOperatorRoute("/more/sub")).toBe(true);
+    });
+
     it("does not match non-operator routes", () => {
       expect(isOperatorRoute("/")).toBe(false);
       expect(isOperatorRoute("/auth/login")).toBe(false);
@@ -97,77 +96,165 @@ describe("Route classification", () => {
       expect(isAuthRoute("/")).toBe(false);
     });
   });
+
+  describe("isRenterDashboardRoute", () => {
+    it("matches /rentals and all sub-paths except /rentals/verify", () => {
+      expect(isRenterDashboardRoute("/rentals")).toBe(true);
+      expect(isRenterDashboardRoute("/rentals/booking-1")).toBe(true);
+      expect(isRenterDashboardRoute("/rentals/booking-1/extend")).toBe(true);
+      expect(isRenterDashboardRoute("/rentals/booking-1/cancel")).toBe(true);
+      expect(isRenterDashboardRoute("/rentals/booking-1/check-in")).toBe(true);
+    });
+
+    it("does not match /rentals/verify (public OTP entry point)", () => {
+      expect(isRenterDashboardRoute("/rentals/verify")).toBe(false);
+    });
+
+    it("does not match unrelated paths", () => {
+      expect(isRenterDashboardRoute("/")).toBe(false);
+      expect(isRenterDashboardRoute("/book/listing-1")).toBe(false);
+      expect(isRenterDashboardRoute("/dashboard")).toBe(false);
+    });
+  });
+
+  describe("isRenterProtectedBookingRoute", () => {
+    it("matches contract / payment / confirmed booking steps", () => {
+      expect(
+        isRenterProtectedBookingRoute("/book/listing-1/contract"),
+      ).toBe(true);
+      expect(
+        isRenterProtectedBookingRoute("/book/listing-1/payment"),
+      ).toBe(true);
+      expect(
+        isRenterProtectedBookingRoute("/book/listing-1/confirmed"),
+      ).toBe(true);
+    });
+
+    it("does not match the base listing page or verify page", () => {
+      expect(isRenterProtectedBookingRoute("/book/listing-1")).toBe(false);
+      expect(
+        isRenterProtectedBookingRoute("/book/listing-1/verify"),
+      ).toBe(false);
+    });
+
+    it("does not match non-booking routes", () => {
+      expect(isRenterProtectedBookingRoute("/dashboard")).toBe(false);
+      expect(isRenterProtectedBookingRoute("/")).toBe(false);
+    });
+  });
 });
 
-describe("Middleware routing logic", () => {
-  // Test the decision matrix without mocking Next.js/Supabase internals
+describe("Routing decision matrix", () => {
+  // Mirrors the decision logic in updateSession() — kept here as a thin
+  // composition over the (now exported, not duplicated) classification
+  // helpers, so the actual rules in proxy.ts remain the source of truth.
 
-  type RouteDecision = "allow" | "redirect-login" | "redirect-dashboard" | "redirect-home";
+  type RouteDecision =
+    | "allow"
+    | "redirect-login"
+    | "redirect-dashboard"
+    | "redirect-home";
 
-  function getRouteDecision(
+  function decide(
     pathname: string,
     claims: { user_role?: string } | null,
   ): RouteDecision {
-    // Public routes
     if (isPublicRoute(pathname)) {
-      // Authenticated operators on auth pages → redirect to dashboard
-      if (isAuthRoute(pathname) && claims?.user_role === "operator") {
+      if (
+        isAuthRoute(pathname) &&
+        claims?.user_role === "operator"
+      ) {
         return "redirect-dashboard";
       }
       return "allow";
     }
-
-    // Protected routes require authentication
-    if (!claims) {
-      return "redirect-login";
-    }
-
-    // Operator routes require operator role
+    if (!claims) return "redirect-login";
     if (isOperatorRoute(pathname) && claims.user_role !== "operator") {
       return "redirect-home";
     }
-
+    if (
+      isRenterProtectedBookingRoute(pathname) &&
+      claims.user_role !== "renter"
+    ) {
+      return "redirect-home";
+    }
+    if (
+      isRenterDashboardRoute(pathname) &&
+      claims.user_role !== "renter"
+    ) {
+      return "redirect-home";
+    }
     return "allow";
   }
 
   it("allows unauthenticated users on public routes", () => {
-    expect(getRouteDecision("/", null)).toBe("allow");
-    expect(getRouteDecision("/auth/login", null)).toBe("allow");
-    expect(getRouteDecision("/book/listing-1", null)).toBe("allow");
+    expect(decide("/", null)).toBe("allow");
+    expect(decide("/auth/login", null)).toBe("allow");
+    expect(decide("/book/listing-1", null)).toBe("allow");
   });
 
   it("redirects unauthenticated users to login for protected routes", () => {
-    expect(getRouteDecision("/dashboard", null)).toBe("redirect-login");
-    expect(getRouteDecision("/listings", null)).toBe("redirect-login");
-    expect(getRouteDecision("/bookings", null)).toBe("redirect-login");
+    expect(decide("/dashboard", null)).toBe("redirect-login");
+    expect(decide("/listings", null)).toBe("redirect-login");
+    expect(decide("/bookings", null)).toBe("redirect-login");
+    expect(decide("/more", null)).toBe("redirect-login");
   });
 
   it("redirects authenticated operators away from auth pages", () => {
-    const operatorClaims = { user_role: "operator" };
-    expect(getRouteDecision("/auth/login", operatorClaims)).toBe(
-      "redirect-dashboard",
-    );
-    expect(getRouteDecision("/auth/sign-up", operatorClaims)).toBe(
-      "redirect-dashboard",
-    );
+    const operator = { user_role: "operator" };
+    expect(decide("/auth/login", operator)).toBe("redirect-dashboard");
+    expect(decide("/auth/sign-up", operator)).toBe("redirect-dashboard");
   });
 
   it("allows operators to access operator routes", () => {
-    const operatorClaims = { user_role: "operator" };
-    expect(getRouteDecision("/dashboard", operatorClaims)).toBe("allow");
-    expect(getRouteDecision("/listings", operatorClaims)).toBe("allow");
-    expect(getRouteDecision("/bookings", operatorClaims)).toBe("allow");
+    const operator = { user_role: "operator" };
+    expect(decide("/dashboard", operator)).toBe("allow");
+    expect(decide("/listings", operator)).toBe("allow");
+    expect(decide("/bookings", operator)).toBe("allow");
+    expect(decide("/more", operator)).toBe("allow");
   });
 
   it("redirects renter users from operator routes", () => {
-    const renterClaims = { user_role: "renter" };
-    expect(getRouteDecision("/dashboard", renterClaims)).toBe("redirect-home");
-    expect(getRouteDecision("/listings", renterClaims)).toBe("redirect-home");
+    const renter = { user_role: "renter" };
+    expect(decide("/dashboard", renter)).toBe("redirect-home");
+    expect(decide("/listings", renter)).toBe("redirect-home");
   });
 
   it("allows renter users on public routes", () => {
-    const renterClaims = { user_role: "renter" };
-    expect(getRouteDecision("/", renterClaims)).toBe("allow");
-    expect(getRouteDecision("/book/listing-1", renterClaims)).toBe("allow");
+    const renter = { user_role: "renter" };
+    expect(decide("/", renter)).toBe("allow");
+    expect(decide("/book/listing-1", renter)).toBe("allow");
+    expect(decide("/book/listing-1/verify", renter)).toBe("allow");
+  });
+
+  it("gates renter-protected booking steps on the renter role", () => {
+    const renter = { user_role: "renter" };
+    const operator = { user_role: "operator" };
+    expect(decide("/book/listing-1/contract", renter)).toBe("allow");
+    expect(decide("/book/listing-1/payment", renter)).toBe("allow");
+    expect(decide("/book/listing-1/contract", operator)).toBe("redirect-home");
+    expect(decide("/book/listing-1/contract", null)).toBe("redirect-login");
+  });
+
+  it("keeps the verify step public for unauthenticated renters", () => {
+    expect(decide("/book/listing-1/verify", null)).toBe("allow");
+  });
+
+  it("redirects users with no role claim from operator routes", () => {
+    const noRole = {} as { user_role?: string };
+    expect(decide("/dashboard", noRole)).toBe("redirect-home");
+  });
+
+  it("gates /rentals dashboard on the renter role", () => {
+    const renter = { user_role: "renter" };
+    const operator = { user_role: "operator" };
+    expect(decide("/rentals", renter)).toBe("allow");
+    expect(decide("/rentals/b-1/extend", renter)).toBe("allow");
+    expect(decide("/rentals", operator)).toBe("redirect-home");
+    expect(decide("/rentals", null)).toBe("redirect-login");
+  });
+
+  it("keeps /rentals/verify public for unauthenticated renters", () => {
+    expect(decide("/rentals/verify", null)).toBe("allow");
   });
 });

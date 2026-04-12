@@ -10,7 +10,11 @@
     "test:watch": "vitest",
     "test:e2e": "varlock run -- node node_modules/@playwright/test/cli.js test",
     "test:e2e:cleanup": "varlock run -- node tests/e2e/helpers/cleanup-cli.mjs",
-    "postinstall": "node scripts/patch-varlock-windows.mjs"
+    "postinstall": "node scripts/patch-varlock-windows.mjs",
+    "supabase:start": "npx supabase start",
+    "supabase:stop": "npx supabase stop",
+    "supabase:reset": "npx supabase db reset",
+    "supabase:status": "npx supabase status"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.1",

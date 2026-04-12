@@ -54,7 +54,7 @@ COMMENT ON TABLE public.sms_log IS
 -- Idempotency guard for the return-reminder endpoint: never send the
 -- same purpose twice for the same booking on the same day.
 CREATE UNIQUE INDEX sms_log_return_reminder_idempotent_idx
-  ON public.sms_log (booking_id, purpose, (created_at::date))
+  ON public.sms_log (booking_id, purpose, ((created_at AT TIME ZONE 'UTC')::date))
   WHERE purpose = 'return-reminder';
 
 -- RLS: no one writes directly. All inserts go through Server Actions

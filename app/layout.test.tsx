@@ -10,10 +10,10 @@ vi.mock("next/font/google", () => ({
 }));
 
 describe("Design system configuration", () => {
-  it("exports RentingApp branding metadata", async () => {
+  it("exports Everything.Rent branding metadata", async () => {
     const { metadata } = await import("./layout");
-    expect(metadata.title).toBe("RentingApp");
-    expect(metadata.description).toContain("Equipment rental");
+    expect(metadata.title).toBe("Everything.Rent");
+    expect(metadata.description).toContain("equipment rentals");
   });
 
   it("exports RootLayout as named export", async () => {

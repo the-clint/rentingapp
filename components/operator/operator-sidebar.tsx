@@ -59,10 +59,10 @@ export function OperatorSidebar({
         )}
       >
         {showLabels ? (
-          <span className="text-h2 font-bold tracking-tight">RentingApp</span>
+          <span className="text-h2 font-bold tracking-tight">Everything.Rent</span>
         ) : (
-          <span aria-hidden="true" className="text-h2 font-bold" title="RentingApp">
-            R
+          <span aria-hidden="true" className="text-h2 font-bold" title="Everything.Rent">
+            E
           </span>
         )}
       </div>

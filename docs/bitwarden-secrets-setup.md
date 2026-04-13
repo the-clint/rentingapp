@@ -1,6 +1,6 @@
 # Bitwarden Secrets Manager + varlock setup
 
-RentingApp loads its runtime secrets from [Bitwarden Secrets Manager](https://bitwarden.com/products/secrets-manager/) (BWS) via the [`@varlock/bitwarden-plugin`](https://varlock.dev/plugins/bitwarden/). The goal is that **the only sensitive material ever written to disk is a single BWS access token**, and even that lives in an OS env var — never in a file.
+Everything.Rent loads its runtime secrets from [Bitwarden Secrets Manager](https://bitwarden.com/products/secrets-manager/) (BWS) via the [`@varlock/bitwarden-plugin`](https://varlock.dev/plugins/bitwarden/). The goal is that **the only sensitive material ever written to disk is a single BWS access token**, and even that lives in an OS env var — never in a file.
 
 This document covers:
 
@@ -20,7 +20,7 @@ This document covers:
 ```
   Bitwarden Secrets Manager              your dev machine                  Next.js
   +---------------------+                +------------------------+        +---------+
-  | rentingapp/dev/*    |  REST API      | varlock + @varlock/   |        |         |
+  | everything-rent/dev/*    |  REST API      | varlock + @varlock/   |        |         |
   | SUPABASE_URL        | <------------  |  bitwarden-plugin      | -----> | process |
   | STRIPE_SECRET_KEY   |   (HTTPS,      |                        |        |  .env   |
   | TWILIO_AUTH_TOKEN   |    BWS_        | reads `.env.schema`,   |        |         |
@@ -77,25 +77,25 @@ Until all six are true, `varlock load`, `npm run dev`, and `npm run build` will 
 1. Log in to your Bitwarden web vault.
 2. Open the **Secrets Manager** app (grid icon, top-right).
 3. **Machine accounts** → **New machine account**.
-4. Name it something like `rentingapp-local-dev` (use a separate account for CI).
+4. Name it something like `everything-rent-local-dev` (use a separate account for CI).
 5. Click **Save**, then click into the account and copy the **Access token** from the banner at the top. **Do this immediately — it will never be shown again.**
 
 ### 2. Populate the secrets
 
-In Secrets Manager, create a **Project** called `rentingapp-dev` (or whatever makes sense for your env). Then create one secret per row in the table below. Secret *names* don't have to match these exactly (varlock looks them up by UUID, not name), but consistent naming makes the dashboard usable.
+In Secrets Manager, create a **Project** called `everything-rent-dev` (or whatever makes sense for your env). Then create one secret per row in the table below. Secret *names* don't have to match these exactly (varlock looks them up by UUID, not name), but consistent naming makes the dashboard usable.
 
 | Env var | BWS secret name (suggested) | Notes |
 |---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | `rentingapp/dev/NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL (public, but still centrally managed) |
-| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY` | `rentingapp/dev/NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY` | Public anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | `rentingapp/dev/SUPABASE_SERVICE_ROLE_KEY` | Service role key — server-only, never leaks to client |
-| `STRIPE_SECRET_KEY` | `rentingapp/dev/STRIPE_SECRET_KEY` | Must start with `sk_` (see validator in `.env.schema`) |
-| `STRIPE_WEBHOOK_SECRET` | `rentingapp/dev/STRIPE_WEBHOOK_SECRET` | Must start with `whsec_` |
-| `TWILIO_ACCOUNT_SID` | `rentingapp/dev/TWILIO_ACCOUNT_SID` | Must start with `AC` |
-| `TWILIO_AUTH_TOKEN` | `rentingapp/dev/TWILIO_AUTH_TOKEN` | |
-| `TWILIO_PHONE_NUMBER` | `rentingapp/dev/TWILIO_PHONE_NUMBER` | Must start with `+` (E.164) |
+| `NEXT_PUBLIC_SUPABASE_URL` | `everything-rent/dev/NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL (public, but still centrally managed) |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY` | `everything-rent/dev/NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY` | Public anon key |
+| `SUPABASE_SERVICE_ROLE_KEY` | `everything-rent/dev/SUPABASE_SERVICE_ROLE_KEY` | Service role key — server-only, never leaks to client |
+| `STRIPE_SECRET_KEY` | `everything-rent/dev/STRIPE_SECRET_KEY` | Must start with `sk_` (see validator in `.env.schema`) |
+| `STRIPE_WEBHOOK_SECRET` | `everything-rent/dev/STRIPE_WEBHOOK_SECRET` | Must start with `whsec_` |
+| `TWILIO_ACCOUNT_SID` | `everything-rent/dev/TWILIO_ACCOUNT_SID` | Must start with `AC` |
+| `TWILIO_AUTH_TOKEN` | `everything-rent/dev/TWILIO_AUTH_TOKEN` | |
+| `TWILIO_PHONE_NUMBER` | `everything-rent/dev/TWILIO_PHONE_NUMBER` | Must start with `+` (E.164) |
 
-After creating each secret, **grant the machine account read access to the project** (Machine accounts → click the account → Projects tab → add `rentingapp-dev`). Otherwise every `bitwarden()` lookup will return **Permission denied** at resolve time.
+After creating each secret, **grant the machine account read access to the project** (Machine accounts → click the account → Projects tab → add `everything-rent-dev`). Otherwise every `bitwarden()` lookup will return **Permission denied** at resolve time.
 
 ### 3. Copy the UUIDs into `.env.schema`
 

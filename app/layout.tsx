@@ -9,9 +9,9 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "RentingApp",
+  title: "Everything.Rent",
   description:
-    "Equipment rental operations platform — list, book, and manage rentals with ease",
+    "Everything.Rent — list, book, and manage equipment rentals with ease",
 };
 
 const inter = Inter({

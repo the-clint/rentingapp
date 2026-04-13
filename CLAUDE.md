@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-RentingApp is a web-based rental operations platform for independent equipment rental operators in the Utah market. Operators create listings, generate classifieds ad copy (KSL, Facebook Marketplace, Craigslist), and funnel all renter interactions into a single management hub. Renters book through shareable links with real-time availability, digital contracts, and Stripe payment holds.
+Everything.Rent is a web-based rental operations platform for independent equipment rental operators in the Utah market. Operators create listings, generate classifieds ad copy (KSL, Facebook Marketplace, Craigslist), and funnel all renter interactions into a single management hub. Renters book through shareable links with real-time availability, digital contracts, and Stripe payment holds.
 
 **Status:** MVP implementation complete. All 7 epics and 32 stories are `done` (see `_bmad-output/implementation-artifacts/sprint-status.yaml`). Current branch `yolo-attempt` is expanding end-to-end test coverage. Epic retrospectives are still optional/pending.
 

@@ -104,7 +104,7 @@ export function renderContract(
   const body = [
     `RENTAL AGREEMENT`,
     ``,
-    `This rental agreement ("Agreement") is entered into between the equipment owner ("Operator") and the renter identified below ("Renter") through the RentingApp platform.`,
+    `This rental agreement ("Agreement") is entered into between the equipment owner ("Operator") and the renter identified below ("Renter") through the Everything.Rent platform.`,
     ``,
     `1. EQUIPMENT`,
     `   Equipment: ${input.listingName}`,
@@ -136,12 +136,12 @@ export function renderContract(
     ``,
     `8. RENTER IDENTIFICATION`,
     `   Phone number: ${phone}`,
-    `   Renter identity is verified via SMS one-time password through the RentingApp platform. The signed timestamp and phone number constitute the electronic signature.`,
+    `   Renter identity is verified via SMS one-time password through the Everything.Rent platform. The signed timestamp and phone number constitute the electronic signature.`,
     ``,
     `9. GOVERNING LAW`,
     `   This Agreement is governed by the laws of the State of Utah.`,
     ``,
-    `By tapping "I Agree & Sign" on the RentingApp contract page, Renter agrees to every term of this Agreement.`,
+    `By tapping "I Agree & Sign" on the Everything.Rent contract page, Renter agrees to every term of this Agreement.`,
   ].join("\n");
 
   return { body, summary };

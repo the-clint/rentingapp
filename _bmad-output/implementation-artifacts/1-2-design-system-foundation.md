@@ -63,7 +63,7 @@ The starter scaffold provides a working but **unbranded** design system that mus
   - [x] Ensure button text uses appropriate contrast colors (white on primary, primary-dark on ghost)
   - [x] Write test: verify focus-visible outline renders on a button element
 - [x] Task 7: Update branding and metadata (cleanup)
-  - [x] Update `app/layout.tsx` metadata: title to "RentingApp", description to match product
+  - [x] Update `app/layout.tsx` metadata: title to "Everything.Rent", description to match product
   - [x] Remove Geist font import completely (replaced by Inter in Task 2)
   - [x] Verify `npm run lint`, `npm run type-check`, `npm test`, and `npm run build` all pass
 
@@ -203,7 +203,7 @@ Claude Opus 4.6 (1M context)
 - Extended Tailwind colors with primary.dark, primary.light, secondary.dark, secondary.light, success, warning, info, neutral scale
 - Updated button.tsx: 3-tier hierarchy (default 48px, secondary 44px, ghost with primary-dark text)
 - Added global focus-visible outline using primary-dark 2px solid
-- Updated branding: title "RentingApp", Inter font
+- Updated branding: title "Everything.Rent", Inter font
 - All verification passes: 12 tests, lint, type-check, build
 
 ### Change Log
@@ -219,5 +219,5 @@ Claude Opus 4.6 (1M context)
 **Modified files:**
 - app/globals.css (complete color system replacement — Desert Sunset palette)
 - tailwind.config.ts (typography scale, spacing scale, extended color mappings)
-- app/layout.tsx (Geist → Inter font, RentingApp branding)
+- app/layout.tsx (Geist → Inter font, Everything.Rent branding)
 - components/ui/button.tsx (3-tier button hierarchy with size variants)

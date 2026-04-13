@@ -13,7 +13,7 @@ const fixture: ListingForTemplates = {
   pickupLocation: "Provo, UT",
 };
 
-const bookingUrl = "https://rentingapp.com/book/test-listing-id";
+const bookingUrl = "https://everything.rent/book/test-listing-id";
 
 describe("generatePostingCopy", () => {
   it("KSL template includes the formatted daily rate, listing name, and booking URL", () => {

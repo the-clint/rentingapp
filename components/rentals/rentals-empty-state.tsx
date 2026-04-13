@@ -3,7 +3,7 @@
  *
  * Rendered when `fetchRenterRentals` returns zero visible cards — copy
  * pointing the renter to the classifieds channels where operators
- * actually list equipment (RentingApp does not run its own marketplace).
+ * actually list equipment (Everything.Rent does not run its own marketplace).
  */
 
 export function RentalsEmptyState() {

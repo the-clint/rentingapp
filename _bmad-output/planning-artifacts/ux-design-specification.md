@@ -22,7 +22,7 @@ inputDocuments:
   - implementation-readiness-report-2026-03-28.md
 ---
 
-# UX Design Specification — RentingApp
+# UX Design Specification — Everything.Rent
 
 **Author:** Clint
 **Date:** 2026-03-28
@@ -33,7 +33,7 @@ inputDocuments:
 
 ### Project Vision
 
-RentingApp is a web-based operational tool for independent equipment rental operators in Utah. It plugs into existing classifieds channels (KSL, Facebook Marketplace, Craigslist) rather than forcing operators or renters onto a new marketplace. Operators create listings once and get platform-tailored ad copy with shareable booking links. Renters click through from classifieds and land on a professional, self-service booking page — browse, book, sign, pay — all in one flow.
+Everything.Rent is a web-based operational tool for independent equipment rental operators in Utah. It plugs into existing classifieds channels (KSL, Facebook Marketplace, Craigslist) rather than forcing operators or renters onto a new marketplace. Operators create listings once and get platform-tailored ad copy with shareable booking links. Renters click through from classifieds and land on a professional, self-service booking page — browse, book, sign, pay — all in one flow.
 
 The product serves two radically different users through one application: operators managing their rental business from a desktop dashboard, and renters booking equipment from their phones in under three minutes.
 
@@ -43,11 +43,11 @@ The product serves two radically different users through one application: operat
 Independent rental operators who already rent equipment through classifieds but are buried in manual coordination — juggling texts across platforms, tracking availability in their heads, losing revenue to no-shows. Comfortable with web dashboards. Primary device: desktop/tablet for management, phone for on-the-go notifications.
 
 **Renters**
-People searching classifieds for equipment rentals. They arrive via a link in a KSL or Facebook Marketplace ad. Tech-savviness varies widely, but the bar is clear: **if they can text or order a pizza from their phone, they can use RentingApp.** They're on mobile, they want to book fast, and they need to feel confident the whole way through. No accounts to create, no passwords to remember — just their phone number.
+People searching classifieds for equipment rentals. They arrive via a link in a KSL or Facebook Marketplace ad. Tech-savviness varies widely, but the bar is clear: **if they can text or order a pizza from their phone, they can use Everything.Rent.** They're on mobile, they want to book fast, and they need to feel confident the whole way through. No accounts to create, no passwords to remember — just their phone number.
 
 ### Key Design Challenges
 
-1. **Trust at first click.** Renters land from a classifieds ad having never heard of RentingApp. The booking page must immediately feel professional and trustworthy — enough for someone to share their phone number, sign a contract, and authorize a payment hold. This is the make-or-break moment for conversion.
+1. **Trust at first click.** Renters land from a classifieds ad having never heard of Everything.Rent. The booking page must immediately feel professional and trustworthy — enough for someone to share their phone number, sign a contract, and authorize a payment hold. This is the make-or-break moment for conversion.
 
 2. **Pizza-order simplicity with real-world complexity.** The booking flow involves date selection, OTP authentication, contract signing, and payment authorization. That's inherently more complex than ordering a pizza — but it must *feel* just as easy. Every step needs to feel like the obvious next thing to do, not a hurdle to clear.
 
@@ -69,7 +69,7 @@ People searching classifieds for equipment rentals. They arrive via a link in a 
 
 ### Defining Experience
 
-The core experience of RentingApp is the **renter booking flow** — the journey from tapping a classifieds link to receiving a booking confirmation SMS. This is where trust is built, value is delivered, and the product earns its place. If this flow feels like ordering a pizza on your phone, everything else follows.
+The core experience of Everything.Rent is the **renter booking flow** — the journey from tapping a classifieds link to receiving a booking confirmation SMS. This is where trust is built, value is delivered, and the product earns its place. If this flow feels like ordering a pizza on your phone, everything else follows.
 
 For operators, the defining experience is the **zero-effort booking** — waking up to a notification that a renter found their ad, booked the equipment, signed the contract, and authorized payment, all without a single text exchanged.
 
@@ -114,7 +114,7 @@ Neither the renter nor the operator ever wonders "did that go through?" or "what
 
 3. **Trust at first sight.** The renter's first impression of the booking page determines everything. Professional appearance, clear information, and recognizable patterns (Stripe checkout, SMS verification) signal legitimacy before a single interaction.
 
-4. **The system works so you don't have to.** Automation handles the coordination that humans are bad at — scheduling, reminders, payment capture, calendar updates. The operator's job is to own equipment. RentingApp's job is everything else.
+4. **The system works so you don't have to.** Automation handles the coordination that humans are bad at — scheduling, reminders, payment capture, calendar updates. The operator's job is to own equipment. Everything.Rent's job is everything else.
 
 5. **Mobile-native, not mobile-adapted.** The renter experience is designed for a thumb on a phone screen first. Desktop compatibility is a bonus, not the starting point.
 
@@ -193,13 +193,13 @@ Neither the renter nor the operator ever wonders "did that go through?" or "what
 ### Inspiring Products Analysis
 
 **Venmo — Trust Made Casual**
-Venmo normalizes moving real money through an interface that feels as casual as texting. There's no anxiety in the payment flow — you enter an amount, tap send, and get instant confirmation. The UI is clean, friendly, and doesn't make you feel like you're doing something risky. For RentingApp, this teaches us that payment holds don't need to feel heavy or intimidating. Clear amounts, instant confirmation, and a casual-confident tone remove the fear from financial commitment.
+Venmo normalizes moving real money through an interface that feels as casual as texting. There's no anxiety in the payment flow — you enter an amount, tap send, and get instant confirmation. The UI is clean, friendly, and doesn't make you feel like you're doing something risky. For Everything.Rent, this teaches us that payment holds don't need to feel heavy or intimidating. Clear amounts, instant confirmation, and a casual-confident tone remove the fear from financial commitment.
 
 **Uber / Lyft — Always Know What's Happening**
-The ride-hailing experience is defined by continuous communication. From the moment you request a ride to the moment you arrive, you're never left wondering. Status updates are visual, automatic, and timely. Payment is completely invisible — it happens in the background after the service is complete. For RentingApp, this is the model for the entire rental lifecycle: booked → confirmed → rental started → return reminder → completed. Every stage communicated, every transition clear, no silence.
+The ride-hailing experience is defined by continuous communication. From the moment you request a ride to the moment you arrive, you're never left wondering. Status updates are visual, automatic, and timely. Payment is completely invisible — it happens in the background after the service is complete. For Everything.Rent, this is the model for the entire rental lifecycle: booked → confirmed → rental started → return reminder → completed. Every stage communicated, every transition clear, no silence.
 
 **Panda Express — Minimum Steps to Done**
-The Panda Express ordering flow is radically simple: see the menu, tap what you want, running total visible, check out. No decisions that don't need to be made. No screens that don't earn their place. For RentingApp's booking flow, this means: see the listing, tap your dates, see the total, book. Every screen should move the renter one step closer to confirmed, with no detours.
+The Panda Express ordering flow is radically simple: see the menu, tap what you want, running total visible, check out. No decisions that don't need to be made. No screens that don't earn their place. For Everything.Rent's booking flow, this means: see the listing, tap your dates, see the total, book. Every screen should move the renter one step closer to confirmed, with no detours.
 
 ### Transferable UX Patterns
 
@@ -230,7 +230,7 @@ The Panda Express ordering flow is radically simple: see the menu, tap what you 
 
 - **Manual card entry as the only payment option.** On mobile, typing a 16-digit card number is a conversion killer. Apple Pay / Google Pay must be front and center.
 - **Silent transitions.** If the user does something and nothing visibly happens, trust evaporates. Every action gets a response — visual, SMS, or both.
-- **Account creation walls.** Requiring a username/password/email before the user gets value. RentingApp's phone OTP model avoids this, and the UX must reinforce that there's no "account" to manage — just your phone number.
+- **Account creation walls.** Requiring a username/password/email before the user gets value. Everything.Rent's phone OTP model avoids this, and the UX must reinforce that there's no "account" to manage — just your phone number.
 - **Information overload on mobile.** Dense dashboards, long forms, and wall-of-text contracts don't work on a phone screen. Every mobile view should pass the "can I understand this in 3 seconds?" test.
 - **Hiding the cost.** Any flow where the total isn't visible until the last step creates anxiety and distrust. The renter should see the daily rate, selected days, and total cost updating in real time as they pick dates.
 
@@ -243,7 +243,7 @@ The Panda Express ordering flow is radically simple: see the menu, tap what you 
 - Running cost total visible throughout date selection
 - Instant visual confirmation after every user action
 
-**Adapt for RentingApp:**
+**Adapt for Everything.Rent:**
 - Venmo's casual payment confidence → adapted for authorization holds (not direct charges). Clear one-line explanation: "We'll hold $700 on your card — you're only charged when the rental completes."
 - Uber's real-time tracking → adapted for rental lifecycle stages. Not GPS-level real-time, but clear status communication at every transition.
 - Panda Express's minimal ordering flow → adapted for a slightly longer flow (dates → auth → contract → payment) that still feels just as linear and inevitable.
@@ -304,26 +304,26 @@ The Panda Express ordering flow is radically simple: see the menu, tap what you 
 
 ### Defining Experience
 
-RentingApp's defining experience is a **two-sided instant booking** — one transaction, two moments of delight:
+Everything.Rent's defining experience is a **two-sided instant booking** — one transaction, two moments of delight:
 
 > **Renter:** *"I tapped a link in a KSL ad and booked a $700 excavator in 3 minutes — like ordering a pizza."*
 
 > **Operator:** *"I woke up to a notification: booking confirmed, contract signed, $700 held. I didn't lift a finger."*
 
-These are the same event experienced from both sides. The renter's frictionless booking IS the operator's zero-effort operation. Neither moment exists without the other — and together they define everything RentingApp is.
+These are the same event experienced from both sides. The renter's frictionless booking IS the operator's zero-effort operation. Neither moment exists without the other — and together they define everything Everything.Rent is.
 
 ### User Mental Model
 
 **Renter's current mental model:**
 See a classifieds ad → text the owner → wait → maybe hear back, maybe not → play phone tag for days → try to agree on a time → show up and hope the equipment is actually available → exchange cash awkwardly → hope it goes well. There's no commitment, no contract, no certainty. It feels like haggling with a stranger because it is.
 
-**RentingApp shifts the renter's mental model to:**
+**Everything.Rent shifts the renter's mental model to:**
 See a classifieds ad → tap the link → it's a real booking page, like a hotel or Airbnb → pick dates, see the total → verify with my phone → sign, pay → done. Confirmation in my texts. It feels like a legitimate business transaction because it is.
 
 **Operator's current mental model:**
 Post an ad → get flooded with texts from multiple platforms → juggle conversations → try to track who wants what dates → turn people away manually → hope the booked renter actually shows up → lose a day's revenue on no-shows. It feels like a second job because it is.
 
-**RentingApp shifts the operator's mental model to:**
+**Everything.Rent shifts the operator's mental model to:**
 Create a listing once → post the generated ad copy → bookings come in with contracts signed and payments held → calendar updates automatically → get notified when things happen → capture payment on completion. It feels like having an assistant because the system handles the coordination.
 
 ### Success Criteria
@@ -350,7 +350,7 @@ Create a listing once → post the generated ad copy → bookings come in with c
 
 ### Novel UX Patterns
 
-RentingApp uses **no novel UX patterns**. This is a deliberate design decision aligned with the "familiar beats novel" principle. Every interaction maps to a pattern renters and operators already know:
+Everything.Rent uses **no novel UX patterns**. This is a deliberate design decision aligned with the "familiar beats novel" principle. Every interaction maps to a pattern renters and operators already know:
 
 | Interaction | Familiar Pattern Source |
 |-------------|----------------------|
@@ -412,7 +412,7 @@ RentingApp uses **no novel UX patterns**. This is a deliberate design decision a
 
 **Theme: Desert Sunset**
 
-A warm-forward palette inspired by Utah desert sunsets — distinctive, approachable, and trustworthy. The warmth differentiates RentingApp from cold SaaS blue and signals that this is a human-centered tool built by a real operator.
+A warm-forward palette inspired by Utah desert sunsets — distinctive, approachable, and trustworthy. The warmth differentiates Everything.Rent from cold SaaS blue and signals that this is a human-centered tool built by a real operator.
 
 **Primary Colors:**
 
@@ -640,7 +640,7 @@ Sidebar uses a gradient from terracotta (`#C45A2D`) to twilight (`#2E3E50`), car
 
 ### Design Rationale
 
-1. **Direction A maximizes trust.** The clean white canvas with professional typography and generous spacing is the visual language of legitimate commerce (Airbnb, hotel booking, Stripe checkout). For renters who've never heard of RentingApp, this visual approach immediately signals "this is a real business" — directly supporting the "trust at first sight" principle.
+1. **Direction A maximizes trust.** The clean white canvas with professional typography and generous spacing is the visual language of legitimate commerce (Airbnb, hotel booking, Stripe checkout). For renters who've never heard of Everything.Rent, this visual approach immediately signals "this is a real business" — directly supporting the "trust at first sight" principle.
 
 2. **Warmth without overwhelm.** Direction A uses the desert sunset amber as an accent color, not a dominant surface. This keeps the page feeling warm and distinctive without the visual intensity of Directions B or D. The amber pops where it matters — CTAs and selected states — and recedes everywhere else.
 
@@ -1008,9 +1008,9 @@ flowchart TD
 
 ### Design System Components
 
-**shadcn/ui components that map directly to RentingApp needs:**
+**shadcn/ui components that map directly to Everything.Rent needs:**
 
-| shadcn/ui Component | RentingApp Usage | Customization Needed |
+| shadcn/ui Component | Everything.Rent Usage | Customization Needed |
 |---------------------|-----------------|---------------------|
 | **Button** | CTAs ("Book Now", "Extend", "Confirm"), secondary actions ("Cancel", "Copy") | Desert sunset theme colors, 48px min height for primary mobile CTAs |
 | **Input** | Phone number, equipment name, description, daily rate, pickup location | `primary` focus ring, 44px min height on mobile |
@@ -1036,7 +1036,7 @@ flowchart TD
 
 ### Custom Components
 
-The following components don't exist in shadcn/ui and must be built custom for RentingApp's specific needs:
+The following components don't exist in shadcn/ui and must be built custom for Everything.Rent's specific needs:
 
 #### 1. Availability Calendar
 
@@ -1460,7 +1460,7 @@ These components are needed for the primary conversion flow and must be built fi
 - Sticky bottom bar for primary CTA during date selection
 
 **Manage-My-Rental navigation:**
-- Simple header: "RentingApp" logo + "My Rentals" label
+- Simple header: "Everything.Rent" logo + "My Rentals" label
 - No sidebar, no tabs — just a list of rental cards
 - Each card opens into detail/action views with back navigation
 
@@ -1570,7 +1570,7 @@ These components are needed for the primary conversion flow and must be built fi
 
 ### Responsive Strategy
 
-**RentingApp serves two fundamentally different responsive strategies in one application:**
+**Everything.Rent serves two fundamentally different responsive strategies in one application:**
 
 **Renter Experience — Mobile-First**
 Renters arrive by tapping links on their phones from classifieds apps. Mobile is the primary (and often only) device. Design starts at 375px and scales up.
@@ -1631,7 +1631,7 @@ No formal certification for MVP, but all patterns follow AA standards. This alig
 
 #### Color & Visual Accessibility
 
-| Requirement | Standard | RentingApp Implementation |
+| Requirement | Standard | Everything.Rent Implementation |
 |-------------|----------|---------------------------|
 | Text contrast (normal) | 4.5:1 minimum | All `neutral-900` on white = 15.4:1 ✓. `primary-dark` on white = 5.2:1 ✓. `neutral-500` on white = 4.6:1 ✓ |
 | Text contrast (large) | 3:1 minimum | `primary` on white = 3.4:1 ✓ for large text only. Small text uses `primary-dark` |

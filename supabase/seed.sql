@@ -1,2 +1,2 @@
--- RentingApp dev seed data
+-- Everything.Rent dev seed data
 -- Add seed data for local development here

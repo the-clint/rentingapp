@@ -5,7 +5,7 @@ inputDocuments:
   - product-brief-rentingapp-distillate.md
   - ux-design-specification.md
 workflowType: 'architecture'
-project_name: 'rentingapp'
+project_name: 'everything-rent'
 user_name: 'Clint'
 date: '2026-04-04'
 lastStep: 8
@@ -344,7 +344,7 @@ type Result<T> =
 ### Complete Project Directory Structure
 
 ```
-rentingapp/
+everything-rent/
 ├── .github/
 │   └── workflows/
 │       └── ci.yml                          # Lint + type-check + varlock scan + tests

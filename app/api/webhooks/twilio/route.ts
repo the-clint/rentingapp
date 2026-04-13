@@ -15,7 +15,7 @@
  *   - If the renter phone matches a `contracts.renter_phone`, pick
  *     the listing's operator.
  *   - Else: fall back to the single operator in the `profiles` table
- *     for the MVP. (RentingApp is solo-operator for Clint's first
+ *     for the MVP. (Everything.Rent is solo-operator for Clint's first
  *     deployment; pre-launch for additional operators this will need
  *     a phone-number-to-operator routing table — tracked as a TODO.)
  */

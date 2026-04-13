@@ -38,7 +38,7 @@ const sampleListing = {
   pickup_location: "Provo, UT",
 };
 
-const bookingUrl = "https://rentingapp.com/book/test-id";
+const bookingUrl = "https://everything.rent/book/test-id";
 
 function setupClipboard(reject = false) {
   const writeText = reject

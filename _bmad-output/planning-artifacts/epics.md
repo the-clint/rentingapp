@@ -12,11 +12,11 @@ inputDocuments:
   - ux-design-specification.md
 ---
 
-# RentingApp - Epic Breakdown
+# Everything.Rent - Epic Breakdown
 
 ## Overview
 
-This document provides the complete epic and story breakdown for RentingApp, decomposing the requirements from the PRD, UX Design, and Architecture into implementable stories.
+This document provides the complete epic and story breakdown for Everything.Rent, decomposing the requirements from the PRD, UX Design, and Architecture into implementable stories.
 
 ## Requirements Inventory
 
@@ -75,7 +75,7 @@ NFR2: Availability calendar reflects current state within 5 seconds of any booki
 NFR3: SMS OTP delivery within 30 seconds of request (dependent on Twilio SLA)
 NFR4: Booking flow (date selection → auth → contract → payment hold) completable in under 3 minutes with no system-induced delays
 NFR5: All data encrypted in transit (TLS) and at rest
-NFR6: Payment security delegated entirely to Stripe — no card numbers stored or processed by RentingApp
+NFR6: Payment security delegated entirely to Stripe — no card numbers stored or processed by Everything.Rent
 NFR7: Phone numbers stored securely — used as renter identity, must be protected
 NFR8: Signed contracts stored immutably — no modification after signing
 NFR9: OTP codes expire after 5 minutes and are single-use
@@ -683,7 +683,7 @@ So that I have one place to manage everything.
 
 **Given** the renter is on mobile
 **When** they view the dashboard
-**Then** layout is single column, 480px max-width centered, with simple header "RentingApp" + "My Rentals"
+**Then** layout is single column, 480px max-width centered, with simple header "Everything.Rent" + "My Rentals"
 **And** each rental card shows thumbnail left, info right, actions as full-width buttons below
 
 **Given** active rental cards

@@ -1,12 +1,12 @@
 ---
-title: "Product Brief Distillate: RentingApp"
+title: "Product Brief Distillate: Everything.Rent"
 type: llm-distillate
 source: "product-brief-rentingapp.md"
 created: "2026-03-28T06:00:00Z"
 purpose: "Token-efficient context for downstream PRD creation"
 ---
 
-# Product Brief Distillate: RentingApp
+# Product Brief Distillate: Everything.Rent
 
 ## Requirements Hints
 
@@ -38,8 +38,8 @@ purpose: "Token-efficient context for downstream PRD creation"
 
 ## User Scenarios
 
-- **Owner scenario:** Clint owns a mini excavator. He creates a listing on RentingApp, gets generated ad copy, posts to KSL and Facebook Marketplace with a booking link. A renter finds the ad, clicks through, sees availability, books for next Saturday, signs the contract, and funds are held. Clint gets a notification. Zero back-and-forth texts.
-- **Renter scenario:** Someone searching KSL for "mini excavator rental" finds Clint's ad, clicks the RentingApp link, sees a professional page with photos/pricing/availability, books instantly, signs digitally, and knows the booking is confirmed. No wondering if the owner saw their message.
+- **Owner scenario:** Clint owns a mini excavator. He creates a listing on Everything.Rent, gets generated ad copy, posts to KSL and Facebook Marketplace with a booking link. A renter finds the ad, clicks through, sees availability, books for next Saturday, signs the contract, and funds are held. Clint gets a notification. Zero back-and-forth texts.
+- **Renter scenario:** Someone searching KSL for "mini excavator rental" finds Clint's ad, clicks the Everything.Rent link, sees a professional page with photos/pricing/availability, books instantly, signs digitally, and knows the booking is confirmed. No wondering if the owner saw their message.
 - **No-show prevention:** Renter books Saturday but doesn't show. Because funds were held at booking, the owner isn't penalized — cancellation/no-show policy is in the signed contract, and funds are captured or partially captured per terms.
 
 ## Scope Signals
@@ -81,12 +81,12 @@ purpose: "Token-efficient context for downstream PRD creation"
 - Target take rate: 5–8% inclusive of payment processing fees
 - Risk flagged: unknown cost profile at scale — monitor unit economics closely
 - Hybrid model (small monthly base + lower transaction fee) was discussed as a hedge but not selected for v1
-- Alignment principle: RentingApp only earns when operators earn
+- Alignment principle: Everything.Rent only earns when operators earn
 
 ## Rejected Ideas & Constraints
 
 - **Auto-posting to classifieds** — rejected due to platform restrictions. Facebook Marketplace has no public listing API, Craigslist actively blocks automation. Pivoted to posting assistant model.
-- **Marketplace-first approach** — rejected. RentingApp is an operator tool first, not a destination marketplace. Renters arrive via external classifieds, not by browsing RentingApp.
+- **Marketplace-first approach** — rejected. Everything.Rent is an operator tool first, not a destination marketplace. Renters arrive via external classifieds, not by browsing Everything.Rent.
 - **Defensive moat strategy** — founder explicitly deprioritized. Goal is to build something excellent for personal use first; competitive defense is not a design driver.
 - **Multi-category launch** — rejected for v1. Start with equipment in Utah, prove the model, then expand.
 
@@ -97,4 +97,4 @@ purpose: "Token-efficient context for downstream PRD creation"
 - Contract template legal review — who drafts the base rental agreement template? State-specific legal requirements for equipment rental contracts in Utah?
 - Cancellation/no-show policy defaults — what happens to held funds on cancellation? Owner-configurable or platform-standard?
 - SMS cost modeling — at what message volume per transaction does Twilio cost become material to the take rate?
-- Product naming — "RentingApp" is a working title. Final branding TBD?
+- Product naming — "Everything.Rent" is a working title. Final branding TBD?

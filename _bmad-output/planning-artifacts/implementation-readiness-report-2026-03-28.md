@@ -16,7 +16,7 @@ documentInventory:
 # Implementation Readiness Assessment Report
 
 **Date:** 2026-03-28
-**Project:** RentingApp
+**Project:** Everything.Rent
 **Assessor:** Implementation Readiness Workflow
 
 ## Document Inventory

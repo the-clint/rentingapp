@@ -79,7 +79,7 @@ describe("ListingDetailView", () => {
     render(
       <ListingDetailView
         listing={sampleListing()}
-        bookingUrl="https://rentingapp.com/book/listing-1"
+        bookingUrl="https://everything.rent/book/listing-1"
       />,
     );
     // The listing name appears in multiple places (hero alt text, the
@@ -92,7 +92,7 @@ describe("ListingDetailView", () => {
     render(
       <ListingDetailView
         listing={sampleListing()}
-        bookingUrl="https://rentingapp.com/book/listing-1"
+        bookingUrl="https://everything.rent/book/listing-1"
       />,
     );
     const hero = screen.getByAltText("Honda EU2200i Generator") as HTMLImageElement;
@@ -103,7 +103,7 @@ describe("ListingDetailView", () => {
     render(
       <ListingDetailView
         listing={sampleListing()}
-        bookingUrl="https://rentingapp.com/book/listing-1"
+        bookingUrl="https://everything.rent/book/listing-1"
       />,
     );
     const editLink = screen
@@ -120,7 +120,7 @@ describe("ListingDetailView", () => {
     render(
       <ListingDetailView
         listing={sampleListing()}
-        bookingUrl="https://rentingapp.com/book/listing-1"
+        bookingUrl="https://everything.rent/book/listing-1"
       />,
     );
     // The delete trigger is the first `<Button variant="destructive">` —
@@ -138,7 +138,7 @@ describe("ListingDetailView", () => {
     render(
       <ListingDetailView
         listing={sampleListing()}
-        bookingUrl="https://rentingapp.com/book/listing-1"
+        bookingUrl="https://everything.rent/book/listing-1"
         initialAssistantOpen={true}
       />,
     );
@@ -150,7 +150,7 @@ describe("ListingDetailView", () => {
     render(
       <ListingDetailView
         listing={sampleListing()}
-        bookingUrl="https://rentingapp.com/book/listing-1"
+        bookingUrl="https://everything.rent/book/listing-1"
       />,
     );
     expect(

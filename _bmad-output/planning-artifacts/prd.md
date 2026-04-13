@@ -29,24 +29,24 @@ classification:
   projectContext: greenfield
 ---
 
-# Product Requirements Document — RentingApp
+# Product Requirements Document — Everything.Rent
 
 **Author:** Clint
 **Date:** 2026-03-28
 
 ## Executive Summary
 
-RentingApp is a web-based operational backbone for independent rental operators, starting with equipment rentals in the Utah market. It solves the operational chaos that independent operators face today: juggling text messages across platforms, losing bookings to no-shows, managing availability manually, and presenting an unprofessional experience to potential renters.
+Everything.Rent is a web-based operational backbone for independent rental operators, starting with equipment rentals in the Utah market. It solves the operational chaos that independent operators face today: juggling text messages across platforms, losing bookings to no-shows, managing availability manually, and presenting an unprofessional experience to potential renters.
 
-Rather than forcing operators onto a new marketplace or into bloated enterprise SaaS, RentingApp plugs into the distribution channels operators already use — KSL Classifieds, Facebook Marketplace, and Craigslist. Operators create listings once, get platform-tailored ad copy and booking links, and funnel all renter interactions into a single management hub. Renters who click through land on a professional booking page with real-time availability, instant scheduling, digital contract signing, and payment holds via Stripe — eliminating back-and-forth and preventing no-shows through financial commitment at booking time.
+Rather than forcing operators onto a new marketplace or into bloated enterprise SaaS, Everything.Rent plugs into the distribution channels operators already use — KSL Classifieds, Facebook Marketplace, and Craigslist. Operators create listings once, get platform-tailored ad copy and booking links, and funnel all renter interactions into a single management hub. Renters who click through land on a professional booking page with real-time availability, instant scheduling, digital contract signing, and payment holds via Stripe — eliminating back-and-forth and preventing no-shows through financial commitment at booking time.
 
 The platform is web-first with no native mobile app for MVP. Communication between renters and operators flows through Twilio-powered SMS, unified in a single message hub regardless of which classifieds platform the renter originated from.
 
 ### What Makes This Special
 
-RentingApp is built by an operator, for operators. The product philosophy rejects the "all or nothing" approach taken by competitors like Booqable (overbuilt, overpriced enterprise SaaS) and Fat Llama (closed marketplace requiring operators to drive renters to their platform). Instead, RentingApp grows methodically — small scope, deeply tailored by region.
+Everything.Rent is built by an operator, for operators. The product philosophy rejects the "all or nothing" approach taken by competitors like Booqable (overbuilt, overpriced enterprise SaaS) and Fat Llama (closed marketplace requiring operators to drive renters to their platform). Instead, Everything.Rent grows methodically — small scope, deeply tailored by region.
 
-The regional expansion model (Utah → Idaho → state by state) creates a product that feels custom to each market rather than a generic, cold tool taking a "good enough" approach. The architecture is category-agnostic from day one, but launch is deliberately equipment-only in Utah to prove the model before expanding. RentingApp earns only when operators earn — a per-transaction revenue model aligned with operator success.
+The regional expansion model (Utah → Idaho → state by state) creates a product that feels custom to each market rather than a generic, cold tool taking a "good enough" approach. The architecture is category-agnostic from day one, but launch is deliberately equipment-only in Utah to prove the model before expanding. Everything.Rent earns only when operators earn — a per-transaction revenue model aligned with operator success.
 
 ## Project Classification
 
@@ -59,7 +59,7 @@ The regional expansion model (Utah → Idaho → state by state) creates a produ
 
 ### User Success
 
-- **Operator:** RentingApp becomes the default tool for every rental — meaningfully better than the manual workflow of juggling texts, tracking availability in your head, and hoping renters show up. Listings are created once with generated ad copy ready to post across platforms in minutes.
+- **Operator:** Everything.Rent becomes the default tool for every rental — meaningfully better than the manual workflow of juggling texts, tracking availability in your head, and hoping renters show up. Listings are created once with generated ad copy ready to post across platforms in minutes.
 - **Renter:** The experience from classifieds link click to confirmed booking (with signed contract and payment hold) is frictionless and professional. No back-and-forth texting, no uncertainty about availability, no wondering if the owner saw your message.
 
 ### Business Success
@@ -160,7 +160,7 @@ The regional expansion model (Utah → Idaho → state by state) creates a produ
 
 Clint has a mini excavator sitting idle most weekdays. He's been renting it out through KSL Classifieds, but the process is painful — he posts an ad, gets flooded with texts, plays phone tag to coordinate schedules, and has had two renters no-show after he turned others away. He's done with the chaos.
 
-He signs into RentingApp and creates a listing: uploads photos of the excavator, writes a quick description, sets his daily rate at $350, and blocks out the weekends he needs it for his own projects on the availability calendar. The posting assistant generates three versions of ad copy — one tailored for KSL, one for Facebook Marketplace, one for Craigslist — each with a unique booking link. Clint copies the KSL version, posts it on KSL in under two minutes, and does the same for Facebook. Total time: five minutes. He's live on two platforms with professional copy and a booking link that handles everything.
+He signs into Everything.Rent and creates a listing: uploads photos of the excavator, writes a quick description, sets his daily rate at $350, and blocks out the weekends he needs it for his own projects on the availability calendar. The posting assistant generates three versions of ad copy — one tailored for KSL, one for Facebook Marketplace, one for Craigslist — each with a unique booking link. Clint copies the KSL version, posts it on KSL in under two minutes, and does the same for Facebook. Total time: five minutes. He's live on two platforms with professional copy and a booking link that handles everything.
 
 Over the next few days, messages from interested renters arrive in his unified hub. He can see which platform each message came from, respond via SMS without switching apps, and every conversation is threaded. When a renter books through the link, Clint gets a notification: booking confirmed, contract signed, payment held. No phone tag. No wondering if they'll show up. The excavator is booked for next Tuesday through Thursday, and the calendar updates automatically — no one else can book those days.
 
@@ -194,7 +194,7 @@ Clint receives a notification: "Marcus extended his rental by 1 day. New return 
 
 Clint gets a booking for next Saturday — contract signed, $350 held. He turns away two other inquiries for that day. Saturday morning, the renter doesn't show up. No text, no call. In the old world, Clint would have lost a day's revenue and been furious.
 
-With RentingApp, the no-show policy in the signed contract kicks in. The system flags the rental as a no-show when the renter doesn't confirm pickup. Per the contract terms, Clint can capture the full held amount. He initiates the capture from his dashboard, the $350 is charged, and the day is freed up on the calendar for future bookings.
+With Everything.Rent, the no-show policy in the signed contract kicks in. The system flags the rental as a no-show when the renter doesn't confirm pickup. Per the contract terms, Clint can capture the full held amount. He initiates the capture from his dashboard, the $350 is charged, and the day is freed up on the calendar for future bookings.
 
 **Climax:** Clint lost the rental day but not the revenue. The hold-based system did exactly what it was designed to do.
 
@@ -202,7 +202,7 @@ With RentingApp, the no-show policy in the signed contract kicks in. The system 
 
 ### Journey 5: Platform Operations (Admin — MVP)
 
-For MVP, Clint is both operator and platform admin. Admin needs are minimal — Stripe dashboard handles transaction monitoring and payout details, Twilio dashboard shows SMS activity and costs. Within RentingApp, Clint can view all his listings, see upcoming and past bookings, and review the unified message hub.
+For MVP, Clint is both operator and platform admin. Admin needs are minimal — Stripe dashboard handles transaction monitoring and payout details, Twilio dashboard shows SMS activity and costs. Within Everything.Rent, Clint can view all his listings, see upcoming and past bookings, and review the unified message hub.
 
 If a dispute arises (renter claims they returned equipment damaged, operator disagrees), the check-in record from the manage-my-rental flow provides documented evidence — the renter's own damage report or confirmation of good condition. For MVP, dispute resolution beyond this documentation is handled offline.
 
@@ -214,7 +214,7 @@ If a dispute arises (renter claims they returned equipment damaged, operator dis
 
 ### Project-Type Overview
 
-RentingApp is a single-page application (SPA) serving two distinct user experiences: an operator-facing dashboard for listing management, booking oversight, and communication, and a renter-facing booking flow for availability viewing, contract signing, and payment. Renters arrive exclusively via classifieds links — organic search discovery is not part of the MVP strategy.
+Everything.Rent is a single-page application (SPA) serving two distinct user experiences: an operator-facing dashboard for listing management, booking oversight, and communication, and a renter-facing booking flow for availability viewing, contract signing, and payment. Renters arrive exclusively via classifieds links — organic search discovery is not part of the MVP strategy.
 
 ### Technical Architecture Considerations
 
@@ -351,7 +351,7 @@ RentingApp is a single-page application (SPA) serving two distinct user experien
 ### Security
 
 - All data encrypted in transit (TLS) and at rest
-- Payment security delegated entirely to Stripe — no card numbers stored or processed by RentingApp
+- Payment security delegated entirely to Stripe — no card numbers stored or processed by Everything.Rent
 - Phone numbers stored securely — used as renter identity, must be protected
 - Signed contracts stored immutably — no modification after signing
 - OTP codes expire after 5 minutes and are single-use

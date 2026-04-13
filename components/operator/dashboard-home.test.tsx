@@ -83,7 +83,7 @@ describe("DashboardHome", () => {
         name: /haven't created any listings yet/i,
       }),
     ).toBeInTheDocument();
-    const cta = screen.getByRole("link", { name: "Create Listing" });
+    const cta = screen.getByRole("link", { name: "New Listing" });
     expect(cta).toHaveAttribute("href", "/listings/new");
   });
 

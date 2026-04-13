@@ -128,7 +128,7 @@ export function CreateListingWizard() {
       <WizardStepIndicator currentStep={state.step} />
 
       <Card>
-        <CardContent className="p-space-6">
+        <CardContent className="p-space-6 pt-space-6">
           {state.step === 1 && (
             <PhotosStep
               operatorId={operatorId ?? ""}

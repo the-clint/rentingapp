@@ -20,9 +20,9 @@ describe("EmptyListingsCard", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders the Create Listing CTA pointing at /listings/new", () => {
+  it("renders the New Listing CTA pointing at /listings/new", () => {
     render(<EmptyListingsCard />);
-    const cta = screen.getByRole("link", { name: "Create Listing" });
+    const cta = screen.getByRole("link", { name: "New Listing" });
     expect(cta).toHaveAttribute("href", "/listings/new");
   });
 });

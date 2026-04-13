@@ -39,7 +39,7 @@ export function ListingCard({
             className="h-full w-full object-cover"
           />
         </div>
-        <CardContent className="flex flex-col gap-space-2 p-space-4">
+        <CardContent className="flex flex-col gap-space-2 p-space-4 pt-space-4">
           <h2 className="text-h2 truncate">{name}</h2>
           <p className="text-body font-medium">{dailyRate}</p>
           <p className="text-body text-neutral-700 truncate">

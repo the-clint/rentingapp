@@ -125,7 +125,7 @@ describe("PaymentHoldForm", () => {
       configurable: true,
       value: {
         ...originalLocation,
-        origin: "http://localhost",
+        origin: "http://everything.test",
         pathname: "/book/listing-1/payment",
         search: "?bookingId=booking-1",
       },

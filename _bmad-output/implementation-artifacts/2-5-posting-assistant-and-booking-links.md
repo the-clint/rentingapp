@@ -209,7 +209,7 @@ The booking URL is built in `app/(operator)/listings/[listingId]/page.tsx` using
 
 1. `process.env.NEXT_PUBLIC_SITE_URL` — if set, use it verbatim (strip trailing slash).
 2. `headers()` — read `x-forwarded-proto` + `host`. This covers Vercel and most proxies.
-3. Fallback `http://localhost:3000` — only in local dev when neither above is present.
+3. Fallback `http://everything.test:3000` — only in local dev when neither above is present.
 
 Append `/book/{listingId}` to the resolved base URL.
 
@@ -229,7 +229,7 @@ async function buildBookingUrl(listingId: string): Promise<string> {
   if (host) {
     return `${proto}://${host}/book/${listingId}`;
   }
-  return `http://localhost:3000/book/${listingId}`;
+  return `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://everything.test:3000"}/book/${listingId}`;
 }
 ```
 
@@ -335,7 +335,7 @@ No migrations. No new Server Actions. No new npm deps.
 - Pure generator `lib/utils/posting-templates.ts` covers KSL / Facebook Marketplace / Craigslist with verbatim templates from Dev Notes. Daily rate formatted via private `formatDailyRate` helper.
 - `PostingAssistantDialog` uses the native `<dialog>` pattern from Story 2.3. Auto-open is guarded with both `hasConsumedInitialOpen` state and a `router.replace(pathname)` URL scrub on close (only when `window.location.search` contains `posted=1`).
 - Clipboard API is wrapped in try/catch with per-target `copiedTarget` / `erroredTarget` state. The 2-second revert uses `window.setTimeout` with a `current === key` guard so rapid sequential copies across buttons behave correctly.
-- Detail page Server Component builds `bookingUrl` via `buildBookingUrl` helper: `NEXT_PUBLIC_SITE_URL` > `x-forwarded-proto` + `host` headers > `http://localhost:3000` fallback.
+- Detail page Server Component builds `bookingUrl` via `buildBookingUrl` helper: `NEXT_PUBLIC_SITE_URL` > `x-forwarded-proto` + `host` headers > `http://everything.test:3000` fallback.
 - Wizard publish redirect now appends `?posted=1`. No existing wizard test needed updating (no `create-listing-wizard.test.*` exists).
 - Tests: 217 / 217 passing, 13 net new (`posting-templates` 5, `posting-assistant-dialog` 6, `listing-detail-view` +2).
 - Lint: clean. Type-check: clean.

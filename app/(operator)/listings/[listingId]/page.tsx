@@ -20,7 +20,7 @@ interface ListingDetailPageProps {
  * Build the renter-facing booking URL. Priority (per Story 2.5 AC #9):
  *   1. `NEXT_PUBLIC_SITE_URL` env var (strip trailing slash)
  *   2. `x-forwarded-proto` + `host` request headers
- *   3. `http://localhost:3000` fallback for local dev
+ *   3. `http://everything.test:3000` fallback for local dev
  *
  * The `/book/{listingId}` route itself ships in Epic 3 Story 3.1 — clicking
  * today will 404, which is expected.
@@ -36,7 +36,7 @@ async function buildBookingUrl(listingId: string): Promise<string> {
   if (host) {
     return `${proto}://${host}/book/${listingId}`;
   }
-  return `http://localhost:3000/book/${listingId}`;
+  return `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://everything.test:3000"}/book/${listingId}`;
 }
 
 interface ListingRow {

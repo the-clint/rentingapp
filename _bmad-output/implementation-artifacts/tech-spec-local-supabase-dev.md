@@ -42,16 +42,16 @@ context: ['docs/bitwarden-secrets-setup.md']
 
 **Acceptance Criteria:**
 - Given Docker is running, when `npm run supabase:start` is executed, then the local Supabase stack starts and all 15 migrations apply
-- Given local Supabase is running, when `npm run dev` is executed, then the Next.js app connects to the local Supabase instance (verified via Supabase Studio at localhost:54323)
+- Given local Supabase is running, when `npm run dev` is executed, then the Next.js app connects to the local Supabase instance (verified via Supabase Studio at everything.test:54323)
 - Given local Supabase is running, when `npm run supabase:reset` is executed, then the database is wiped and migrations + seed are re-applied
 - Given the `.env.local` file exists, when a production deployment occurs (using Varlock), then cloud Supabase credentials from Bitwarden are used (`.env.local` is not deployed)
 
 ## Verification
 
 **Commands:**
-- `npm run supabase:start` -- expected: all containers start, migrations apply, Studio accessible at http://127.0.0.1:54323
+- `npm run supabase:start` -- expected: all containers start, migrations apply, Studio accessible at http://everything.test:54323
 - `npm run supabase:status` -- expected: shows running services and their URLs/ports
 
 **Manual checks (if no CLI):**
-- Open Supabase Studio at http://127.0.0.1:54323 and confirm all tables from migrations are present
+- Open Supabase Studio at http://everything.test:54323 and confirm all tables from migrations are present
 - Run `npm run dev` and verify the app loads without Supabase connection errors

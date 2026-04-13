@@ -2,17 +2,11 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "Next.js dev",
+      "name": "dev",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["scripts/dev-with-bws.mjs"],
+      "runtimeArgs": ["scripts/dev.mjs"],
       "port": 3000,
       "autoPort": false
-    },
-    {
-      "name": "Supabase Studio",
-      "runtimeExecutable": "supabase",
-      "runtimeArgs": ["start"],
-      "port": 54323
     }
   ]
 }

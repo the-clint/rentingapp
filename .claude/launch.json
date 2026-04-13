@@ -5,7 +5,7 @@
       "name": "dev",
       "runtimeExecutable": "node",
       "runtimeArgs": ["scripts/dev.mjs"],
-      "port": 3000,
+      "port": 80,
       "autoPort": false
     }
   ]

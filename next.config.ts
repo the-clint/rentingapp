@@ -3,6 +3,7 @@ import { varlockNextConfigPlugin } from "@varlock/nextjs-integration/plugin";
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
+  allowedDevOrigins: ["everything.test"],
 };
 
 // Wrap with the varlock Next.js plugin so env var loading, validation,

@@ -78,7 +78,7 @@ _bmad-output/
    ```bash
    npm run dev
    ```
-   This single command starts the local Supabase emulator (if not already running) and then launches the Next.js dev server. The app will be available at http://everything.test:3000.
+   This single command starts the local Supabase emulator (if not already running) and then launches the Next.js dev server. The app will be available at http://everything.test.
 
 ## Scripts
 

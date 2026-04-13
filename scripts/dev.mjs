@@ -97,7 +97,7 @@ if (!childEnv.BWS_SECRETS_TOKEN) {
 // eslint-disable-next-line no-console
 console.log("[dev] Starting Next.js...");
 
-const child = spawn("npx", ["next", "dev"], {
+const child = spawn("npx", ["next", "dev", "--hostname", "everything.test", "--port", "80"], {
   stdio: "inherit",
   env: childEnv,
   shell: isWindows,

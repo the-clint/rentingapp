@@ -1,7 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 3000;
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? `http://everything.test:${PORT}`;
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://everything.test";
 
 export default defineConfig({
   testDir: "./tests/e2e",

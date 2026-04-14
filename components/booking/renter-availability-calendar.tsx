@@ -130,16 +130,16 @@ function cellClassName(
       stateCls += "bg-neutral-100 text-neutral-300 cursor-default";
       break;
     case "booked":
-      stateCls += "bg-neutral-100 text-neutral-400 cursor-default";
+      stateCls += "bg-neutral-100 text-neutral-500 cursor-default";
       break;
     case "blocked":
-      stateCls += "bg-neutral-100 text-neutral-400 cursor-default";
+      stateCls += "bg-neutral-100 text-neutral-500 cursor-default";
       break;
     case "maintenance":
-      stateCls += "bg-neutral-200 text-neutral-600 cursor-default";
+      stateCls += "bg-muted text-neutral-500 cursor-default";
       break;
     case "available":
-      stateCls += "bg-white text-neutral-900 hover:bg-neutral-100";
+      stateCls += "bg-card text-neutral-900 hover:bg-neutral-100";
       break;
   }
   const todayCls = isToday ? "ring-2 ring-primary-dark ring-inset" : "";

@@ -171,7 +171,7 @@ export function ListingPhotoCarousel({
         disabled={atStart}
         aria-disabled={atStart}
         aria-label="Previous photo"
-        className="absolute left-space-2 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-neutral-900 shadow-md transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 md:flex"
+        className="absolute left-space-2 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-card/90 text-neutral-900 shadow-md transition hover:bg-card disabled:cursor-not-allowed disabled:opacity-40 md:flex"
       >
         <ChevronLeft className="h-5 w-5" aria-hidden="true" />
       </button>
@@ -181,7 +181,7 @@ export function ListingPhotoCarousel({
         disabled={atEnd}
         aria-disabled={atEnd}
         aria-label="Next photo"
-        className="absolute right-space-2 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-neutral-900 shadow-md transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40 md:flex"
+        className="absolute right-space-2 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-card/90 text-neutral-900 shadow-md transition hover:bg-card disabled:cursor-not-allowed disabled:opacity-40 md:flex"
       >
         <ChevronRight className="h-5 w-5" aria-hidden="true" />
       </button>

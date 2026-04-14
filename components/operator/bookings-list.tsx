@@ -40,7 +40,7 @@ const STATUS_BADGE_CLASSES: Record<OperatorBookingRow["status"], string> = {
   upcoming:
     "bg-[hsl(var(--success))]/15 text-[hsl(var(--success))]",
   completed:
-    "bg-neutral-200 text-neutral-700",
+    "bg-muted text-neutral-700",
   cancelled:
     "bg-[hsl(var(--destructive))]/10 text-[hsl(var(--destructive))]",
   no_show:
@@ -70,7 +70,7 @@ export function OperatorBookingsList({
   return (
     <div className="flex flex-col gap-space-4">
       <nav
-        className="flex flex-wrap gap-space-2 border-b border-neutral-200"
+        className="flex flex-wrap gap-space-2 border-b border-border"
         aria-label="Booking status filter"
       >
         {OPERATOR_BOOKINGS_STATUS_FILTERS.map((filter) => {
@@ -114,10 +114,10 @@ function EmptyState({ filter }: { filter: OperatorBookingsStatusFilter }) {
   if (filter === "all") {
     return (
       <div
-        className="rounded-lg border border-dashed border-neutral-300 bg-neutral-50 p-space-6 text-center"
+        className="rounded-lg border border-dashed border-neutral-300 bg-muted p-space-6 text-center"
         data-testid="operator-bookings-empty-all"
       >
-        <p className="text-small text-neutral-800">
+        <p className="text-small text-neutral-900">
           No bookings yet. Once you post your listing on classifieds,
           bookings will appear here.
         </p>
@@ -126,10 +126,10 @@ function EmptyState({ filter }: { filter: OperatorBookingsStatusFilter }) {
   }
   return (
     <div
-      className="rounded-lg border border-dashed border-neutral-300 bg-neutral-50 p-space-6 text-center"
+      className="rounded-lg border border-dashed border-neutral-300 bg-muted p-space-6 text-center"
       data-testid="operator-bookings-empty-filter"
     >
-      <p className="text-small text-neutral-800">
+      <p className="text-small text-neutral-900">
         No bookings match this filter.
       </p>
       <Link
@@ -148,12 +148,12 @@ function BookingRow({ booking }: { booking: OperatorBookingRow }) {
       data-testid="operator-booking-row"
       data-booking-id={booking.bookingId}
       data-status={booking.status}
-      className="rounded-lg border border-neutral-200 bg-white p-space-3 shadow-sm"
+      className="rounded-lg border border-border bg-card p-space-3 shadow-sm"
     >
       <div className="flex flex-col gap-space-3 lg:flex-row lg:items-center">
         <div
           aria-hidden="true"
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-neutral-200 text-xs font-semibold text-neutral-800"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold text-neutral-900"
         >
           {booking.renterInitials}
         </div>

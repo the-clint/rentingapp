@@ -141,12 +141,12 @@ export function ContractSigningFlow({
 
       <section
         aria-label="Contract summary"
-        className="flex flex-col gap-space-3 rounded-lg border border-neutral-200 bg-white p-space-4"
+        className="flex flex-col gap-space-3 rounded-lg border border-border bg-card p-space-4"
       >
         <h2 className="text-h3 font-semibold text-neutral-900">
           What you&apos;re agreeing to
         </h2>
-        <ul className="flex flex-col gap-space-2 text-base text-neutral-800">
+        <ul className="flex flex-col gap-space-2 text-base text-neutral-900">
           {summaryLines.map((line, i) => (
             <li key={i} className="flex gap-space-2">
               <span aria-hidden="true" className="text-primary-dark">
@@ -164,7 +164,7 @@ export function ContractSigningFlow({
           onClick={() => setIsExpanded((v) => !v)}
           aria-expanded={isExpanded}
           aria-controls={panelId}
-          className="flex items-center justify-between rounded-md border border-neutral-200 bg-neutral-50 px-space-3 py-space-2 text-base font-medium text-neutral-900 hover:bg-neutral-100"
+          className="flex items-center justify-between rounded-md border border-border bg-muted px-space-3 py-space-2 text-base font-medium text-neutral-900 hover:bg-neutral-100"
           data-testid="view-full-terms"
         >
           <span>View Full Terms</span>
@@ -187,7 +187,7 @@ export function ContractSigningFlow({
             isExpanded ? "max-h-[4000px]" : "max-h-0",
           )}
         >
-          <pre className="mt-space-2 whitespace-pre-wrap rounded-md border border-neutral-200 bg-white p-space-4 font-mono text-sm text-neutral-900">
+          <pre className="mt-space-2 whitespace-pre-wrap rounded-md border border-border bg-card p-space-4 font-mono text-sm text-neutral-900">
             {body}
           </pre>
         </div>

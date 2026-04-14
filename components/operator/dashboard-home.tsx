@@ -133,7 +133,7 @@ export async function DashboardHome() {
             {recent.map((b) => (
               <li
                 key={b.bookingId}
-                className="flex items-center justify-between rounded-md border border-neutral-200 bg-white p-space-3"
+                className="flex items-center justify-between rounded-md border border-border bg-card p-space-3"
                 data-testid="dashboard-recent-booking"
               >
                 <div className="min-w-0">
@@ -170,10 +170,10 @@ function StatCard({
 }) {
   return (
     <div
-      className="flex flex-col gap-space-1 rounded-lg border border-neutral-200 bg-white p-space-4 shadow-sm"
+      className="flex flex-col gap-space-1 rounded-lg border border-border bg-card p-space-4 shadow-sm"
       data-testid={testId}
     >
-      <p className="text-xs font-medium uppercase tracking-wide text-neutral-600">
+      <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">
         {label}
       </p>
       <p className="text-h2 font-semibold text-neutral-900">{value}</p>

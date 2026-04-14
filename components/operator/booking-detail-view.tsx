@@ -130,7 +130,7 @@ export function OperatorBookingDetailView({
         >
           &larr; All bookings
         </Link>
-        <div className="flex flex-col gap-space-3 rounded-lg border border-neutral-200 bg-white p-space-4 shadow-sm md:flex-row md:items-center">
+        <div className="flex flex-col gap-space-3 rounded-lg border border-border bg-card p-space-4 shadow-sm md:flex-row md:items-center">
           <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-md bg-neutral-100">
             {booking.heroPhotoUrl ? (
               <Image
@@ -162,7 +162,7 @@ export function OperatorBookingDetailView({
             <span
               className={cn(
                 "inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold",
-                "bg-neutral-200 text-neutral-800",
+                "bg-muted text-neutral-900",
               )}
               data-testid="booking-detail-status"
             >
@@ -178,7 +178,7 @@ export function OperatorBookingDetailView({
       </header>
 
       <section
-        className="flex flex-col gap-space-3 rounded-lg border border-neutral-200 bg-white p-space-4"
+        className="flex flex-col gap-space-3 rounded-lg border border-border bg-card p-space-4"
         data-testid="booking-detail-contract"
       >
         <div className="flex items-center justify-between">
@@ -192,11 +192,11 @@ export function OperatorBookingDetailView({
           ) : null}
         </div>
         {booking.hasContract && booking.contractBody ? (
-          <details className="rounded-md border border-neutral-200 bg-neutral-50 p-space-3">
+          <details className="rounded-md border border-border bg-muted p-space-3">
             <summary className="cursor-pointer text-small font-medium text-neutral-900">
               View contract body
             </summary>
-            <pre className="mt-space-2 whitespace-pre-wrap text-xs text-neutral-800">
+            <pre className="mt-space-2 whitespace-pre-wrap text-xs text-neutral-900">
               {booking.contractBody}
             </pre>
           </details>
@@ -205,7 +205,7 @@ export function OperatorBookingDetailView({
             No signed contract on file.
           </p>
         )}
-        <p className="text-xs text-neutral-600">
+        <p className="text-xs text-neutral-500">
           This contract is immutable.
           {" "}
           <a
@@ -220,7 +220,7 @@ export function OperatorBookingDetailView({
 
       {booking.checkInSubmitted ? (
         <section
-          className="flex flex-col gap-space-3 rounded-lg border border-neutral-200 bg-white p-space-4"
+          className="flex flex-col gap-space-3 rounded-lg border border-border bg-card p-space-4"
           data-testid="booking-detail-check-in"
         >
           <div className="flex items-center justify-between">
@@ -231,14 +231,14 @@ export function OperatorBookingDetailView({
               {formatDateTime(booking.checkInSubmittedAt)}
             </span>
           </div>
-          <p className="text-small text-neutral-800">
+          <p className="text-small text-neutral-900">
             Condition:{" "}
             <strong className="capitalize">
               {booking.checkInCondition ?? "—"}
             </strong>
           </p>
           {booking.checkInComments ? (
-            <p className="whitespace-pre-wrap text-small text-neutral-800">
+            <p className="whitespace-pre-wrap text-small text-neutral-900">
               {booking.checkInComments}
             </p>
           ) : null}
@@ -261,11 +261,11 @@ export function OperatorBookingDetailView({
         </section>
       ) : null}
 
-      <section className="flex flex-col gap-space-3 rounded-lg border border-neutral-200 bg-white p-space-4">
+      <section className="flex flex-col gap-space-3 rounded-lg border border-border bg-card p-space-4">
         <h2 className="text-h3 font-semibold text-neutral-900">
           Pickup instructions
         </h2>
-        <p className="text-small text-neutral-800">{booking.pickupLocation}</p>
+        <p className="text-small text-neutral-900">{booking.pickupLocation}</p>
       </section>
 
       {lastCapture ? (
@@ -276,7 +276,7 @@ export function OperatorBookingDetailView({
           <p className="text-small font-semibold text-[hsl(var(--success))]">
             ✓ Captured {formatUsd(lastCapture.captured)}
           </p>
-          <p className="text-xs text-neutral-800">
+          <p className="text-xs text-neutral-900">
             Fees: {formatUsd(lastCapture.fees)} &middot; Net:{" "}
             <strong>{formatUsd(lastCapture.net)}</strong>
           </p>
@@ -376,11 +376,11 @@ function ConfirmDialog({
       aria-modal="true"
       data-testid="booking-confirm-dialog"
     >
-      <div className="w-full max-w-md rounded-lg bg-white p-space-5 shadow-lg">
+      <div className="w-full max-w-md rounded-lg bg-card p-space-5 shadow-lg">
         <h3 className="text-h3 font-semibold text-neutral-900">
           {copy.title}
         </h3>
-        <p className="mt-space-2 text-small text-neutral-800">{copy.body}</p>
+        <p className="mt-space-2 text-small text-neutral-900">{copy.body}</p>
         <div className="mt-space-4 flex justify-end gap-space-2">
           <Button
             type="button"

@@ -30,7 +30,7 @@ const BADGE_TONE_CLASSES: Record<RentalBadgeTone, string> = {
     "border-transparent bg-[hsl(var(--primary))]/15 text-[hsl(var(--primary-dark))]",
   warning:
     "border-transparent bg-[hsl(var(--warning))]/20 text-[hsl(var(--warning))] motion-safe:animate-pulse",
-  muted: "border-transparent bg-neutral-200 text-neutral-700",
+  muted: "border-transparent bg-muted text-neutral-700",
   destructive:
     "border-transparent bg-[hsl(var(--destructive))]/10 text-[hsl(var(--destructive))]",
 };
@@ -64,7 +64,7 @@ export function RentalCard({ rental }: RentalCardProps) {
       data-testid="rental-card"
       data-lifecycle-state={lifecycle.state}
       className={cn(
-        "flex flex-col gap-space-4 rounded-lg border border-neutral-200 bg-white p-space-4 shadow-sm",
+        "flex flex-col gap-space-4 rounded-lg border border-border bg-card p-space-4 shadow-sm",
         lifecycle.isPast && "opacity-80",
       )}
     >
@@ -95,7 +95,7 @@ export function RentalCard({ rental }: RentalCardProps) {
           <p className="text-small text-neutral-700">
             {formatDateRange(rental.startDate, rental.endDate)}
           </p>
-          <p className="truncate text-xs text-neutral-600">
+          <p className="truncate text-xs text-neutral-500">
             {rental.pickupLocation}
           </p>
           <span

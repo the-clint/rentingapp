@@ -45,7 +45,7 @@ export function ListingCard({
           <p className="text-body text-neutral-700 truncate">
             {pickupLocation}
           </p>
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm text-neutral-500">
             Created {formatRelativeTime(createdAtIso)}
           </p>
         </CardContent>

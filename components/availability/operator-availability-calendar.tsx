@@ -304,7 +304,7 @@ export function OperatorAvailabilityCalendar({
       )}
 
       {isDirty && (
-        <div className="sticky bottom-0 z-10 flex flex-col gap-space-2 border-t border-neutral-200 bg-white p-space-4 shadow-lg">
+        <div className="sticky bottom-0 z-10 flex flex-col gap-space-2 border-t border-border bg-card p-space-4 shadow-lg">
           {state.saveError && (
             <div
               role="status"

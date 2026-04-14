@@ -171,7 +171,7 @@ export function PostingAssistantDialog({
         onClick={handleBackdropClick}
         onClose={handleClose}
         aria-labelledby="posting-assistant-dialog-title"
-        className="max-w-3xl w-[min(92vw,48rem)] rounded-lg border border-neutral-200 p-space-6 shadow-lg backdrop:bg-black/50"
+        className="max-w-4xl w-[min(94vw,56rem)] rounded-lg border border-border bg-card text-foreground p-space-6 shadow-lg backdrop:bg-black/50"
       >
         <div className="flex flex-col gap-space-5">
           <header className="flex items-start justify-between gap-space-4">
@@ -200,11 +200,11 @@ export function PostingAssistantDialog({
 
           <section
             aria-labelledby="posting-assistant-booking-link-label"
-            className="flex flex-col gap-space-3 rounded-lg border border-neutral-200 bg-neutral-50 p-space-4"
+            className="flex flex-col gap-space-3 rounded-lg border border-border bg-muted p-space-4"
           >
             <label
               id="posting-assistant-booking-link-label"
-              className="text-sm font-medium text-neutral-600"
+              className="text-sm font-medium text-neutral-500"
             >
               Booking link
             </label>
@@ -241,7 +241,7 @@ export function PostingAssistantDialog({
             {/* TODO: QR code (Story 3.1). Requires a renter-facing /book/[id] page to target. Planned: add `qrcode` dep or hand-write encoder in that story. */}
             <div
               aria-hidden="true"
-              className="rounded-md border border-dashed border-neutral-300 bg-white px-space-3 py-space-2 text-xs text-neutral-500"
+              className="rounded-md border border-dashed border-neutral-300 bg-card px-space-3 py-space-2 text-xs text-neutral-500"
             >
               QR code will be generated in Epic 3 (Story 3.1) once the booking
               page exists.
@@ -286,7 +286,7 @@ function PlatformCopyCard({
 }: PlatformCopyCardProps) {
   const textareaId = `posting-assistant-${platform}-copy`;
   return (
-    <article className="flex flex-col gap-space-3 rounded-lg border border-neutral-200 bg-white p-space-4">
+    <article className="flex flex-col gap-space-3 rounded-lg border border-border bg-card p-space-4">
       <h3 className="text-h3 font-semibold">{heading}</h3>
       <textarea
         id={textareaId}
@@ -294,7 +294,7 @@ function PlatformCopyCard({
         value={copy}
         rows={8}
         aria-label={`${heading} ad copy`}
-        className="w-full resize-none rounded-md border border-neutral-200 bg-neutral-50 p-space-2 font-mono text-sm"
+        className="w-full resize-none rounded-md border border-border bg-muted p-space-2 font-mono text-sm"
       />
       <Button type="button" variant="outline" onClick={onCopy}>
         {copied ? (

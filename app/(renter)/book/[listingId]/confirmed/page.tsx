@@ -120,7 +120,7 @@ async function ConfirmedPageBody({ params, searchParams }: ConfirmedPageProps) {
         </p>
       </div>
 
-      <div className="flex flex-col gap-space-3 rounded-md border border-neutral-200 p-space-4">
+      <div className="flex flex-col gap-space-3 rounded-md border border-border p-space-4">
         <h2 className="text-h3 font-semibold text-neutral-900">
           {listing?.name ?? "Your rental"}
         </h2>

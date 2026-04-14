@@ -4,8 +4,9 @@
  *
  * 1. Checks if local Supabase is already running (via `supabase status`).
  * 2. If not, starts it with `supabase start`.
- * 3. Hydrates BWS_SECRETS_TOKEN on Windows (same logic as dev-with-bws.mjs).
- * 4. Spawns `next dev` with the populated env.
+ * 3. Starts Caddy reverse proxy (via docker compose).
+ * 4. Hydrates BWS_SECRETS_TOKEN on Windows (same logic as dev-with-bws.mjs).
+ * 5. Spawns `next dev` on port 3000 (Caddy fronts it at https://everything.test).
  *
  * Usage:  node scripts/dev.mjs        (or `npm run dev`)
  */
@@ -53,6 +54,24 @@ if (isSupabaseRunning()) {
 }
 
 // ---------------------------------------------------------------------------
+// Caddy: start the reverse proxy (https://everything.test -> localhost:3000)
+// ---------------------------------------------------------------------------
+// eslint-disable-next-line no-console
+console.log("[dev] Starting Caddy...");
+try {
+  execSync("docker compose up -d caddy", {
+    stdio: "inherit",
+    timeout: 30_000,
+  });
+  // eslint-disable-next-line no-console
+  console.log("[dev] Caddy started. App will be available at https://everything.test");
+} catch (err) {
+  // eslint-disable-next-line no-console
+  console.error("[dev] Failed to start Caddy. Is Docker running?");
+  process.exit(1);
+}
+
+// ---------------------------------------------------------------------------
 // BWS token: hydrate from Windows User scope if needed
 // ---------------------------------------------------------------------------
 const childEnv = { ...process.env };
@@ -97,13 +116,22 @@ if (!childEnv.BWS_SECRETS_TOKEN) {
 // eslint-disable-next-line no-console
 console.log("[dev] Starting Next.js...");
 
-const child = spawn("npx", ["next", "dev", "--hostname", "everything.test", "--port", "80"], {
+const child = spawn("npx", ["next", "dev", "--port", "3000"], {
   stdio: "inherit",
   env: childEnv,
   shell: isWindows,
 });
 
+function cleanup() {
+  try {
+    execSync("docker compose down", { stdio: "inherit", timeout: 10_000 });
+  } catch {
+    // Best-effort — container may already be stopped
+  }
+}
+
 child.on("exit", (code, signal) => {
+  cleanup();
   if (signal) {
     process.kill(process.pid, signal);
     return;

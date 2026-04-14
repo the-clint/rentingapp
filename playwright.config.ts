@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://everything.test";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://everything.test";
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -12,6 +12,7 @@ export default defineConfig({
   globalTeardown: "./tests/e2e/global-teardown.ts",
   use: {
     baseURL: BASE_URL,
+    ignoreHTTPSErrors: true,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },

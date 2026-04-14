@@ -110,7 +110,7 @@ export function BookingStickyBar({
       data-testid="booking-sticky-bar"
       data-visible={isVisible ? "true" : "false"}
       aria-hidden={!isVisible}
-      className={`fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 bg-white px-space-4 py-space-4 shadow-[0_-8px_24px_rgba(0,0,0,0.08)] transition-transform duration-200 ease-out ${
+      className={`fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card px-space-4 py-space-4 shadow-[0_-8px_24px_rgba(0,0,0,0.08)] transition-transform duration-200 ease-out ${
         isVisible ? "translate-y-0" : "translate-y-full"
       }`}
     >

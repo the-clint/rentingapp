@@ -168,7 +168,7 @@ function InnerPaymentHoldForm({
       className="flex flex-col gap-space-4"
       aria-label="Payment hold form"
     >
-      <div className="rounded-md border border-neutral-200 bg-neutral-100 p-space-3">
+      <div className="rounded-md border border-border bg-neutral-100 p-space-3">
         <p className="text-body text-neutral-900">
           We&rsquo;ll hold <strong>{formatUsd(amountCents)}</strong> — you&rsquo;re only
           charged when the rental completes.

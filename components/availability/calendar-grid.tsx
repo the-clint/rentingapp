@@ -78,14 +78,14 @@ export function cellClassName(state: CellState, isToday: boolean): string {
       stateCls = "bg-neutral-100 text-neutral-300 cursor-default";
       break;
     case "maintenance_buffer":
-      stateCls = "bg-neutral-200 text-neutral-600 cursor-default";
+      stateCls = "bg-muted text-neutral-500 cursor-default";
       break;
     case "operator_block":
       stateCls =
-        "bg-neutral-100 text-neutral-500 hover:bg-neutral-200 availability-hatch";
+        "bg-neutral-100 text-neutral-500 hover:bg-muted availability-hatch";
       break;
     case "available":
-      stateCls = "bg-white text-neutral-900 hover:bg-neutral-100";
+      stateCls = "bg-card text-neutral-900 hover:bg-neutral-100";
       break;
   }
   const todayCls = isToday ? "ring-2 ring-primary-dark ring-inset" : "";

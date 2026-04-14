@@ -133,7 +133,7 @@ export function RealtimeNotifications({
         <div
           key={t.id}
           role="status"
-          className="pointer-events-auto max-w-sm rounded-lg border border-[hsl(var(--primary))]/30 bg-white p-3 shadow-lg"
+          className="pointer-events-auto max-w-sm rounded-lg border border-[hsl(var(--primary))]/30 bg-card p-3 shadow-lg"
           data-testid="operator-toast"
         >
           <p className="text-small font-semibold text-neutral-900">{t.title}</p>

@@ -65,7 +65,7 @@ export function BookingStepIndicator({
                   "border-primary bg-primary text-primary-foreground",
                 !isCurrent &&
                   !isComplete &&
-                  "border-neutral-300 bg-white text-neutral-500",
+                  "border-neutral-300 bg-card text-neutral-500",
               )}
             >
               {isComplete ? (

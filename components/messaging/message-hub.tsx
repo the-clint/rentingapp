@@ -40,7 +40,7 @@ const PLATFORM_BADGE: Record<
     label: "CL",
     className: "bg-purple-100 text-purple-800",
   },
-  direct: { label: "Direct", className: "bg-neutral-200 text-neutral-800" },
+  direct: { label: "Direct", className: "bg-muted text-neutral-900" },
 };
 
 function formatTime(iso: string | null): string {
@@ -153,10 +153,10 @@ export function MessageHub({
   if (conversations.length === 0) {
     return (
       <div
-        className="rounded-lg border border-dashed border-neutral-300 bg-neutral-50 p-space-6 text-center"
+        className="rounded-lg border border-dashed border-neutral-300 bg-muted p-space-6 text-center"
         data-testid="messages-empty-state"
       >
-        <p className="text-small text-neutral-800">
+        <p className="text-small text-neutral-900">
           No messages yet. When renters reach out, conversations will
           appear here.
         </p>
@@ -170,7 +170,7 @@ export function MessageHub({
       data-testid="message-hub"
     >
       <aside
-        className="lg:w-[300px] lg:shrink-0 overflow-y-auto border border-neutral-200 bg-white rounded-lg"
+        className="lg:w-[300px] lg:shrink-0 overflow-y-auto border border-border bg-card rounded-lg"
         data-testid="conversation-list"
       >
         <ul>
@@ -187,7 +187,7 @@ export function MessageHub({
                   data-testid={`conversation-item-${conv.id}`}
                   data-active={active ? "true" : undefined}
                   className={cn(
-                    "flex w-full flex-col gap-1 border-b border-neutral-200 px-space-3 py-space-2 text-left hover:bg-neutral-50",
+                    "flex w-full flex-col gap-1 border-b border-border px-space-3 py-space-2 text-left hover:bg-muted",
                     active && "bg-[hsl(var(--primary))]/10",
                   )}
                 >
@@ -226,14 +226,14 @@ export function MessageHub({
 
       <section
         className={cn(
-          "flex min-h-0 flex-1 flex-col gap-space-2 rounded-lg border border-neutral-200 bg-white",
+          "flex min-h-0 flex-1 flex-col gap-space-2 rounded-lg border border-border bg-card",
           !thread && "hidden lg:flex",
         )}
         data-testid="conversation-thread"
       >
         {thread ? (
           <>
-            <header className="flex items-center justify-between border-b border-neutral-200 px-space-3 py-space-2">
+            <header className="flex items-center justify-between border-b border-border px-space-3 py-space-2">
               <div>
                 <p className="text-small font-semibold text-neutral-900">
                   {thread.conversation.renterDisplay}
@@ -307,7 +307,7 @@ export function MessageHub({
 
             <form
               onSubmit={handleSend}
-              className="flex items-center gap-space-2 border-t border-neutral-200 p-space-2"
+              className="flex items-center gap-space-2 border-t border-border p-space-2"
               data-testid="message-compose"
             >
               <input

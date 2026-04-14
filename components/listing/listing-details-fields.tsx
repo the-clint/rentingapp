@@ -132,7 +132,7 @@ export function ListingDetailsFields({
           )}
           <span
             id="listing-description-count"
-            className="text-sm text-neutral-600"
+            className="text-sm text-neutral-500"
           >
             {details.description.length} / 2000
           </span>

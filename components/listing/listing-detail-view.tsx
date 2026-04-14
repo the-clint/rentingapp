@@ -52,7 +52,7 @@ export function ListingDetailView({
   return (
     <div className="flex flex-col gap-space-6">
       {hero && (
-        <div className="overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100">
+        <div className="overflow-hidden rounded-lg border border-border bg-neutral-100">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={hero.url}
@@ -70,7 +70,7 @@ export function ListingDetailView({
           {thumbnails.map((photo, i) => (
             <li
               key={photo.path}
-              className="overflow-hidden rounded-md border border-neutral-200 bg-neutral-100"
+              className="overflow-hidden rounded-md border border-border bg-neutral-100"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -85,18 +85,18 @@ export function ListingDetailView({
 
       <dl className="grid gap-space-3">
         <div>
-          <dt className="text-sm font-medium text-neutral-600">Daily rate</dt>
+          <dt className="text-sm font-medium text-neutral-500">Daily rate</dt>
           <dd className="text-body font-semibold">
             {formatDailyRate(listing.daily_rate_cents)}
           </dd>
         </div>
         <div>
-          <dt className="text-sm font-medium text-neutral-600">Pickup location</dt>
+          <dt className="text-sm font-medium text-neutral-500">Pickup location</dt>
           <dd className="text-body">{listing.pickup_location}</dd>
         </div>
         {listing.pickup_instructions && listing.pickup_instructions.length > 0 && (
           <div>
-            <dt className="text-sm font-medium text-neutral-600">
+            <dt className="text-sm font-medium text-neutral-500">
               Pickup instructions
             </dt>
             <dd className="whitespace-pre-wrap text-body">
@@ -105,7 +105,7 @@ export function ListingDetailView({
           </div>
         )}
         <div>
-          <dt className="text-sm font-medium text-neutral-600">Description</dt>
+          <dt className="text-sm font-medium text-neutral-500">Description</dt>
           <dd className="whitespace-pre-wrap text-body">{listing.description}</dd>
         </div>
       </dl>

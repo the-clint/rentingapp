@@ -20,7 +20,7 @@ export function OperatorMobileTabBar() {
       className={cn(
         "fixed bottom-0 inset-x-0 z-40 md:hidden",
         "h-14 pb-[env(safe-area-inset-bottom)]",
-        "bg-white border-t border-neutral-300",
+        "bg-card border-t border-neutral-300",
         "flex items-stretch justify-around",
       )}
     >

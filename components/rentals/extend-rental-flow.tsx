@@ -150,8 +150,8 @@ export function ExtendRentalFlow(props: ExtendRentalFlowProps) {
         className="flex flex-col gap-space-4"
         data-testid="extend-flow-select"
       >
-        <div className="rounded-md border border-neutral-200 bg-neutral-100 p-space-3">
-          <p className="text-small text-neutral-800">
+        <div className="rounded-md border border-border bg-neutral-100 p-space-3">
+          <p className="text-small text-neutral-900">
             <strong>{props.listingName}</strong>
           </p>
           <p className="text-small text-neutral-700">
@@ -185,7 +185,7 @@ export function ExtendRentalFlow(props: ExtendRentalFlowProps) {
                     "rounded-md border px-space-2 py-space-2 text-small font-medium",
                     selected
                       ? "border-primary bg-primary/10 text-primary-dark"
-                      : "border-neutral-300 bg-white text-neutral-800",
+                      : "border-neutral-300 bg-card text-neutral-900",
                     opt.disabled && "cursor-not-allowed opacity-50",
                   )}
                 >
@@ -198,7 +198,7 @@ export function ExtendRentalFlow(props: ExtendRentalFlowProps) {
             })}
           </div>
           {props.maxExtendDays < 4 ? (
-            <p className="text-xs text-neutral-600">
+            <p className="text-xs text-neutral-500">
               Only {props.maxExtendDays} day
               {props.maxExtendDays === 1 ? "" : "s"} available (based on
               the remaining maintenance buffer).
@@ -206,7 +206,7 @@ export function ExtendRentalFlow(props: ExtendRentalFlowProps) {
           ) : null}
         </div>
 
-        <div className="rounded-md border border-neutral-200 bg-white p-space-3 text-small text-neutral-800">
+        <div className="rounded-md border border-border bg-card p-space-3 text-small text-neutral-900">
           <p data-testid="extend-cost-math">
             {formatUsd(props.dailyRateCents)}/day &times; {extendDays}{" "}
             additional day{extendDays > 1 ? "s" : ""} ={" "}
@@ -272,13 +272,13 @@ export function ExtendRentalFlow(props: ExtendRentalFlowProps) {
         <p className="text-base font-semibold text-[hsl(var(--success))]">
           Rental extended!
         </p>
-        <p className="text-small text-neutral-800">
+        <p className="text-small text-neutral-900">
           New return date:{" "}
           <strong>
             {formatDateReadable(prepared?.newEndDate ?? newEndDate)}
           </strong>
         </p>
-        <p className="text-small text-neutral-800">
+        <p className="text-small text-neutral-900">
           Additional hold placed:{" "}
           <strong>{formatUsd(prepared?.amountCents ?? deltaCents)}</strong>
         </p>
@@ -388,7 +388,7 @@ function InnerExtendAuthorize({
       aria-label="Extension hold form"
       data-testid="extend-flow-authorize"
     >
-      <div className="rounded-md border border-neutral-200 bg-neutral-100 p-space-3">
+      <div className="rounded-md border border-border bg-neutral-100 p-space-3">
         <p className="text-body text-neutral-900">
           We&rsquo;ll place an additional hold of{" "}
           <strong>{formatUsd(prepared.amountCents)}</strong>.

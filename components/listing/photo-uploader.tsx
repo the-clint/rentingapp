@@ -244,7 +244,7 @@ export function PhotoUploader({
       <button
         type="button"
         onClick={openPicker}
-        className="flex flex-col items-center justify-center gap-space-2 rounded-lg border-2 border-dashed border-neutral-300 bg-neutral-50 p-space-8 text-center transition-colors hover:border-primary hover:bg-primary-light/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex flex-col items-center justify-center gap-space-2 rounded-lg border-2 border-dashed border-neutral-300 bg-muted p-space-8 text-center transition-colors hover:border-primary hover:bg-primary-light/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         aria-label="Add photos"
       >
         <Upload className="h-8 w-8 text-neutral-500" aria-hidden="true" />
@@ -292,7 +292,7 @@ export function PhotoUploader({
                 setDragOverIdx(null);
               }}
               className={cn(
-                "group relative overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100",
+                "group relative overflow-hidden rounded-lg border border-border bg-neutral-100",
                 dragOverIdx === idx && "ring-2 ring-primary",
               )}
             >

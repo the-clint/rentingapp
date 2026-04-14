@@ -37,7 +37,7 @@ export function WizardStepIndicator({ currentStep }: WizardStepIndicatorProps) {
                   "flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium",
                   isActive && "bg-primary text-white",
                   isCompleted && "bg-primary-light text-primary-dark",
-                  isFuture && "bg-neutral-200 text-neutral-500",
+                  isFuture && "bg-muted text-neutral-500",
                 )}
               >
                 {isCompleted ? (
@@ -62,7 +62,7 @@ export function WizardStepIndicator({ currentStep }: WizardStepIndicatorProps) {
                 aria-hidden="true"
                 className={cn(
                   "h-px flex-1",
-                  step.id < currentStep ? "bg-primary-light" : "bg-neutral-200",
+                  step.id < currentStep ? "bg-primary-light" : "bg-muted",
                 )}
               />
             )}

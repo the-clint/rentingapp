@@ -1,3 +1,14 @@
+/*
+ * Theme-aware colors only. Do NOT use literal Tailwind utilities like
+ * bg-white, text-white (except over a colored backdrop), bg-neutral-50,
+ * bg-neutral-200, border-neutral-200 — they break dark mode because
+ * Tailwind's default neutral palette stays light regardless of the .dark
+ * class. Only the odd-indexed neutrals (100/300/500/700/900) are mapped
+ * to CSS variables in tailwind.config.ts.
+ *
+ * Use:  bg-card, bg-background, bg-muted, text-foreground,
+ *       text-neutral-{100,300,500,700,900}, border-border.
+ */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

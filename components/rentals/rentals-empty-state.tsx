@@ -10,7 +10,7 @@ export function RentalsEmptyState() {
   return (
     <div
       data-testid="rentals-empty-state"
-      className="flex flex-col items-center gap-space-3 rounded-lg border border-dashed border-neutral-200 bg-white p-space-6 text-center"
+      className="flex flex-col items-center gap-space-3 rounded-lg border border-dashed border-border bg-card p-space-6 text-center"
     >
       <h2 className="text-base font-semibold text-neutral-900">
         No rentals yet

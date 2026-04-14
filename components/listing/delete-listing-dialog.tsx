@@ -77,7 +77,7 @@ export function DeleteListingDialog({
         onClick={handleDialogClick}
         onClose={() => setErrorMessage(null)}
         aria-labelledby="delete-listing-dialog-title"
-        className="rounded-lg border border-neutral-200 p-space-6 shadow-lg backdrop:bg-black/50 max-w-md w-[min(90vw,28rem)]"
+        className="rounded-lg border border-border bg-card text-foreground p-space-6 shadow-lg backdrop:bg-black/50 max-w-md w-[min(90vw,28rem)]"
       >
         <div className="flex flex-col gap-space-4">
           <h2

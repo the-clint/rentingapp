@@ -39,7 +39,7 @@ export function DisassociateHistoryButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="text-small text-neutral-600 underline"
+        className="text-small text-neutral-500 underline"
         data-testid="disassociate-trigger"
       >
         I don&rsquo;t recognize these rentals
@@ -52,11 +52,11 @@ export function DisassociateHistoryButton() {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-space-4"
           data-testid="disassociate-dialog"
         >
-          <div className="w-full max-w-md rounded-lg bg-white p-space-5 shadow-lg">
+          <div className="w-full max-w-md rounded-lg bg-card p-space-5 shadow-lg">
             <h3 className="text-h3 font-semibold text-neutral-900">
               Remove rental history from this dashboard?
             </h3>
-            <p className="mt-space-2 text-small text-neutral-800">
+            <p className="mt-space-2 text-small text-neutral-900">
               This will remove all current rental history from your
               dashboard. Any future bookings you make will appear
               normally. Your phone number stays linked to future

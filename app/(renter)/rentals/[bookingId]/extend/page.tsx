@@ -172,7 +172,7 @@ async function ExtendRentalPageBody({
   return (
     <div className="mx-auto flex max-w-[480px] flex-col gap-space-6 px-space-4 py-space-6">
       <header className="flex flex-col gap-space-1">
-        <p className="text-small font-medium uppercase tracking-wide text-neutral-600">
+        <p className="text-small font-medium uppercase tracking-wide text-neutral-500">
           Everything.Rent
         </p>
         <h1 className="text-h2 font-semibold text-neutral-900">

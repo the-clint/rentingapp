@@ -109,7 +109,7 @@ export function CancelBookingFlow(props: CancelBookingFlowProps) {
           >
             ✓ Cancelled
           </p>
-          <p className="text-small text-neutral-800">
+          <p className="text-small text-neutral-900">
             {props.outcome === "refund"
               ? `Your hold of ${formatUsd(props.amountCents)} will be released within a few business days.`
               : `The hold of ${formatUsd(props.amountCents)} was captured per the within-48-hour cancellation policy.`}
@@ -131,8 +131,8 @@ export function CancelBookingFlow(props: CancelBookingFlowProps) {
       className="flex flex-col gap-space-4"
       data-testid="cancel-flow-review"
     >
-      <div className="rounded-md border border-neutral-200 bg-neutral-100 p-space-3">
-        <p className="text-small text-neutral-800">
+      <div className="rounded-md border border-border bg-neutral-100 p-space-3">
+        <p className="text-small text-neutral-900">
           <strong>{props.listingName}</strong>
         </p>
         <p className="text-small text-neutral-700">
@@ -152,7 +152,7 @@ export function CancelBookingFlow(props: CancelBookingFlowProps) {
           <p className="text-small font-medium text-neutral-900">
             Full refund &mdash; hold will be released
           </p>
-          <p className="text-small text-neutral-800">
+          <p className="text-small text-neutral-900">
             You&rsquo;re cancelling more than 48 hours before the rental
             starts, so your hold of{" "}
             <strong>{formatUsd(props.amountCents)}</strong> will be

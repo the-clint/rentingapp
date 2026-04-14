@@ -191,7 +191,7 @@ export function CheckInFlow(props: CheckInFlowProps) {
           >
             ✓ Check-in complete — thanks!
           </p>
-          <p className="text-small text-neutral-800">
+          <p className="text-small text-neutral-900">
             We&rsquo;ve let the operator know the rental is back.
           </p>
         </div>
@@ -212,8 +212,8 @@ export function CheckInFlow(props: CheckInFlowProps) {
       className="flex flex-col gap-space-5"
       data-testid="check-in-flow"
     >
-      <div className="flex items-center gap-space-3 rounded-md border border-neutral-200 bg-neutral-100 p-space-3">
-        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-neutral-200">
+      <div className="flex items-center gap-space-3 rounded-md border border-border bg-neutral-100 p-space-3">
+        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
           {props.heroPhotoUrl ? (
             <Image
               src={props.heroPhotoUrl}
@@ -264,7 +264,7 @@ export function CheckInFlow(props: CheckInFlowProps) {
               "flex cursor-pointer items-start gap-space-2 rounded-md border p-space-3 transition-colors",
               condition === opt.value
                 ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary))]/10"
-                : "border-neutral-200 bg-white hover:bg-neutral-50",
+                : "border-border bg-card hover:bg-muted",
             )}
             data-testid={`check-in-condition-${opt.value}`}
           >
@@ -346,7 +346,7 @@ export function CheckInFlow(props: CheckInFlowProps) {
               {photos.map((photo) => (
                 <li
                   key={photo.path}
-                  className="relative overflow-hidden rounded-md border border-neutral-200"
+                  className="relative overflow-hidden rounded-md border border-border"
                   data-testid="check-in-photo-item"
                 >
                   <Image

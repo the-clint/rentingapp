@@ -633,7 +633,7 @@ everything-rent/
 **Local Development:**
 1. `supabase start` — Starts local Supabase (PostgreSQL, Auth, Storage, Realtime) via Docker
 2. `npm run dev` — Starts Next.js dev server with Turbopack
-3. Supabase Studio available at `localhost:54323` for database inspection
+3. Supabase Studio available at `everything.test:54323` for database inspection
 4. Varlock validates env vars on dev server startup
 
 **CI Pipeline (GitHub Actions):**

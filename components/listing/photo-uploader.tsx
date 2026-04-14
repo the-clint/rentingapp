@@ -30,6 +30,29 @@ interface PhotoUploaderProps {
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
 
+/** Try to decode the file as an image. Returns an error message or null. */
+function validateImageContent(file: File): Promise<string | null> {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+        resolve(`${file.name}: image has no dimensions — the file may be corrupt`);
+      } else {
+        resolve(null);
+      }
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(
+        `${file.name}: file could not be read as an image — it may be corrupt or not a real image`,
+      );
+    };
+    img.src = url;
+  });
+}
+
 // TODO(a11y): keyboard drag-and-drop reordering is intentionally NOT
 // implemented for Story 2.1 (see story spec, Task 6.4). A future
 // accessibility story will add keyboard reorder controls.
@@ -91,11 +114,24 @@ export function PhotoUploader({
 
       if (valid.length === 0) return;
 
+      // Validate that files are actual decodable images (catches corrupt files,
+      // renamed non-images, etc.) before spending time on the upload.
+      const decoded: File[] = [];
+      for (const file of valid) {
+        const err = await validateImageContent(file);
+        if (err) {
+          addError(err);
+        } else {
+          decoded.push(file);
+        }
+      }
+      if (decoded.length === 0) return;
+
       const supabase = createClient();
 
-      setUploadingCount((c) => c + valid.length);
+      setUploadingCount((c) => c + decoded.length);
 
-      for (const file of valid) {
+      for (const file of decoded) {
         const path = getListingPhotoUploadPath(operatorId, draftId, file.name);
         const { error } = await supabase.storage
           .from(LISTING_PHOTOS_BUCKET)

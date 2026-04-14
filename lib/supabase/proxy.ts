@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { hasEnvVars } from "../utils";
+import { SUPABASE_COOKIE_NAME } from "./constants";
 
 function copyCookies(from: NextResponse, to: NextResponse): void {
   from.cookies.getAll().forEach(({ name, value, ...options }) => {
@@ -100,9 +101,10 @@ export async function updateSession(request: NextRequest) {
   }
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
     {
+      cookieOptions: { name: SUPABASE_COOKIE_NAME },
       cookies: {
         getAll() {
           return request.cookies.getAll();

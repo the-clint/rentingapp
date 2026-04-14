@@ -50,6 +50,10 @@ _bmad-output/
 - **Stripe account** (test mode is fine for local dev)
 - **Twilio account** with an SMS-capable phone number
 - **Bitwarden Secrets Manager** account with a machine access token (`BWS_SECRETS_TOKEN`) — secrets are pulled at load time by `@varlock/bitwarden-plugin`
+- **Hosts file entry** mapping `everything.test` to `127.0.0.1` — required so the browser, Next.js dev server, and local Supabase all share the same origin. Add this line to your hosts file (`C:\Windows\System32\drivers\etc\hosts` on Windows, `/etc/hosts` on macOS/Linux):
+  ```
+  127.0.0.1  everything.test
+  ```
 
 ## Getting Started
 
@@ -60,20 +64,21 @@ _bmad-output/
    npm install
    ```
 
-2. **Configure secrets**
+2. **Create your local env file**
+   ```bash
+   cp .env.example .env.local
+   ```
+   This gives you all the defaults needed to run against the local Supabase emulator. No secrets required for basic local dev.
+
+3. **Configure production secrets** _(optional — only needed for Stripe/Twilio features)_
    - Set `BWS_SECRETS_TOKEN` as a user/shell env var (never commit it).
    - Populate the referenced secrets in your BWS dashboard. See `.env.schema` for the required keys and `docs/bitwarden-secrets-setup.md` for the recommended naming convention.
 
-3. **Apply database migrations**
-   ```bash
-   # From supabase/ — see that directory for migration and seed instructions
-   ```
-
-4. **Run the dev server**
+4. **Run the dev environment**
    ```bash
    npm run dev
    ```
-   The app will be available at http://localhost:3000.
+   This single command starts the local Supabase emulator (if not already running) and then launches the Next.js dev server. The app will be available at http://everything.test.
 
 ## Scripts
 

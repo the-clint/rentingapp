@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { SUPABASE_COOKIE_NAME } from "./constants";
 
 /**
  * Especially important if using Fluid compute: Don't put this client in a
@@ -10,9 +11,10 @@ export async function createClient() {
   const cookieStore = await cookies();
 
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY!,
     {
+      cookieOptions: { name: SUPABASE_COOKIE_NAME },
       cookies: {
         getAll() {
           return cookieStore.getAll();

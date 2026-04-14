@@ -27,7 +27,7 @@ import { verifyTwilioWebhook } from "@/lib/services/twilio";
 
 function absoluteUrl(request: NextRequest): string {
   const proto = request.headers.get("x-forwarded-proto") ?? "https";
-  const host = request.headers.get("host") ?? "localhost";
+  const host = request.headers.get("host") ?? "everything.test";
   return `${proto}://${host}${request.nextUrl.pathname}`;
 }
 

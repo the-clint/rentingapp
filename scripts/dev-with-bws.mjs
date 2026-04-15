@@ -48,12 +48,10 @@ if (!childEnv.BWS_SECRETS_TOKEN) {
   const fromUserScope = getTokenFromWindowsUserScope();
   if (fromUserScope) {
     childEnv.BWS_SECRETS_TOKEN = fromUserScope;
-    // eslint-disable-next-line no-console
     console.log(
       "[dev-with-bws] hydrated BWS_SECRETS_TOKEN from Windows User scope",
     );
   } else {
-    // eslint-disable-next-line no-console
     console.warn(
       "[dev-with-bws] BWS_SECRETS_TOKEN is not set and could not be read from the OS user scope. varlock validation will fail — see docs/bitwarden-secrets-setup.md.",
     );

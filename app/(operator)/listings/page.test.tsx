@@ -135,8 +135,11 @@ describe("ListingsIndexBody", () => {
         name: /haven't created any listings yet/i,
       }),
     ).toBeInTheDocument();
-    const headerCta = screen.getByRole("link", { name: "New Listing" });
-    expect(headerCta).toHaveAttribute("href", "/listings/new");
+    const ctas = screen.getAllByRole("link", { name: "New Listing" });
+    expect(ctas).toHaveLength(2);
+    for (const cta of ctas) {
+      expect(cta).toHaveAttribute("href", "/listings/new");
+    }
   });
 
   it("renders one ListingCard per row when rows are present", async () => {

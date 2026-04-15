@@ -4,6 +4,7 @@ import { MapPin } from "lucide-react";
 
 import { BookingFlow } from "@/components/booking/booking-flow";
 import { ListingPhotoCarousel } from "@/components/booking/listing-photo-carousel";
+import { PreBookingInquiry } from "@/components/booking/pre-booking-inquiry";
 import { fetchPublicAvailability } from "@/lib/services/public-availability";
 import { fetchPublicListing } from "@/lib/services/public-listing";
 import { getBookingFlowResumePoint } from "@/lib/services/booking-flow-state";
@@ -109,6 +110,8 @@ async function BookingPageBody({ params, searchParams }: BookingPageProps) {
           {listing.description}
         </p>
       </div>
+
+      <PreBookingInquiry listingId={listing.id} />
 
       <BookingFlow
         listingId={listing.id}

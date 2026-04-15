@@ -192,14 +192,21 @@ export function MessageHub({
                   )}
                 >
                   <div className="flex items-center justify-between gap-space-2">
-                    <span
-                      className={cn(
-                        "truncate text-small font-semibold text-neutral-900",
-                        conv.unreadCount > 0 && "font-bold",
-                      )}
+                    <div className="flex min-w-0 items-center gap-space-1">
+                      <span
+                        className={cn(
+                          "truncate text-small font-semibold text-neutral-900",
+                          conv.unreadCount > 0 && "font-bold",
+                        )}
                     >
                       {conv.renterDisplay}
                     </span>
+                    {conv.listingId && !conv.bookingId ? (
+                      <span className="shrink-0 rounded px-1.5 text-xs font-semibold bg-amber-100 text-amber-800">
+                        Inquiry
+                      </span>
+                    ) : null}
+                    </div>
                     {badge ? (
                       <span
                         className={cn(
@@ -211,6 +218,11 @@ export function MessageHub({
                       </span>
                     ) : null}
                   </div>
+                  {conv.listingName ? (
+                    <p className="truncate text-xs font-medium text-neutral-600">
+                      Re: {conv.listingName}
+                    </p>
+                  ) : null}
                   <p className="truncate text-xs text-neutral-700">
                     {conv.preview || "No messages yet"}
                   </p>

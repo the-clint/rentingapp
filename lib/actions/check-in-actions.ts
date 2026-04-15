@@ -35,7 +35,7 @@ import { computeRentalLifecycle } from "@/lib/services/rental-lifecycle";
 import { createClient } from "@/lib/supabase/server";
 import { err, ok, type Result } from "@/lib/utils/result";
 
-export const CHECK_IN_CONDITIONS = ["good", "damage", "issue"] as const;
+const CHECK_IN_CONDITIONS = ["good", "damage", "issue"] as const;
 export type CheckInCondition = (typeof CHECK_IN_CONDITIONS)[number];
 
 export interface SubmitCheckInInput {

@@ -13,6 +13,9 @@ export interface ConversationSummary {
   lastMessageAt: string | null;
   unreadCount: number;
   preview: string;
+  listingId: string | null;
+  bookingId: string | null;
+  listingName: string | null;
 }
 
 export interface ConversationThreadMessage {
@@ -46,6 +49,7 @@ export async function fetchOperatorConversations(
     .from("conversations")
     .select(
       `id, renter_phone, platform_origin, unread_count_for_operator, last_message_at,
+       booking_id, listing_id, listings(name),
        messages(id, body, direction, created_at)`,
     )
     .eq("operator_id", operatorId)
@@ -69,6 +73,9 @@ export async function fetchOperatorConversations(
       lastMessageAt: row.last_message_at,
       unreadCount: row.unread_count_for_operator ?? 0,
       preview: latest?.body?.slice(0, 120) ?? "",
+      listingId: row.listing_id ?? null,
+      bookingId: row.booking_id ?? null,
+      listingName: row.listings?.name ?? null,
     };
   });
 
@@ -126,6 +133,9 @@ export async function fetchConversationThread(args: {
       lastMessageAt: conv.last_message_at,
       unreadCount: conv.unread_count_for_operator ?? 0,
       preview: msgs[msgs.length - 1]?.body?.slice(0, 120) ?? "",
+      listingId: conv.listing_id ?? null,
+      bookingId: conv.booking_id ?? null,
+      listingName: conv.listings?.name ?? null,
     },
     messages: msgs,
     bookingId: conv.booking_id ?? null,

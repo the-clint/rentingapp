@@ -35,5 +35,18 @@ jobs:
       - name: Build
         run: npm run build
         env:
+          # Varlock validates every @required @sensitive item in .env.schema at
+          # load time. CI has no Bitwarden access, so we override every
+          # bitwarden(...) value with a placeholder — varlock uses the env var
+          # and never invokes the plugin. BWS_SECRETS_TOKEN still has to be a
+          # syntactically valid bitwardenAccessToken for @initBitwarden to pass
+          # (the plugin validates format at init but lazy-connects on demand).
+          BWS_SECRETS_TOKEN: "0.00000000-0000-0000-0000-000000000000.00000000-0000-0000-0000-000000000000:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: placeholder-publishable-key
+          SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role-key
+          STRIPE_SECRET_KEY: sk_test_placeholder
+          STRIPE_WEBHOOK_SECRET: whsec_placeholder
+          TWILIO_ACCOUNT_SID: ACplaceholder
+          TWILIO_AUTH_TOKEN: placeholder
+          TWILIO_PHONE_NUMBER: "+15555550123"

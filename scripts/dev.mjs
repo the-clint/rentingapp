@@ -34,20 +34,16 @@ function isSupabaseRunning() {
 }
 
 if (isSupabaseRunning()) {
-  // eslint-disable-next-line no-console
   console.log("[dev] Supabase is already running.");
 } else {
-  // eslint-disable-next-line no-console
   console.log("[dev] Starting Supabase...");
   try {
     execSync("npx supabase start", {
       stdio: "inherit",
       timeout: 120_000,
     });
-    // eslint-disable-next-line no-console
     console.log("[dev] Supabase started.");
-  } catch (err) {
-    // eslint-disable-next-line no-console
+  } catch {
     console.error("[dev] Failed to start Supabase. Is Docker running?");
     process.exit(1);
   }
@@ -56,17 +52,14 @@ if (isSupabaseRunning()) {
 // ---------------------------------------------------------------------------
 // Caddy: start the reverse proxy (https://everything.test -> localhost:3000)
 // ---------------------------------------------------------------------------
-// eslint-disable-next-line no-console
 console.log("[dev] Starting Caddy...");
 try {
   execSync("docker compose up -d caddy", {
     stdio: "inherit",
     timeout: 30_000,
   });
-  // eslint-disable-next-line no-console
   console.log("[dev] Caddy started. App will be available at https://everything.test");
-} catch (err) {
-  // eslint-disable-next-line no-console
+} catch {
   console.error("[dev] Failed to start Caddy. Is Docker running?");
   process.exit(1);
 }
@@ -92,7 +85,6 @@ if (!childEnv.BWS_SECRETS_TOKEN) {
       const trimmed = out.trim();
       if (trimmed.length > 0) {
         childEnv.BWS_SECRETS_TOKEN = trimmed;
-        // eslint-disable-next-line no-console
         console.log(
           "[dev] Hydrated BWS_SECRETS_TOKEN from Windows User scope.",
         );
@@ -103,7 +95,6 @@ if (!childEnv.BWS_SECRETS_TOKEN) {
   }
 
   if (!childEnv.BWS_SECRETS_TOKEN) {
-    // eslint-disable-next-line no-console
     console.log(
       "[dev] BWS_SECRETS_TOKEN not set — Stripe/Twilio features will be unavailable. This is fine for basic local dev.",
     );
@@ -113,7 +104,6 @@ if (!childEnv.BWS_SECRETS_TOKEN) {
 // ---------------------------------------------------------------------------
 // Launch Next.js dev server
 // ---------------------------------------------------------------------------
-// eslint-disable-next-line no-console
 console.log("[dev] Starting Next.js...");
 
 const child = spawn("npx", ["next", "dev", "--port", "3000"], {

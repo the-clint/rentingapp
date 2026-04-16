@@ -31,7 +31,9 @@
       "Bash(node -e ':*)",
       "Bash(cat .eslintrc*)",
       "Bash(npm view:*)",
-      "Bash(git -C \"C:/Users/clint/OneDrive/Documents/Code/rentingapp\" status --short lib/supabase/)"
+      "Bash(git -C \"C:/Users/clint/OneDrive/Documents/Code/rentingapp\" status --short lib/supabase/)",
+      "Bash(BWS_SECRETS_TOKEN=\"\" npx varlock scan)",
+      "Bash(echo \"exit=$?\")"
     ]
   }
 }

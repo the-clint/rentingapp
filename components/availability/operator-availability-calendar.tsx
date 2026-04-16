@@ -243,6 +243,7 @@ export function OperatorAvailabilityCalendar({
     if (isBusy) return;
     const [lo, hi] = startKey <= endKey ? [startKey, endKey] : [endKey, startKey];
     const keys = enumerateDateRange(lo, hi).filter((k) => {
+      if (k === startKey) return false;
       if (k < today) return false;
       const server = state.serverCells.get(k);
       return !isInertServerState(server);

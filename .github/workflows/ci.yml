@@ -46,6 +46,11 @@ jobs:
           # leak scan doesn't match them against incidental substrings in the
           # compiled output (e.g. the literal word "placeholder" appears in
           # rendered HTML placeholder="" attributes).
+          #
+          # APP_ENV picks the dev branch of each `remap($APP_ENV, ...)` in the
+          # schema so varlock can parse the schema. The env overrides below
+          # then short-circuit the bitwarden() calls.
+          APP_ENV: development
           BWS_SECRETS_TOKEN: "0.00000000-0000-0000-0000-000000000000.00000000-0000-0000-0000-000000000000:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
           NEXT_PUBLIC_SUPABASE_URL: https://everythingrent-ci.supabase.co
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY: sbp_ci_build_only_qzx8mk2arv9nlf4jh7dc3pnw6eyy5tt1

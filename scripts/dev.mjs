@@ -69,6 +69,12 @@ try {
 // ---------------------------------------------------------------------------
 const childEnv = { ...process.env };
 
+// Varlock picks dev vs prod BWS UUIDs via `remap($APP_ENV, ...)` in the schema.
+// `npm run dev` always means development.
+if (!childEnv.APP_ENV) {
+  childEnv.APP_ENV = "development";
+}
+
 if (!childEnv.BWS_SECRETS_TOKEN) {
   if (isWindows) {
     try {

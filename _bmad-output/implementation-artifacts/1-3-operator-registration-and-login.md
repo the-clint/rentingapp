@@ -98,7 +98,7 @@ export default function signUp(...) { }  // WRONG
 export async function signUp() {
   const supabase = await createClient();
 }
-// WRONG — causes session leakage on Vercel Fluid Compute
+// WRONG — causes session leakage on any serverless runtime (Netlify Functions, Vercel, etc.) that reuses module state across invocations
 const supabase = await createClient();
 ```
 
@@ -318,7 +318,7 @@ Functionally sound with all 41 tests passing, but found a serious split source-o
 ### Low-severity findings
 
 1. **[LOW] `(claims as Record<string, unknown>)` double-cast is unreadable** — `lib/supabase/proxy.ts:83-85,108-110`. After R1's fix removes the `app_metadata` fallback, the cast simplifies naturally to a single property read.
-2. **[LOW] `getBaseUrl()` trusts `x-forwarded-proto` / `host` headers** — `lib/actions/auth-actions.ts:15-21`. Host-header injection vector for password-reset `redirectTo`. **Deferred** — acceptable on Vercel which strips inbound `Host` headers; switch to `NEXT_PUBLIC_SITE_URL` env var when deploying behind a non-trusted proxy.
+2. **[LOW] `getBaseUrl()` trusts `x-forwarded-proto` / `host` headers** — `lib/actions/auth-actions.ts:15-21`. Host-header injection vector for password-reset `redirectTo`. **TODO before first Netlify production deploy:** verify Netlify's handling of inbound `Host` headers and switch to `NEXT_PUBLIC_SITE_URL` env var if not sanitized at the edge.
 3. **[LOW] `LoginForm` does `router.push('/dashboard')` after server action** — duplicates work the proxy would do; harmless cosmetic.
 
 ### Acceptance criteria coverage

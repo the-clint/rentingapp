@@ -88,7 +88,7 @@ Full-stack web application based on project requirements — SPA frontend with A
 2. shadcn/ui already initialized — aligns with UX spec's design system choice
 3. Next.js Route Handlers provide a built-in API layer for Stripe webhooks, Twilio webhooks, and booking logic — no separate backend needed
 4. Supabase provides PostgreSQL (database), Auth, Storage (listing photos), and Realtime (availability updates) under one managed service
-5. Vercel deployment is zero-config for Next.js — cheapest path to production
+5. Netlify deployment is zero-config for Next.js via `@netlify/plugin-nextjs` — cheapest path to production
 
 **Initialization Command:**
 
@@ -132,7 +132,7 @@ npx create-next-app@latest rentingapp -e with-supabase
 
 | Service | Platform | Cost |
 |---------|----------|------|
-| Frontend + API | Vercel free tier | $0 |
+| Frontend + API | Netlify free tier | $0 |
 | Database + Auth + Storage | Supabase free tier (dev) → Pro (prod) | $0 dev / $25/mo prod |
 
 **Note:** Project initialization using this command should be the first implementation story.
@@ -191,9 +191,9 @@ npx create-next-app@latest rentingapp -e with-supabase
 
 ### Infrastructure & Deployment
 
-- **CI/CD:** GitHub Actions for lint + type-check + tests on PRs. Vercel auto-deploys on merge to main
-- **Environments:** Two environments — local (Supabase CLI via Docker) and production (Vercel + Supabase Pro)
-- **Monitoring:** Vercel built-in analytics and function logs. SMS failures logged to `sms_log` table in Supabase with operator dashboard visibility. Console logging for server-side errors
+- **CI/CD:** GitHub Actions for lint + type-check + tests on PRs. Netlify auto-deploys on merge to main (via the Netlify GitHub App)
+- **Environments:** Two environments — local (Supabase CLI via Docker) and production (Netlify + Supabase Pro)
+- **Monitoring:** Netlify built-in analytics and function logs. SMS failures logged to `sms_log` table in Supabase with operator dashboard visibility. Console logging for server-side errors
 - **Supabase projects:** Dev (free tier, local CLI) + Prod (Pro plan, $25/month)
 
 ### Decision Impact Analysis
@@ -613,7 +613,7 @@ everything-rent/
 - `.env.local` — Gitignored. Contains actual secret values.
 - `varlock scan` — Runs in CI pipeline and as a git pre-commit hook to prevent secret leaks.
 - Runtime validation — Catches missing or invalid env vars at startup.
-- Log redaction — Prevents sensitive values from appearing in Vercel function logs.
+- Log redaction — Prevents sensitive values from appearing in Netlify function logs.
 
 **Required Environment Variables (defined in `.env.schema`):**
 
@@ -644,9 +644,11 @@ everything-rent/
 5. Build verification (`next build`)
 
 **Deployment:**
-- Push to `main` → Vercel auto-deploys to production
-- PRs → Vercel creates preview deployment
-- Env vars configured in Vercel dashboard (production) and `.env.local` (local dev)
+- Push to `main` → Netlify auto-deploys to production
+- PRs → Netlify creates a Deploy Preview
+- Env vars configured in Netlify Site configuration (production) and `.env.local` (local dev)
+
+> **2026-04-19 decision:** Switched host from Vercel to Netlify prior to first production deploy. Driver: operator preference. Next.js 15 App Router is supported via `@netlify/plugin-nextjs`; scheduled jobs (e.g. Story 4-5 return reminders) run on Netlify Scheduled Functions.
 
 ## Architecture Validation Results
 
@@ -711,7 +713,7 @@ RLS and application-level availability checks do not prevent race conditions whe
 **Confidence Level:** High
 
 **Key Strengths:**
-- Managed services (Supabase, Stripe, Twilio, Vercel) minimize operational overhead for solo developer
+- Managed services (Supabase, Stripe, Twilio, Netlify) minimize operational overhead for solo developer
 - Hybrid API pattern avoids over-engineering while keeping business logic centralized
 - Dual auth model (password + OTP) handled natively by single auth provider (Supabase Auth)
 - Explicit patterns and anti-patterns prevent AI agent implementation conflicts

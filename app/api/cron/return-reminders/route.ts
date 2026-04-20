@@ -3,8 +3,8 @@
  *
  * POST /api/cron/return-reminders
  *
- * Expected caller: a scheduled job (Vercel Cron, Supabase pg_cron,
- * Cloudflare Workers Cron, etc.) that fires once a day at the right
+ * Expected caller: a scheduled job (Netlify Scheduled Functions,
+ * Supabase pg_cron, Cloudflare Workers Cron, etc.) that fires once a day at the right
  * local time for the operator market. The endpoint is idempotent by
  * day per booking thanks to the unique partial index on
  * `sms_log (booking_id, purpose, created_at::date) WHERE purpose =

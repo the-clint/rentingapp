@@ -19,20 +19,27 @@ This document covers:
 
 ```
   Bitwarden Secrets Manager              your dev machine                  Next.js
-  +---------------------+                +------------------------+        +---------+
-  | everything-rent/dev/*    |  REST API      | varlock + @varlock/   |        |         |
-  | SUPABASE_URL        | <------------  |  bitwarden-plugin      | -----> | process |
-  | STRIPE_SECRET_KEY   |   (HTTPS,      |                        |        |  .env   |
-  | TWILIO_AUTH_TOKEN   |    BWS_        | reads `.env.schema`,   |        |         |
-  | ...                 |    SECRETS_    | pulls each `bitwarden()| @varlock
-  +---------------------+    TOKEN)      | secret by UUID         | nextjs-|         |
-                                         +------------------------+ integr. +---------+
+  +---------------------------+          +------------------------+        +---------+
+  | everything-rent-dev/      |  REST    | varlock + @varlock/    |        |         |
+  |   SUPABASE_URL            | <------- |  bitwarden-plugin      | -----> | process |
+  |   STRIPE_SECRET_KEY       |          |                        |        |  .env   |
+  |   TWILIO_AUTH_TOKEN ...   |          | reads `.env.schema`,   |        |         |
+  +---------------------------+          | picks dev vs prod UUID | @varlock
+  | everything-rent-prod/     | <------- | via remap($APP_ENV,    | nextjs- |         |
+  |   SUPABASE_URL            |          |   development=..,      | integr. +---------+
+  |   STRIPE_SECRET_KEY ...   |          |   production=..),      |
+  +---------------------------+          | then fetches by UUID   |
+                                         +------------------------+
                                                   ^
                                                   |  process.env.BWS_SECRETS_TOKEN
-                                                  |  (set in OS / shell / CI secret)
+                                                  |  process.env.APP_ENV  (development|production)
+                                                  |  (set in OS / shell / CI / hosting platform)
 ```
 
-- **`.env.schema`** is committed to the repo. It declares every env var the app needs, with types and validators, and uses the `bitwarden("<uuid>")` resolver function for values that must be fetched from BWS.
+- **Two BWS projects, one per environment.** Dev machines use `everything-rent-dev` with a dev machine-account token. The hosting platform (Vercel) uses `everything-rent-prod` with a prod machine-account token. A leaked dev token therefore cannot reach production secrets.
+- **`$APP_ENV` selects the environment.** Each secret in `.env.schema` is declared as `bitwarden(remap($APP_ENV, development="<dev-uuid>", production="<prod-uuid>"))`. Varlock evaluates `remap()` against `$APP_ENV`, then hands the resulting UUID to the Bitwarden plugin. Set `APP_ENV=development` locally (handled by `scripts/dev.mjs`) and `APP_ENV=production` on Vercel.
+- **Non-secret per-env values** (public URLs, the Stripe publishable key, the Turnstile site key) are committed in `.env.development` and `.env.production`. Varlock auto-loads the one matching `$APP_ENV`.
+- **`.env.schema`** is committed to the repo. It declares every env var the app needs, with types and validators, and uses the `bitwarden(remap(...))` resolver for values fetched from BWS.
 - **`@varlock/nextjs-integration`** replaces Next's built-in env loader. It's wired via TWO pieces — both are required:
     1. A plugin wrapper in `next.config.ts` (`varlockNextConfigPlugin()(nextConfig)`).
     2. A package.json `overrides` entry that aliases the nested `@next/env` dependency to `@varlock/nextjs-integration`. Without this, Next boots with its own loader, the plugin sees `__VARLOCK_ENV is not set`, and `next dev` fails. See [package.json override](#packagejson-override) below.
@@ -60,13 +67,15 @@ After editing `overrides`, always run `npm install` to apply the substitution. Y
 Before running any of the commands in this document, you must have:
 
 1. **A Bitwarden organization with Secrets Manager enabled.** (Free tier works for small teams; paid plans have more secrets.)
-2. **A machine account** created inside that org, with **Can read** permission on every secret this project uses.
-3. **The access token** for that machine account, copied at creation time. Bitwarden only displays it **once** — if you lose it, create a new machine account.
-4. **The secrets themselves populated in BWS** — see [Secret naming convention](#secret-naming-convention) below for the list.
-5. **The UUIDs for each secret pasted into `.env.schema`**, replacing the `TODO-*-UUID` placeholders.
-6. **`BWS_SECRETS_TOKEN` set as an OS / shell env var** on your dev machine.
+2. **One BWS project per environment you plan to run** — at minimum `everything-rent-dev` for local/CI, and `everything-rent-prod` before going live.
+3. **One machine account per environment**, with **Can read** permission on its own project only (not both). Separate accounts limit blast radius if a token leaks.
+4. **The access tokens** for those machine accounts, copied at creation time. Bitwarden only displays each token **once** — if you lose it, create a new machine account.
+5. **The secrets themselves populated in BWS** — see [Secret naming convention](#secret-naming-convention) below for the list. Create matching secrets in both projects (dev and prod) with different values.
+6. **The UUIDs pasted into `.env.schema`** — each secret has a `development=` slot and a `production=` slot inside `remap(...)`. Replace the `TODO-*-PROD-UUID` placeholders with the prod project's UUIDs before running in production.
+7. **`BWS_SECRETS_TOKEN` set as an OS / shell env var** on your dev machine (dev token) and in the hosting platform's env UI (prod token).
+8. **`APP_ENV` set to `development` or `production`** — `scripts/dev.mjs` auto-sets it for local dev; CI sets it in `.github/workflows/ci.yml`; set it on Vercel explicitly.
 
-Until all six are true, `varlock load`, `npm run dev`, and `npm run build` will all fail — loudly and with useful errors.
+Until the prerequisites for your target environment are met, `varlock load`, `npm run dev`, and `npm run build` will all fail — loudly and with useful errors. Running with `APP_ENV=production` while the prod UUIDs are still placeholders will report the placeholder strings as invalid UUIDs; that is the intended behavior.
 
 ---
 
@@ -74,15 +83,17 @@ Until all six are true, `varlock load`, `npm run dev`, and `npm run build` will 
 
 ### 1. Create a machine account in Bitwarden
 
+Do this once per environment — one for `dev`, one for `prod`.
+
 1. Log in to your Bitwarden web vault.
 2. Open the **Secrets Manager** app (grid icon, top-right).
 3. **Machine accounts** → **New machine account**.
-4. Name it something like `everything-rent-local-dev` (use a separate account for CI).
+4. Name it so the scope is unambiguous — e.g. `everything-rent-dev-local` for your laptop, `everything-rent-dev-ci` for GitHub Actions, `everything-rent-prod-vercel` for the hosting platform. Never share one token across environments.
 5. Click **Save**, then click into the account and copy the **Access token** from the banner at the top. **Do this immediately — it will never be shown again.**
 
 ### 2. Populate the secrets
 
-In Secrets Manager, create a **Project** called `everything-rent-dev` (or whatever makes sense for your env). Then create one secret per row in the table below. Secret *names* don't have to match these exactly (varlock looks them up by UUID, not name), but consistent naming makes the dashboard usable.
+In Secrets Manager, create two **Projects**: `everything-rent-dev` and `everything-rent-prod`. Create one secret per row in the table below **in each project**, with the appropriate value for that environment (test keys in dev, live keys in prod). Secret *names* don't have to match these exactly (varlock looks them up by UUID, not name), but consistent naming keeps the dashboard usable.
 
 | Env var | BWS secret name (suggested) | Notes |
 |---|---|---|
@@ -95,26 +106,24 @@ In Secrets Manager, create a **Project** called `everything-rent-dev` (or whatev
 | `TWILIO_AUTH_TOKEN` | `everything-rent/dev/TWILIO_AUTH_TOKEN` | |
 | `TWILIO_PHONE_NUMBER` | `everything-rent/dev/TWILIO_PHONE_NUMBER` | Must start with `+` (E.164) |
 
-After creating each secret, **grant the machine account read access to the project** (Machine accounts → click the account → Projects tab → add `everything-rent-dev`). Otherwise every `bitwarden()` lookup will return **Permission denied** at resolve time.
+After creating each secret, **grant the matching machine account read access to its project** (Machine accounts → click the account → Projects tab → add `everything-rent-dev` or `everything-rent-prod`). Each machine account should only have access to the project for its environment. Otherwise every `bitwarden()` lookup will return **Permission denied** at resolve time.
 
 ### 3. Copy the UUIDs into `.env.schema`
 
-For each secret you just created:
+Each secret in the schema looks like this:
+
+```env
+STRIPE_SECRET_KEY=bitwarden(remap($APP_ENV,
+  development="<dev-project-uuid>",
+  production="TODO-STRIPE-SECRET-KEY-PROD-UUID"))
+```
+
+For each secret in each project:
 
 1. Click the secret in the BWS dashboard.
 2. Copy the UUID from the URL or the **Secret ID** field (format: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`).
 3. Open `.env.schema` in your editor.
-4. Replace the matching `"TODO-*-UUID"` string with the real UUID. Keep the surrounding `bitwarden("...")` intact.
-
-Example:
-
-```env
-# before
-NEXT_PUBLIC_SUPABASE_URL=bitwarden("TODO-SUPABASE-URL-UUID")
-
-# after
-NEXT_PUBLIC_SUPABASE_URL=bitwarden("a1b2c3d4-e5f6-7890-abcd-ef1234567890")
-```
+4. Paste the UUID into the matching environment slot inside `remap(...)`. The dev project's UUID goes after `development=`; the prod project's UUID replaces the `TODO-<NAME>-PROD-UUID` placeholder after `production=`.
 
 Commit `.env.schema` to the repo — **UUIDs are not secrets**, they're just pointers. The actual values stay in BWS.
 
@@ -247,20 +256,27 @@ If any required env var is missing, invalid, or fails its type check, `next dev`
 
 ## CI/CD
 
-Treat `BWS_SECRETS_TOKEN` as a CI secret:
+Treat `BWS_SECRETS_TOKEN` as a CI secret, and always pair it with an explicit `APP_ENV`:
 
-- **GitHub Actions:** repository or org secret → inject as `env: BWS_SECRETS_TOKEN: ${{ secrets.BWS_SECRETS_TOKEN }}` at the job level.
-- **Vercel:** project → Settings → Environment Variables → add `BWS_SECRETS_TOKEN` for each env (dev/preview/prod). Vercel will inject it at build and runtime; the varlock Next.js plugin takes it from there.
+- **GitHub Actions (build/test CI):** `.github/workflows/ci.yml` sets `APP_ENV: development` at the job level and overrides every `@sensitive` env var with a distinctive placeholder — varlock never calls BWS in CI, so the dev-branch UUIDs are never resolved. The `BWS_SECRETS_TOKEN` placeholder exists only to satisfy the `@initBitwarden` format validator.
+- **Vercel (runtime):** project → Settings → Environment Variables. Add two vars per deployment target:
+  - `APP_ENV=production` (for the Production target; set to `development` for Preview or leave Preview unconfigured while dogfooding)
+  - `BWS_SECRETS_TOKEN=<prod machine-account token>` (for Production only; never reuse the dev token)
+  Vercel injects both at build and runtime; the varlock Next.js plugin reads them from there.
 
-Use **separate machine accounts** for `dev`, `preview`, and `production`, scoped to separate BWS projects, so a leaked CI token can't reach production secrets. Rotate each account independently.
+Use **separate machine accounts per environment**, scoped to separate BWS projects, so a leaked dev/CI token can't reach production secrets. Rotate each account independently.
 
 ---
 
 ## Troubleshooting
 
-### `bitwarden(): Invalid secret ID format: "TODO-*-UUID"`
+### `bitwarden(): Invalid secret ID format: "TODO-*-PROD-UUID"`
 
-You still have placeholder UUIDs in `.env.schema`. Replace them with the real UUIDs from your BWS dashboard (see [One-time setup → step 3](#3-copy-the-uuids-into-envschema)).
+You tried to run with `APP_ENV=production` before filling in the prod-slot UUIDs in `.env.schema`. Paste the real UUIDs from the `everything-rent-prod` BWS project — see [One-time setup → step 3](#3-copy-the-uuids-into-envschema).
+
+### `remap(): $APP_ENV has no mapping for value ""`
+
+`APP_ENV` is unset. Local dev: run `npm run dev` (which sets it via `scripts/dev.mjs`). CI: confirm the `APP_ENV` line in `.github/workflows/ci.yml`. Vercel: set it in Settings → Environment Variables.
 
 ### `Authentication failed` / `401 Unauthorized`
 

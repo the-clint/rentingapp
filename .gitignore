@@ -1,6 +1,9 @@
 # Dependencies
 node_modules/
 
+# BMAD Method
+_bmad
+
 # Next.js
 .next/
 out/

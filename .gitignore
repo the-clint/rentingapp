@@ -19,8 +19,8 @@ supabase/.temp/
 supabase/.branches/
 .supabase/
 
-# Vercel
-.vercel
+# Netlify
+.netlify
 
 # TypeScript
 *.tsbuildinfo

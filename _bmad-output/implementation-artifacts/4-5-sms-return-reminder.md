@@ -7,8 +7,8 @@ Completed: 2026-04-10
 ## Summary
 
 Ships the day-of return-reminder SMS path. A `/api/cron/return-reminders`
-POST endpoint is called once per day by an external scheduler (Vercel
-Cron or equivalent); for every booking whose `end_date === today` and
+POST endpoint is called once per day by an external scheduler (Netlify
+Scheduled Functions or equivalent); for every booking whose `end_date === today` and
 `status === 'confirmed'`, it sends a concise SMS via the notification
 stub (real Twilio delivery lands in Story 6-4) and records the result
 in a new `sms_log` table. Failures are persisted with the `operator_id`

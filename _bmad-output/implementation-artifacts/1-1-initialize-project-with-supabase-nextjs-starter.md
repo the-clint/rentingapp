@@ -197,7 +197,7 @@ All env vars defined in `.env.schema`. Actual values in `.env.local` (gitignored
 
 ### Deployment
 - **Local:** `supabase start` + `npm run dev` (Turbopack)
-- **Production:** Vercel auto-deploys on merge to main
+- **Production:** Netlify auto-deploys on merge to main
 - **CI:** GitHub Actions runs lint → type-check → varlock scan → tests → build
 
 ### Project Structure Notes

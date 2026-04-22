@@ -208,7 +208,7 @@ BOOK ONLINE WITH INSTANT AVAILABILITY AND SECURE PAYMENT:
 The booking URL is built in `app/(operator)/listings/[listingId]/page.tsx` using this priority order:
 
 1. `process.env.NEXT_PUBLIC_SITE_URL` — if set, use it verbatim (strip trailing slash).
-2. `headers()` — read `x-forwarded-proto` + `host`. This covers Vercel and most proxies.
+2. `headers()` — read `x-forwarded-proto` + `host`. This covers most proxies (Netlify, Vercel, etc.).
 3. Fallback `http://everything.test` — only in local dev when neither above is present.
 
 Append `/book/{listingId}` to the resolved base URL.

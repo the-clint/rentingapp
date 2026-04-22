@@ -107,7 +107,7 @@ NFR20: Twilio is core dependency for bidirectional SMS and OTP authentication �
 - Double-booking prevention: `booking_dates` junction table with unique constraint on `(listing_id, date)` — database-level lock via Supabase RPC transaction
 - Stripe hold capped at 7-day default for MVP — extensions beyond hold period covered by signed contract + payment method on file
 - Environment management: Varlock (`@varlock/nextjs-integration`) for env var validation, CI scanning, and log redaction
-- CI/CD: GitHub Actions (lint + type-check + varlock scan + tests + build), Vercel auto-deploy on merge to main
+- CI/CD: GitHub Actions (lint + type-check + varlock scan + tests + build), Netlify auto-deploy on merge to main
 - Feature-based project structure with `(operator)` and `(renter)` route groups, `lib/actions/` for Server Actions, `lib/schemas/` for Zod schemas, `lib/services/` for third-party wrappers
 - Database naming: `snake_case` tables (plural), `snake_case` columns, `{table_singular}_id` foreign keys
 - Code naming: `kebab-case` files, PascalCase components, camelCase functions/variables, SCREAMING_SNAKE_CASE constants

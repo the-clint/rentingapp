@@ -36,8 +36,8 @@ This document covers:
                                                   |  (set in OS / shell / CI / hosting platform)
 ```
 
-- **Two BWS projects, one per environment.** Dev machines use `everything-rent-dev` with a dev machine-account token. The hosting platform (Vercel) uses `everything-rent-prod` with a prod machine-account token. A leaked dev token therefore cannot reach production secrets.
-- **`$APP_ENV` selects the environment.** Each secret in `.env.schema` is declared as `bitwarden(remap($APP_ENV, development="<dev-uuid>", production="<prod-uuid>"))`. Varlock evaluates `remap()` against `$APP_ENV`, then hands the resulting UUID to the Bitwarden plugin. Set `APP_ENV=development` locally (handled by `scripts/dev.mjs`) and `APP_ENV=production` on Vercel.
+- **Two BWS projects, one per environment.** Dev machines use `everything-rent-dev` with a dev machine-account token. The hosting platform (Netlify) uses `everything-rent-prod` with a prod machine-account token. A leaked dev token therefore cannot reach production secrets.
+- **`$APP_ENV` selects the environment.** Each secret in `.env.schema` is declared as `bitwarden(remap($APP_ENV, development="<dev-uuid>", production="<prod-uuid>"))`. Varlock evaluates `remap()` against `$APP_ENV`, then hands the resulting UUID to the Bitwarden plugin. Set `APP_ENV=development` locally (handled by `scripts/dev.mjs`) and `APP_ENV=production` on Netlify.
 - **Non-secret per-env values** (public URLs, the Stripe publishable key, the Turnstile site key) are committed in `.env.development` and `.env.production`. Varlock auto-loads the one matching `$APP_ENV`.
 - **`.env.schema`** is committed to the repo. It declares every env var the app needs, with types and validators, and uses the `bitwarden(remap(...))` resolver for values fetched from BWS.
 - **`@varlock/nextjs-integration`** replaces Next's built-in env loader. It's wired via TWO pieces — both are required:
@@ -73,7 +73,7 @@ Before running any of the commands in this document, you must have:
 5. **The secrets themselves populated in BWS** — see [Secret naming convention](#secret-naming-convention) below for the list. Create matching secrets in both projects (dev and prod) with different values.
 6. **The UUIDs pasted into `.env.schema`** — each secret has a `development=` slot and a `production=` slot inside `remap(...)`. Replace the `TODO-*-PROD-UUID` placeholders with the prod project's UUIDs before running in production.
 7. **`BWS_SECRETS_TOKEN` set as an OS / shell env var** on your dev machine (dev token) and in the hosting platform's env UI (prod token).
-8. **`APP_ENV` set to `development` or `production`** — `scripts/dev.mjs` auto-sets it for local dev; CI sets it in `.github/workflows/ci.yml`; set it on Vercel explicitly.
+8. **`APP_ENV` set to `development` or `production`** — `scripts/dev.mjs` auto-sets it for local dev; CI sets it in `.github/workflows/ci.yml`; set it on Netlify explicitly.
 
 Until the prerequisites for your target environment are met, `varlock load`, `npm run dev`, and `npm run build` will all fail — loudly and with useful errors. Running with `APP_ENV=production` while the prod UUIDs are still placeholders will report the placeholder strings as invalid UUIDs; that is the intended behavior.
 
@@ -88,7 +88,7 @@ Do this once per environment — one for `dev`, one for `prod`.
 1. Log in to your Bitwarden web vault.
 2. Open the **Secrets Manager** app (grid icon, top-right).
 3. **Machine accounts** → **New machine account**.
-4. Name it so the scope is unambiguous — e.g. `everything-rent-dev-local` for your laptop, `everything-rent-dev-ci` for GitHub Actions, `everything-rent-prod-vercel` for the hosting platform. Never share one token across environments.
+4. Name it so the scope is unambiguous — e.g. `everything-rent-dev-local` for your laptop, `everything-rent-dev-ci` for GitHub Actions, `everything-rent-prod-netlify` for the hosting platform. Never share one token across environments.
 5. Click **Save**, then click into the account and copy the **Access token** from the banner at the top. **Do this immediately — it will never be shown again.**
 
 ### 2. Populate the secrets
@@ -259,10 +259,10 @@ If any required env var is missing, invalid, or fails its type check, `next dev`
 Treat `BWS_SECRETS_TOKEN` as a CI secret, and always pair it with an explicit `APP_ENV`:
 
 - **GitHub Actions (build/test CI):** `.github/workflows/ci.yml` sets `APP_ENV: development` at the job level and overrides every `@sensitive` env var with a distinctive placeholder — varlock never calls BWS in CI, so the dev-branch UUIDs are never resolved. The `BWS_SECRETS_TOKEN` placeholder exists only to satisfy the `@initBitwarden` format validator.
-- **Vercel (runtime):** project → Settings → Environment Variables. Add two vars per deployment target:
-  - `APP_ENV=production` (for the Production target; set to `development` for Preview or leave Preview unconfigured while dogfooding)
+- **Netlify (runtime):** Site configuration → Environment variables. Add two vars per deploy context:
+  - `APP_ENV=production` (for the Production context; set to `development` for Deploy Previews/Branch deploys or leave them unconfigured while dogfooding)
   - `BWS_SECRETS_TOKEN=<prod machine-account token>` (for Production only; never reuse the dev token)
-  Vercel injects both at build and runtime; the varlock Next.js plugin reads them from there.
+  Netlify injects both at build and runtime; the varlock Next.js plugin reads them from there.
 
 Use **separate machine accounts per environment**, scoped to separate BWS projects, so a leaked dev/CI token can't reach production secrets. Rotate each account independently.
 
@@ -276,7 +276,7 @@ You tried to run with `APP_ENV=production` before filling in the prod-slot UUIDs
 
 ### `remap(): $APP_ENV has no mapping for value ""`
 
-`APP_ENV` is unset. Local dev: run `npm run dev` (which sets it via `scripts/dev.mjs`). CI: confirm the `APP_ENV` line in `.github/workflows/ci.yml`. Vercel: set it in Settings → Environment Variables.
+`APP_ENV` is unset. Local dev: run `npm run dev` (which sets it via `scripts/dev.mjs`). CI: confirm the `APP_ENV` line in `.github/workflows/ci.yml`. Netlify: set it in Site configuration → Environment variables.
 
 ### `Authentication failed` / `401 Unauthorized`
 
@@ -321,7 +321,7 @@ Do this whenever the token has been exposed (even momentarily), whenever a lapto
    [Environment]::SetEnvironmentVariable("BWS_SECRETS_TOKEN", "<new-token>", "User")
    ```
 4. Close and reopen your terminal / Claude Code.
-5. Update the CI secret in GitHub Actions / Vercel / wherever.
+5. Update the CI secret in GitHub Actions / Netlify / wherever.
 6. Verify: `npx varlock load` should print ✅ against every entry.
 
 The individual secrets inside BWS (Supabase keys, Stripe keys, etc.) are independent — rotating the access token does not rotate the secrets themselves. Rotate those separately via their respective dashboards.

@@ -347,7 +347,7 @@ type Result<T> =
 everything-rent/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml                          # Lint + type-check + varlock scan + tests
+│       └── ci.yml                          # Lint + type-check + tests + build
 ├── .env.schema                             # Varlock schema (committed, AI-readable)
 ├── .env.local                              # Actual secrets (gitignored)
 ├── .gitignore
@@ -611,7 +611,7 @@ everything-rent/
 **Varlock** (`@varlock/nextjs-integration`) manages all environment variables:
 - `.env.schema` — Committed to repo. Defines all env vars with types, required/optional, sensitivity flags, and descriptions. AI agents read this for context, never `.env.local`.
 - `.env.local` — Gitignored. Contains actual secret values.
-- `varlock scan` — Runs in CI pipeline and as a git pre-commit hook to prevent secret leaks.
+- `varlock scan` — Runs locally (via `npx varlock scan --install-hook` as a git pre-commit hook) to prevent secret leaks. Not run in CI — CI has no Bitwarden access so it can't resolve real secrets; scanning against committed `.env.development` values would produce false positives against local-emulator defaults.
 - Runtime validation — Catches missing or invalid env vars at startup.
 - Log redaction — Prevents sensitive values from appearing in Netlify function logs.
 
@@ -639,9 +639,10 @@ everything-rent/
 **CI Pipeline (GitHub Actions):**
 1. Lint (ESLint)
 2. Type-check (`tsc --noEmit`)
-3. Varlock scan (`varlock scan` — detect leaked secrets)
-4. Tests (Vitest)
-5. Build verification (`next build`)
+3. Tests (Vitest)
+4. Build verification (`next build`)
+
+Varlock's leak scan (`varlock scan`) is intentionally NOT part of CI — it runs locally as a git pre-commit hook where real secrets are available. See `.github/workflows/ci.yml` for the rationale.
 
 **Deployment:**
 - Push to `main` → Netlify auto-deploys to production

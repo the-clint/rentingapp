@@ -26,8 +26,15 @@ jobs:
       - name: Type check
         run: npm run type-check
 
-      - name: Varlock scan
-        run: npx varlock scan
+      # Note: `varlock scan` is intentionally NOT run in CI. It resolves live
+      # secrets from Bitwarden and scans the repo for plaintext occurrences —
+      # CI has no BWS access, so the scan would either fail to resolve or
+      # produce false positives against the committed .env.development values
+      # (which are dev-only / local-emulator defaults, not real secrets).
+      # Run varlock scan locally instead, ideally as a git pre-commit hook:
+      #   npx varlock scan --install-hook
+      # See docs/bitwarden-secrets-setup.md for the full leak-prevention
+      # rationale.
 
       - name: Tests
         run: npm test

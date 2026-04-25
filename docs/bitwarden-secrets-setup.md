@@ -18,28 +18,30 @@ This document covers:
 ## Architecture
 
 ```
-  Bitwarden Secrets Manager              your dev machine                  Next.js
-  +---------------------------+          +------------------------+        +---------+
-  | everything-rent-dev/      |  REST    | varlock + @varlock/    |        |         |
-  |   SUPABASE_URL            | <------- |  bitwarden-plugin      | -----> | process |
-  |   STRIPE_SECRET_KEY       |          |                        |        |  .env   |
-  |   TWILIO_AUTH_TOKEN ...   |          | reads `.env.schema`,   |        |         |
-  +---------------------------+          | picks dev vs prod UUID | @varlock
-  | everything-rent-prod/     | <------- | via remap($APP_ENV,    | nextjs- |         |
-  |   SUPABASE_URL            |          |   development=..,      | integr. +---------+
-  |   STRIPE_SECRET_KEY ...   |          |   production=..),      |
-  +---------------------------+          | then fetches by UUID   |
-                                         +------------------------+
-                                                  ^
-                                                  |  process.env.BWS_SECRETS_TOKEN
-                                                  |  process.env.APP_ENV  (development|production)
-                                                  |  (set in OS / shell / CI / hosting platform)
+  Bitwarden Secrets Manager                 your dev machine                   Next.js
+  +-------------------------------+         +------------------------+         +---------+
+  | everything-rent-dev/          |  REST   | varlock + @varlock/    |         |         |
+  |   SUPABASE_URL                | <------ |  bitwarden-plugin      | ------> | process |
+  |   STRIPE_SECRET_KEY ...       |         |                        |         |  .env   |
+  +-------------------------------+         | 1. reads `.env.schema` | @varlock+---------+
+  | everything-rent-preview/      | <------ |    (types only)        | nextjs-
+  |   SUPABASE_URL                |         | 2. auto-loads          | integr.
+  |   STRIPE_SECRET_KEY ...       |         |    `.env.${APP_ENV}`   |
+  +-------------------------------+         | 3. evaluates           |
+  | everything-rent-prod/         | <------ |    `bitwarden("<uuid>")|
+  |   SUPABASE_URL                |         |    calls in that file, |
+  |   STRIPE_SECRET_KEY ...       |         |    fetches by UUID     |
+  +-------------------------------+         +------------------------+
+                                                     ^
+                                                     |  process.env.BWS_SECRETS_TOKEN
+                                                     |  process.env.APP_ENV  (development|preview|production)
+                                                     |  (set in OS / shell / CI / Netlify context)
 ```
 
-- **Two BWS projects, one per environment.** Dev machines use `everything-rent-dev` with a dev machine-account token. The hosting platform (Netlify) uses `everything-rent-prod` with a prod machine-account token. A leaked dev token therefore cannot reach production secrets.
-- **`$APP_ENV` selects the environment.** Each secret in `.env.schema` is declared as `bitwarden(remap($APP_ENV, development="<dev-uuid>", production="<prod-uuid>"))`. Varlock evaluates `remap()` against `$APP_ENV`, then hands the resulting UUID to the Bitwarden plugin. Set `APP_ENV=development` locally (handled by `scripts/dev.mjs`) and `APP_ENV=production` on Netlify.
-- **Non-secret per-env values** (public URLs, the Stripe publishable key, the Turnstile site key) are committed in `.env.development` and `.env.production`. Varlock auto-loads the one matching `$APP_ENV`.
-- **`.env.schema`** is committed to the repo. It declares every env var the app needs, with types and validators, and uses the `bitwarden(remap(...))` resolver for values fetched from BWS.
+- **Three BWS projects, three environments, three Supabase instances.** Each environment has its own dedicated Bitwarden project, its own machine-account token, and (for preview/production) its own cloud Supabase project; development runs against a local Supabase emulator. A leaked dev or preview token cannot reach production secrets.
+- **`$APP_ENV` picks the per-env file.** Types and decorators are declared in `.env.schema`; concrete values — including `bitwarden("<uuid>")` calls — live in `.env.development`, `.env.preview`, and `.env.production`. Varlock auto-loads `.env.${APP_ENV}`, evaluates any `bitwarden(...)` expressions inside, and merges the result over the schema's type declarations. `scripts/dev.mjs` sets `APP_ENV=development` locally; `netlify.toml` sets `preview` for deploy-preview/branch-deploy contexts and `production` for the production context.
+- **Per-env files hold every value the app uses at runtime.** `.env.development`, `.env.preview`, and `.env.production` are committed. Non-secret values (URLs, Stripe publishable keys, Turnstile site keys) appear as literal strings; secrets appear as `bitwarden("<uuid>")` calls pointing at the matching project in that environment's BWS project.
+- **`.env.schema`** is committed and type-only. It declares every env var with its `@required`/`@optional`, `@sensitive`/`@public`, and `@type=` decorators, registers the Bitwarden plugin, and pins `$APP_ENV` as the environment flag. It holds no UUIDs and no `remap()` calls.
 - **`@varlock/nextjs-integration`** replaces Next's built-in env loader. It's wired via TWO pieces — both are required:
     1. A plugin wrapper in `next.config.ts` (`varlockNextConfigPlugin()(nextConfig)`).
     2. A package.json `overrides` entry that aliases the nested `@next/env` dependency to `@varlock/nextjs-integration`. Without this, Next boots with its own loader, the plugin sees `__VARLOCK_ENV is not set`, and `next dev` fails. See [package.json override](#packagejson-override) below.
@@ -67,15 +69,16 @@ After editing `overrides`, always run `npm install` to apply the substitution. Y
 Before running any of the commands in this document, you must have:
 
 1. **A Bitwarden organization with Secrets Manager enabled.** (Free tier works for small teams; paid plans have more secrets.)
-2. **One BWS project per environment you plan to run** — at minimum `everything-rent-dev` for local/CI, and `everything-rent-prod` before going live.
-3. **One machine account per environment**, with **Can read** permission on its own project only (not both). Separate accounts limit blast radius if a token leaks.
+2. **Three BWS projects**, one per environment: `everything-rent-dev`, `everything-rent-preview`, and `everything-rent-prod`. Each holds the same set of secret keys with environment-appropriate values (test keys for dev/preview, live keys for prod).
+3. **One machine account per project**, with **Can read** permission on its own project only. Separate accounts mean a leaked dev or preview token cannot reach production secrets.
 4. **The access tokens** for those machine accounts, copied at creation time. Bitwarden only displays each token **once** — if you lose it, create a new machine account.
-5. **The secrets themselves populated in BWS** — see [Secret naming convention](#secret-naming-convention) below for the list. Create matching secrets in both projects (dev and prod) with different values.
-6. **The UUIDs pasted into `.env.schema`** — each secret has a `development=` slot and a `production=` slot inside `remap(...)`. Replace the `TODO-*-PROD-UUID` placeholders with the prod project's UUIDs before running in production.
-7. **`BWS_SECRETS_TOKEN` set as an OS / shell env var** on your dev machine (dev token) and in the hosting platform's env UI (prod token).
-8. **`APP_ENV` set to `development` or `production`** — `scripts/dev.mjs` auto-sets it for local dev; CI sets it in `.github/workflows/ci.yml`; set it on Netlify explicitly.
+5. **The secrets themselves populated in BWS** — see [Secret naming convention](#secret-naming-convention) below. Create the same set of secrets in each of the three projects with environment-appropriate values.
+6. **The UUIDs pasted into the matching `.env.<env>` file** — dev UUIDs into `.env.development`, preview UUIDs into `.env.preview`, prod UUIDs into `.env.production`. Each file holds its env's complete picture. `.env.schema` has no UUIDs.
+7. **`BWS_SECRETS_TOKEN` set as an OS / shell env var** on your dev machine (dev token), and in Netlify's Site configuration → Environment variables (preview token scoped to Deploy Previews + Branch Deploys, prod token scoped to Production).
+8. **`APP_ENV` set to `development`, `preview`, or `production`** — `scripts/dev.mjs` auto-sets it for local dev; CI sets it in `.github/workflows/ci.yml`; `netlify.toml` sets it per deploy context.
+9. **A dedicated cloud Supabase project for preview and production.** Development runs against the local Supabase emulator (auto-started by `npm run dev`); preview and production each have their own cloud Supabase project, with the URL and keys stored in the matching BWS project.
 
-Until the prerequisites for your target environment are met, `varlock load`, `npm run dev`, and `npm run build` will all fail — loudly and with useful errors. Running with `APP_ENV=production` while the prod UUIDs are still placeholders will report the placeholder strings as invalid UUIDs; that is the intended behavior.
+Until the prerequisites for your target environment are met, `varlock load`, `npm run dev`, and `npm run build` will all fail — loudly and with useful errors. Running with `APP_ENV=preview` or `APP_ENV=production` while the per-env file's UUIDs are still `TODO-*-UUID` placeholders will report the placeholder strings as invalid UUIDs; that is the intended behavior.
 
 ---
 
@@ -83,17 +86,17 @@ Until the prerequisites for your target environment are met, `varlock load`, `np
 
 ### 1. Create a machine account in Bitwarden
 
-Do this once per environment — one for `dev`, one for `prod`.
+Do this once per environment — one for `dev`, one for `preview`, one for `prod`.
 
 1. Log in to your Bitwarden web vault.
 2. Open the **Secrets Manager** app (grid icon, top-right).
 3. **Machine accounts** → **New machine account**.
-4. Name it so the scope is unambiguous — e.g. `everything-rent-dev-local` for your laptop, `everything-rent-dev-ci` for GitHub Actions, `everything-rent-prod-netlify` for the hosting platform. Never share one token across environments.
+4. Name it so the scope is unambiguous — e.g. `everything-rent-dev-local` for your laptop, `everything-rent-dev-ci` for GitHub Actions, `everything-rent-preview-netlify` for preview deploys, `everything-rent-prod-netlify` for production. Never share one token across environments.
 5. Click **Save**, then click into the account and copy the **Access token** from the banner at the top. **Do this immediately — it will never be shown again.**
 
 ### 2. Populate the secrets
 
-In Secrets Manager, create two **Projects**: `everything-rent-dev` and `everything-rent-prod`. Create one secret per row in the table below **in each project**, with the appropriate value for that environment (test keys in dev, live keys in prod). Secret *names* don't have to match these exactly (varlock looks them up by UUID, not name), but consistent naming keeps the dashboard usable.
+In Secrets Manager, create three **Projects**: `everything-rent-dev`, `everything-rent-preview`, and `everything-rent-prod`. Create one secret per row in the table below **in each project**, with environment-appropriate values (test keys in dev/preview, live keys in prod). Secret *names* don't have to match these exactly (varlock looks them up by UUID, not name), but consistent naming keeps the dashboard usable.
 
 | Env var | BWS secret name (suggested) | Notes |
 |---|---|---|
@@ -106,26 +109,31 @@ In Secrets Manager, create two **Projects**: `everything-rent-dev` and `everythi
 | `TWILIO_AUTH_TOKEN` | `everything-rent/dev/TWILIO_AUTH_TOKEN` | |
 | `TWILIO_PHONE_NUMBER` | `everything-rent/dev/TWILIO_PHONE_NUMBER` | Must start with `+` (E.164) |
 
-After creating each secret, **grant the matching machine account read access to its project** (Machine accounts → click the account → Projects tab → add `everything-rent-dev` or `everything-rent-prod`). Each machine account should only have access to the project for its environment. Otherwise every `bitwarden()` lookup will return **Permission denied** at resolve time.
+After creating each secret, **grant the matching machine account read access to its project** (Machine accounts → click the account → Projects tab → add the one project that matches). Each machine account should only have access to the project for its environment. Otherwise every `bitwarden()` lookup will return **Permission denied** at resolve time.
 
-### 3. Copy the UUIDs into `.env.schema`
+### 3. Copy the UUIDs into the matching per-env file
 
-Each secret in the schema looks like this:
+Each secret appears in its per-env file as a `bitwarden("<uuid>")` call:
 
 ```env
-STRIPE_SECRET_KEY=bitwarden(remap($APP_ENV,
-  development="<dev-project-uuid>",
-  production="TODO-STRIPE-SECRET-KEY-PROD-UUID"))
+# in .env.development
+STRIPE_SECRET_KEY=bitwarden("<dev-project-uuid>")
+
+# in .env.preview
+STRIPE_SECRET_KEY=bitwarden("<preview-project-uuid>")
+
+# in .env.production
+STRIPE_SECRET_KEY=bitwarden("<prod-project-uuid>")
 ```
 
 For each secret in each project:
 
 1. Click the secret in the BWS dashboard.
 2. Copy the UUID from the URL or the **Secret ID** field (format: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`).
-3. Open `.env.schema` in your editor.
-4. Paste the UUID into the matching environment slot inside `remap(...)`. The dev project's UUID goes after `development=`; the prod project's UUID replaces the `TODO-<NAME>-PROD-UUID` placeholder after `production=`.
+3. Open the matching `.env.<env>` file in your editor.
+4. Paste the UUID inside the `bitwarden("...")` call for that secret, replacing any `TODO-*-UUID` placeholder.
 
-Commit `.env.schema` to the repo — **UUIDs are not secrets**, they're just pointers. The actual values stay in BWS.
+Commit the per-env files to the repo — **UUIDs are not secrets**, they're just pointers. The actual values stay in BWS. `.env.schema` holds no UUIDs and does not need updating when secrets are added or rotated.
 
 ### 4. Set `BWS_SECRETS_TOKEN` in your shell env
 
@@ -258,25 +266,25 @@ If any required env var is missing, invalid, or fails its type check, `next dev`
 
 Treat `BWS_SECRETS_TOKEN` as a CI secret, and always pair it with an explicit `APP_ENV`:
 
-- **GitHub Actions (build/test CI):** `.github/workflows/ci.yml` sets `APP_ENV: development` at the job level and overrides every `@sensitive` env var with a distinctive placeholder — varlock never calls BWS in CI, so the dev-branch UUIDs are never resolved. The `BWS_SECRETS_TOKEN` placeholder exists only to satisfy the `@initBitwarden` format validator.
-- **Netlify (runtime):** Site configuration → Environment variables. Add two vars per deploy context:
-  - `APP_ENV=production` (for the Production context; set to `development` for Deploy Previews/Branch deploys or leave them unconfigured while dogfooding)
-  - `BWS_SECRETS_TOKEN=<prod machine-account token>` (for Production only; never reuse the dev token)
-  Netlify injects both at build and runtime; the varlock Next.js plugin reads them from there.
+- **GitHub Actions (build/test CI):** `.github/workflows/ci.yml` sets `APP_ENV: development` at the job level and overrides every `@sensitive` env var with a distinctive placeholder — varlock never calls BWS in CI, so the dev UUIDs in `.env.development` are never resolved. The `BWS_SECRETS_TOKEN` placeholder exists only to satisfy the `@initBitwarden` format validator.
+- **Netlify (build + runtime):** `APP_ENV` is pinned per deploy context in `netlify.toml` — don't set it manually in the UI. What you DO set in **Site configuration → Environment variables**:
+  - `BWS_SECRETS_TOKEN=<prod machine-account token>`, scoped to the **Production** context.
+  - `BWS_SECRETS_TOKEN=<preview machine-account token>`, scoped to **Deploy Previews** + **Branch Deploys**.
+  Netlify's per-context scoping lets the same variable name resolve to different values depending on the deploy. Varlock reads the token at build time, pulls the matching BWS project's secrets, and bakes them into the build. Rotating a secret is: edit it in Bitwarden → trigger a Netlify redeploy for that context.
 
-Use **separate machine accounts per environment**, scoped to separate BWS projects, so a leaked dev/CI token can't reach production secrets. Rotate each account independently.
+Use **separate machine accounts per environment**, scoped to separate BWS projects, so a leaked dev/preview/CI token can't reach production secrets. Rotate each account independently.
 
 ---
 
 ## Troubleshooting
 
-### `bitwarden(): Invalid secret ID format: "TODO-*-PROD-UUID"`
+### `bitwarden(): Invalid secret ID format: "TODO-*-UUID"`
 
-You tried to run with `APP_ENV=production` before filling in the prod-slot UUIDs in `.env.schema`. Paste the real UUIDs from the `everything-rent-prod` BWS project — see [One-time setup → step 3](#3-copy-the-uuids-into-envschema).
+You tried to run with `APP_ENV=preview` or `APP_ENV=production` before filling in that env's UUIDs. Paste the real UUIDs from the matching BWS project into `.env.preview` or `.env.production` — see [One-time setup → step 3](#3-copy-the-uuids-into-the-matching-per-env-file).
 
-### `remap(): $APP_ENV has no mapping for value ""`
+### `$APP_ENV is not set` / per-env file not loaded
 
-`APP_ENV` is unset. Local dev: run `npm run dev` (which sets it via `scripts/dev.mjs`). CI: confirm the `APP_ENV` line in `.github/workflows/ci.yml`. Netlify: set it in Site configuration → Environment variables.
+`APP_ENV` is unset or misspelled. Varlock auto-loads `.env.${APP_ENV}`, so a typo means the file is silently skipped and every secret falls back to the empty schema default. Local dev: run `npm run dev` (which sets it via `scripts/dev.mjs`). CI: confirm the `APP_ENV` line in `.github/workflows/ci.yml`. Netlify: `netlify.toml` pins it per deploy context — if this fires on a Netlify build the `[context.*.environment]` blocks have been tampered with.
 
 ### `Authentication failed` / `401 Unauthorized`
 

@@ -64,17 +64,11 @@ _bmad-output/
    npm install
    ```
 
-2. **Create your local env file**
-   ```bash
-   cp .env.example .env.local
-   ```
-   This gives you all the defaults needed to run against the local Supabase emulator. No secrets required for basic local dev.
+2. **Set `BWS_SECRETS_TOKEN` in your shell env**
+   - You do NOT copy any env file — `.env.development` is committed and auto-loaded by varlock. Secrets come from Bitwarden Secrets Manager.
+   - Set `BWS_SECRETS_TOKEN` as an OS/user env var (never in a file). See [docs/bitwarden-secrets-setup.md](docs/bitwarden-secrets-setup.md) for the full runbook and `.env.schema` for the list of required keys.
 
-3. **Configure production secrets** _(optional — only needed for Stripe/Twilio features)_
-   - Set `BWS_SECRETS_TOKEN` as a user/shell env var (never commit it).
-   - Populate the referenced secrets in your BWS dashboard. See `.env.schema` for the required keys and `docs/bitwarden-secrets-setup.md` for the recommended naming convention.
-
-4. **Run the dev environment**
+3. **Run the dev environment**
    ```bash
    npm run dev
    ```

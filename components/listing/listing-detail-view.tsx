@@ -47,27 +47,16 @@ export function ListingDetailView({
 }: ListingDetailViewProps) {
   const sorted = [...listing.photos].sort((a, b) => a.position - b.position);
   const hero = sorted.find((p) => p.isHero) ?? sorted[0];
-  const thumbnails = sorted.filter((p) => p !== hero);
+  const showGrid = sorted.length > 1;
 
   return (
     <div className="flex flex-col gap-space-6">
-      {hero && (
-        <div className="overflow-hidden rounded-lg border border-border bg-neutral-100">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={hero.url}
-            alt={listing.name}
-            className="aspect-video w-full object-cover"
-          />
-        </div>
-      )}
-
-      {thumbnails.length > 0 && (
+      {showGrid ? (
         <ul
-          aria-label={`${listing.name} thumbnail photos`}
-          className="grid grid-cols-3 gap-space-2 sm:grid-cols-4 md:grid-cols-5"
+          aria-label={`${listing.name} photos`}
+          className="grid grid-cols-2 gap-space-2 sm:grid-cols-3"
         >
-          {thumbnails.map((photo, i) => (
+          {sorted.map((photo, i) => (
             <li
               key={photo.path}
               className="overflow-hidden rounded-md border border-border bg-neutral-100"
@@ -75,40 +64,24 @@ export function ListingDetailView({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={photo.url}
-                alt={`${listing.name} photo ${i + 2}`}
+                alt={`${listing.name} photo ${i + 1}`}
                 className="aspect-square w-full object-cover"
               />
             </li>
           ))}
         </ul>
-      )}
-
-      <dl className="grid gap-space-3">
-        <div>
-          <dt className="text-sm font-medium text-neutral-500">Daily rate</dt>
-          <dd className="text-body font-semibold">
-            {formatDailyRate(listing.daily_rate_cents)}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-sm font-medium text-neutral-500">Pickup location</dt>
-          <dd className="text-body">{listing.pickup_location}</dd>
-        </div>
-        {listing.pickup_instructions && listing.pickup_instructions.length > 0 && (
-          <div>
-            <dt className="text-sm font-medium text-neutral-500">
-              Pickup instructions
-            </dt>
-            <dd className="whitespace-pre-wrap text-body">
-              {listing.pickup_instructions}
-            </dd>
+      ) : (
+        hero && (
+          <div className="overflow-hidden rounded-lg border border-border bg-neutral-100">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={hero.url}
+              alt={listing.name}
+              className="aspect-video w-full object-cover"
+            />
           </div>
-        )}
-        <div>
-          <dt className="text-sm font-medium text-neutral-500">Description</dt>
-          <dd className="whitespace-pre-wrap text-body">{listing.description}</dd>
-        </div>
-      </dl>
+        )
+      )}
 
       <div className="flex flex-wrap gap-space-2">
         <Button asChild>
@@ -138,6 +111,33 @@ export function ListingDetailView({
           listingName={listing.name}
         />
       </div>
+
+      <dl className="grid gap-space-3">
+        <div>
+          <dt className="text-sm font-medium text-neutral-500">Daily rate</dt>
+          <dd className="text-body font-semibold">
+            {formatDailyRate(listing.daily_rate_cents)}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-sm font-medium text-neutral-500">Pickup location</dt>
+          <dd className="text-body">{listing.pickup_location}</dd>
+        </div>
+        {listing.pickup_instructions && listing.pickup_instructions.length > 0 && (
+          <div>
+            <dt className="text-sm font-medium text-neutral-500">
+              Pickup instructions
+            </dt>
+            <dd className="whitespace-pre-wrap text-body">
+              {listing.pickup_instructions}
+            </dd>
+          </div>
+        )}
+        <div>
+          <dt className="text-sm font-medium text-neutral-500">Description</dt>
+          <dd className="whitespace-pre-wrap text-body">{listing.description}</dd>
+        </div>
+      </dl>
     </div>
   );
 }

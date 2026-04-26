@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { OperatorMobileTabBar } from "./operator-mobile-tab-bar";
+import { OperatorMobileTopBar } from "./operator-mobile-top-bar";
 import { OperatorSidebar } from "./operator-sidebar";
 
 const STORAGE_KEY = "operator-sidebar-collapsed";
@@ -93,12 +94,14 @@ export function OperatorShell({ userEmailSlot, children }: OperatorShellProps) {
         showLabels={collapseState !== "collapsed"}
         onToggle={toggleCollapsed}
       />
+      <OperatorMobileTopBar />
       <OperatorMobileTabBar />
       <main
         className={[
           "min-h-screen bg-neutral-100",
           mainPaddingClass,
-          // Reserve space for fixed mobile tab bar.
+          // Reserve space for fixed mobile top bar and bottom tab bar.
+          "pt-14 md:pt-0",
           "pb-14 md:pb-0",
           "transition-[padding] duration-150",
         ].join(" ")}

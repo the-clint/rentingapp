@@ -130,13 +130,16 @@ function cellClassName(
       stateCls += "bg-neutral-100 text-neutral-300 cursor-default";
       break;
     case "booked":
-      stateCls += "bg-neutral-100 text-neutral-500 cursor-default";
+      stateCls +=
+        "bg-neutral-100 text-neutral-500 cursor-default availability-hatch";
       break;
     case "blocked":
-      stateCls += "bg-neutral-100 text-neutral-500 cursor-default";
+      stateCls +=
+        "bg-neutral-100 text-neutral-500 cursor-default availability-hatch";
       break;
     case "maintenance":
-      stateCls += "bg-muted text-neutral-500 cursor-default";
+      stateCls +=
+        "bg-muted text-neutral-500 cursor-default availability-hatch";
       break;
     case "available":
       stateCls += "bg-card text-neutral-900 hover:bg-neutral-100";

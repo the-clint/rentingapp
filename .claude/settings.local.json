@@ -40,7 +40,10 @@
       "mcp__Claude_Preview__preview_start",
       "Bash(git checkout *)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(git worktree *)",
+      "PowerShell(Get-Process | Where-Object { $_.ProcessName -match 'OneDrive|explorer|node' } | Select-Object Id, ProcessName | Format-Table -AutoSize)",
+      "PowerShell($src = \"C:\\\\Users\\\\clint\\\\OneDrive\\\\Documents\\\\Code\\\\rentingapp\\\\.claude\\\\worktrees\\\\nifty-bouman-348758\"; $dst = \"C:\\\\Users\\\\clint\\\\OneDrive\\\\Documents\\\\Code\\\\rentingapp\\\\.claude\\\\worktrees\\\\_pending_delete_$\\(Get-Random\\)\"; try { Rename-Item -Path $src -NewName \\(Split-Path $dst -Leaf\\) -ErrorAction Stop; \"renamed\" } catch { \"rename failed: $\\($_.Exception.Message\\)\" })"
     ]
   }
 }

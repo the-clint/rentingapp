@@ -104,6 +104,7 @@ export function ListingDetailView({
             pickup_location: listing.pickup_location,
           }}
           bookingUrl={bookingUrl}
+          listingId={listing.id}
           initialOpen={initialAssistantOpen}
         />
         <DeleteListingDialog

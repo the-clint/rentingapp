@@ -29,6 +29,11 @@ vi.mock("next/navigation", () => ({
   usePathname: () => pathnameMock(),
 }));
 
+const toDataURLMock = vi.fn().mockResolvedValue("data:image/png;base64,fake");
+vi.mock("qrcode", () => ({
+  default: { toDataURL: (...args: unknown[]) => toDataURLMock(...args) },
+}));
+
 import { PostingAssistantDialog } from "./posting-assistant-dialog";
 
 const sampleListing = {
@@ -68,6 +73,7 @@ describe("PostingAssistantDialog", () => {
       <PostingAssistantDialog
         listing={sampleListing}
         bookingUrl={bookingUrl}
+        listingId="test-id"
       />,
     );
     const dialog = document.querySelector("dialog");
@@ -86,6 +92,7 @@ describe("PostingAssistantDialog", () => {
       <PostingAssistantDialog
         listing={sampleListing}
         bookingUrl={bookingUrl}
+        listingId="test-id"
       />,
     );
     fireEvent.click(
@@ -108,6 +115,7 @@ describe("PostingAssistantDialog", () => {
       <PostingAssistantDialog
         listing={sampleListing}
         bookingUrl={bookingUrl}
+        listingId="test-id"
       />,
     );
     fireEvent.click(
@@ -146,6 +154,7 @@ describe("PostingAssistantDialog", () => {
       <PostingAssistantDialog
         listing={sampleListing}
         bookingUrl={bookingUrl}
+        listingId="test-id"
       />,
     );
     fireEvent.click(
@@ -177,6 +186,7 @@ describe("PostingAssistantDialog", () => {
       <PostingAssistantDialog
         listing={sampleListing}
         bookingUrl={bookingUrl}
+        listingId="test-id"
       />,
     );
     fireEvent.click(
@@ -189,6 +199,28 @@ describe("PostingAssistantDialog", () => {
     });
 
     expect(writeText).toHaveBeenCalledWith(bookingUrl);
+  });
+
+  it("renders the QR code and download button in the booking link section", async () => {
+    setupClipboard();
+    const { findByRole } = render(
+      <PostingAssistantDialog
+        listing={sampleListing}
+        bookingUrl={bookingUrl}
+        listingId="test-id"
+      />,
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: /^posting assistant$/i }),
+    );
+
+    const qrImage = await findByRole("img", { name: /QR code/i });
+    expect(qrImage.getAttribute("src")).toBe("data:image/png;base64,fake");
+
+    const downloadLink = screen.getByRole("link", { name: /download qr/i });
+    expect(downloadLink.getAttribute("download")).toBe(
+      "booking-qr-test-id.png",
+    );
   });
 
   it("auto-opens once when initialOpen is true and scrubs ?posted=1 on close", async () => {
@@ -212,6 +244,7 @@ describe("PostingAssistantDialog", () => {
         <PostingAssistantDialog
           listing={sampleListing}
           bookingUrl={bookingUrl}
+          listingId="test-id"
           initialOpen={true}
         />,
       );

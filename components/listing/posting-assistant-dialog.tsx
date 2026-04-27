@@ -4,6 +4,7 @@ import { Check, Copy, Megaphone, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
+import { BookingQrCode } from "@/components/booking/booking-qr-code";
 import { Button } from "@/components/ui/button";
 import {
   generatePostingCopy,
@@ -21,6 +22,7 @@ interface PostingAssistantDialogProps {
     pickup_location: string;
   };
   bookingUrl: string;
+  listingId: string;
   initialOpen?: boolean;
 }
 
@@ -42,6 +44,7 @@ interface PlatformSection {
 export function PostingAssistantDialog({
   listing,
   bookingUrl,
+  listingId,
   initialOpen = false,
 }: PostingAssistantDialogProps) {
   const router = useRouter();
@@ -183,8 +186,8 @@ export function PostingAssistantDialog({
                 Posting assistant
               </h2>
               <p className="text-sm text-neutral-700">
-                Copy ad text for each classifieds platform and share your
-                booking link.
+                Copy ad text for each classifieds platform, share your booking
+                link, or print the QR code.
               </p>
             </div>
             <Button
@@ -200,52 +203,51 @@ export function PostingAssistantDialog({
 
           <section
             aria-labelledby="posting-assistant-booking-link-label"
-            className="flex flex-col gap-space-3 rounded-lg border border-border bg-muted p-space-4"
+            className="flex flex-col gap-space-3 rounded-lg border border-border bg-muted p-space-4 md:flex-row md:items-start md:gap-space-4"
           >
-            <label
-              id="posting-assistant-booking-link-label"
-              className="text-sm font-medium text-neutral-500"
-            >
-              Booking link
-            </label>
-            <code className="block break-all rounded-md bg-neutral-100 px-space-3 py-space-2 text-sm">
-              {bookingUrl}
-            </code>
-            <div className="flex flex-col gap-space-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => handleCopy("link", bookingUrl)}
+            <div className="flex flex-1 flex-col gap-space-3">
+              <label
+                id="posting-assistant-booking-link-label"
+                className="text-sm font-medium text-neutral-500"
               >
-                {copiedTarget === "link" ? (
-                  <>
-                    <Check className="h-4 w-4" aria-hidden="true" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-4 w-4" aria-hidden="true" />
-                    Copy link
-                  </>
+                Booking link
+              </label>
+              <code className="block break-all rounded-md bg-neutral-100 px-space-3 py-space-2 text-sm">
+                {bookingUrl}
+              </code>
+              <div className="flex flex-col gap-space-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleCopy("link", bookingUrl)}
+                >
+                  {copiedTarget === "link" ? (
+                    <>
+                      <Check className="h-4 w-4" aria-hidden="true" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4" aria-hidden="true" />
+                      Copy link
+                    </>
+                  )}
+                </Button>
+                <span className="sr-only" aria-live="polite">
+                  {copiedTarget === "link" ? "Copied booking link" : ""}
+                </span>
+                {erroredTarget === "link" && (
+                  <p className="text-xs text-destructive" role="alert">
+                    Copy failed — select the text and press Ctrl+C manually.
+                  </p>
                 )}
-              </Button>
-              <span className="sr-only" aria-live="polite">
-                {copiedTarget === "link" ? "Copied booking link" : ""}
-              </span>
-              {erroredTarget === "link" && (
-                <p className="text-xs text-destructive" role="alert">
-                  Copy failed — select the text and press Ctrl+C manually.
-                </p>
-              )}
+              </div>
             </div>
-            {/* TODO: QR code (Story 3.1). Requires a renter-facing /book/[id] page to target. Planned: add `qrcode` dep or hand-write encoder in that story. */}
-            <div
-              aria-hidden="true"
-              className="rounded-md border border-dashed border-neutral-300 bg-card px-space-3 py-space-2 text-xs text-neutral-500"
-            >
-              QR code will be generated in Epic 3 (Story 3.1) once the booking
-              page exists.
-            </div>
+            <BookingQrCode
+              bookingUrl={bookingUrl}
+              listingId={listingId}
+              listingName={listing.name}
+            />
           </section>
 
           <section className="grid gap-space-4 md:grid-cols-3">

@@ -4,8 +4,8 @@ import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
 const defaultUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  process.env.URL ??
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  process.env.URL ||
   "http://everything.test";
 
 export const metadata: Metadata = {

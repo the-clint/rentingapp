@@ -47,27 +47,16 @@ export function ListingDetailView({
 }: ListingDetailViewProps) {
   const sorted = [...listing.photos].sort((a, b) => a.position - b.position);
   const hero = sorted.find((p) => p.isHero) ?? sorted[0];
-  const thumbnails = sorted.filter((p) => p !== hero);
+  const showGrid = sorted.length > 1;
 
   return (
     <div className="flex flex-col gap-space-6">
-      {hero && (
-        <div className="overflow-hidden rounded-lg border border-border bg-neutral-100">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={hero.url}
-            alt={listing.name}
-            className="aspect-video w-full object-cover"
-          />
-        </div>
-      )}
-
-      {thumbnails.length > 0 && (
+      {showGrid ? (
         <ul
-          aria-label={`${listing.name} thumbnail photos`}
-          className="grid grid-cols-3 gap-space-2 sm:grid-cols-4 md:grid-cols-5"
+          aria-label={`${listing.name} photos`}
+          className="grid grid-cols-2 gap-space-2 sm:grid-cols-3"
         >
-          {thumbnails.map((photo, i) => (
+          {sorted.map((photo, i) => (
             <li
               key={photo.path}
               className="overflow-hidden rounded-md border border-border bg-neutral-100"
@@ -75,13 +64,54 @@ export function ListingDetailView({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={photo.url}
-                alt={`${listing.name} photo ${i + 2}`}
+                alt={`${listing.name} photo ${i + 1}`}
                 className="aspect-square w-full object-cover"
               />
             </li>
           ))}
         </ul>
+      ) : (
+        hero && (
+          <div className="overflow-hidden rounded-lg border border-border bg-neutral-100">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={hero.url}
+              alt={listing.name}
+              className="aspect-video w-full object-cover"
+            />
+          </div>
+        )
       )}
+
+      <div className="flex flex-wrap gap-space-2">
+        <Button asChild>
+          <Link href={`/listings/${listing.id}/edit`}>
+            <Pencil className="h-4 w-4" aria-hidden="true" />
+            Edit
+          </Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link href={`/listings/${listing.id}/availability`}>
+            <CalendarDays className="h-4 w-4" aria-hidden="true" />
+            Manage availability
+          </Link>
+        </Button>
+        <PostingAssistantDialog
+          listing={{
+            name: listing.name,
+            description: listing.description,
+            daily_rate_cents: listing.daily_rate_cents,
+            pickup_location: listing.pickup_location,
+          }}
+          bookingUrl={bookingUrl}
+          listingId={listing.id}
+          initialOpen={initialAssistantOpen}
+        />
+        <DeleteListingDialog
+          listingId={listing.id}
+          listingName={listing.name}
+        />
+      </div>
 
       <dl className="grid gap-space-3">
         <div>
@@ -109,35 +139,6 @@ export function ListingDetailView({
           <dd className="whitespace-pre-wrap text-body">{listing.description}</dd>
         </div>
       </dl>
-
-      <div className="flex flex-wrap gap-space-2">
-        <Button asChild>
-          <Link href={`/listings/${listing.id}/edit`}>
-            <Pencil className="h-4 w-4" aria-hidden="true" />
-            Edit
-          </Link>
-        </Button>
-        <Button asChild variant="outline">
-          <Link href={`/listings/${listing.id}/availability`}>
-            <CalendarDays className="h-4 w-4" aria-hidden="true" />
-            Manage availability
-          </Link>
-        </Button>
-        <PostingAssistantDialog
-          listing={{
-            name: listing.name,
-            description: listing.description,
-            daily_rate_cents: listing.daily_rate_cents,
-            pickup_location: listing.pickup_location,
-          }}
-          bookingUrl={bookingUrl}
-          initialOpen={initialAssistantOpen}
-        />
-        <DeleteListingDialog
-          listingId={listing.id}
-          listingName={listing.name}
-        />
-      </div>
     </div>
   );
 }

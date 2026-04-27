@@ -26,7 +26,9 @@ import {
   type ClipboardEvent,
   type KeyboardEvent,
 } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -279,6 +281,14 @@ export function RenterOtpFlow({
   const seconds = secondsRemaining % 60;
   const countdownLabel = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
+  const datesHref = useMemo(() => {
+    const params = new URLSearchParams();
+    if (start) params.set("start", start);
+    if (end) params.set("end", end);
+    const qs = params.toString();
+    return `/book/${listingId}${qs ? `?${qs}` : ""}`;
+  }, [listingId, start, end]);
+
   return (
     <div className="flex flex-col gap-space-6">
       <BookingStepIndicator currentStep={currentStepForIndicator} />
@@ -292,6 +302,14 @@ export function RenterOtpFlow({
           className="flex flex-col gap-space-4"
           aria-label="Phone number verification"
         >
+          <Link
+            href={datesHref}
+            className="inline-flex items-center gap-space-1 self-start text-small font-medium text-neutral-700 hover:text-neutral-900"
+            data-testid="back-to-dates-link"
+          >
+            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+            Back to dates
+          </Link>
           <div className="flex flex-col gap-space-2">
             <h1 className="text-h2 font-semibold text-neutral-900">
               Enter your phone number to continue

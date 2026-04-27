@@ -36,7 +36,11 @@
       "Bash(echo \"exit=$?\")",
       "Bash(APP_ENV=development npx varlock load)",
       "Bash(APP_ENV=development npx varlock run -- node -e \"console.log\\('STRIPE_SECRET_KEY prefix:', process.env.STRIPE_SECRET_KEY?.slice\\(0,7\\)\\); console.log\\('SITE_URL:', process.env.NEXT_PUBLIC_SITE_URL\\); console.log\\('SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL\\); console.log\\('APP_ENV:', process.env.APP_ENV\\)\")",
-      "Bash(APP_ENV=production npx varlock load)"
+      "Bash(APP_ENV=production npx varlock load)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }

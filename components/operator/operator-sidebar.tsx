@@ -6,6 +6,7 @@ import { LogOut, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { signOut } from "@/lib/actions/auth-actions";
+import { BrandLogo } from "@/components/brand-logo";
 import { NAV_ITEMS } from "./nav-items";
 
 interface OperatorSidebarProps {
@@ -54,16 +55,24 @@ export function OperatorSidebar({
       {/* Logo / wordmark */}
       <div
         className={cn(
-          "flex items-center h-16 px-space-4 border-b border-white/10",
-          !showLabels && "justify-center px-0",
+          "flex items-center h-16 border-b border-white/10",
+          showLabels ? "px-space-2" : "justify-center px-0",
         )}
       >
         {showLabels ? (
-          <span className="text-h2 font-bold tracking-tight">Everything.Rent</span>
+          <BrandLogo
+            href="/dashboard"
+            variant="full"
+            fill
+            imgClassName="rounded-lg"
+          />
         ) : (
-          <span aria-hidden="true" className="text-h2 font-bold" title="Everything.Rent">
-            E
-          </span>
+          <BrandLogo
+            href="/dashboard"
+            variant="mark"
+            height={40}
+            imgClassName="rounded-lg"
+          />
         )}
       </div>
 

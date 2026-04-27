@@ -127,16 +127,19 @@ function cellClassName(
   let stateCls = "rounded-md ";
   switch (state) {
     case "past":
-      stateCls += "bg-neutral-100 text-neutral-300 cursor-default";
+      stateCls += "bg-neutral-100 text-neutral-300 cursor-not-allowed";
       break;
     case "booked":
-      stateCls += "bg-neutral-100 text-neutral-500 cursor-default";
+      stateCls +=
+        "bg-neutral-100 text-neutral-500 cursor-not-allowed availability-hatch";
       break;
     case "blocked":
-      stateCls += "bg-neutral-100 text-neutral-500 cursor-default";
+      stateCls +=
+        "bg-neutral-100 text-neutral-500 cursor-not-allowed availability-hatch";
       break;
     case "maintenance":
-      stateCls += "bg-muted text-neutral-500 cursor-default";
+      stateCls +=
+        "bg-muted text-neutral-500 cursor-not-allowed availability-hatch";
       break;
     case "available":
       stateCls += "bg-card text-neutral-900 hover:bg-neutral-100";

@@ -1,5 +1,5 @@
 # generated: 2026-04-06
-# last_updated: 2026-04-10 (story 4-3 done)
+# last_updated: 2026-04-26 (story 2-6 implemented, awaiting code review)
 # project: everything-rent
 # project_key: NOKEY
 # tracking_system: file-system
@@ -35,9 +35,9 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-06
-last_updated: 2026-04-10
+last_updated: 2026-04-26
 project: everything-rent
-# Updated: story 3-6 done, epic 3 done (booking flow state persistence)
+# Updated: story 2-6 implemented (QR code for classifieds posting), status → review
 project_key: NOKEY
 tracking_system: file-system
 story_location: "{project-root}/_bmad-output/implementation-artifacts"
@@ -52,12 +52,13 @@ development_status:
   epic-1-retrospective: optional
 
   # Epic 2: Listing Creation & Classifieds Posting
-  epic-2: done
+  epic-2: in-progress
   2-1-create-listing-with-photos-and-details: done
   2-2-manage-availability-calendar-operator-mode: done
   2-3-edit-and-delete-listings: done
   2-4-view-all-listings: done
   2-5-posting-assistant-and-booking-links: done
+  2-6-qr-code-for-classifieds-posting: review
   epic-2-retrospective: optional
 
   # Epic 3: Renter Booking Flow

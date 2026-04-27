@@ -40,6 +40,12 @@ vi.mock("@/lib/actions/listing-actions", () => ({
   deleteListing: vi.fn(),
 }));
 
+vi.mock("qrcode", () => ({
+  default: {
+    toDataURL: vi.fn().mockResolvedValue("data:image/png;base64,fake"),
+  },
+}));
+
 import {
   ListingDetailView,
   type ListingDetailViewData,
@@ -95,7 +101,12 @@ describe("ListingDetailView", () => {
         bookingUrl="https://everything.rent/book/listing-1"
       />,
     );
-    const hero = screen.getByAltText("Honda EU2200i Generator") as HTMLImageElement;
+    // With multiple photos, ListingDetailView renders the photo grid where
+    // each <img> alt is `${listing.name} photo ${i + 1}`. The hero is sorted
+    // to position 0, so the first grid image carries hero.url.
+    const hero = screen.getByAltText(
+      "Honda EU2200i Generator photo 1",
+    ) as HTMLImageElement;
     expect(hero.src).toBe("https://example/hero.jpg");
   });
 

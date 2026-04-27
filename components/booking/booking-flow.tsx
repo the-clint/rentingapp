@@ -173,14 +173,17 @@ export function BookingFlow({
     return map;
   }, [listingId, currentWindow.startKey, currentWindow.endKey]);
 
-  // Fetch fresh availability whenever the visible month changes — except the
-  // initial render, which is already hydrated from the Server Component.
-  const initialKeyRef = useRef<string>(
-    `${initialYear}-${initialMonthZeroIndexed}`,
-  );
+  // Fetch fresh availability whenever the visible month changes — except on
+  // the very first render, which is already hydrated from the Server
+  // Component. Subsequent visits to the initial month must still re-fetch,
+  // since the in-memory availability state has been overwritten by other
+  // months in the meantime.
+  const skipNextFetchRef = useRef(true);
   useEffect(() => {
-    const key = `${currentWindow.year}-${currentWindow.monthZeroIndexed}`;
-    if (key === initialKeyRef.current) return;
+    if (skipNextFetchRef.current) {
+      skipNextFetchRef.current = false;
+      return;
+    }
     let cancelled = false;
     fetchAvailabilityBrowser(
       listingId,

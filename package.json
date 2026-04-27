@@ -11,7 +11,7 @@
     "test:watch": "vitest",
     "test:e2e": "varlock run -- node node_modules/@playwright/test/cli.js test",
     "test:e2e:cleanup": "varlock run -- node tests/e2e/helpers/cleanup-cli.mjs",
-    "postinstall": "node scripts/patch-varlock-windows.mjs",
+    "postinstall": "node scripts/patch-varlock-windows.mjs && node scripts/install-git-hooks.mjs",
     "supabase:start": "npx supabase start",
     "supabase:stop": "npx supabase stop",
     "supabase:restart": "npx supabase stop && npx supabase start",
@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@netlify/plugin-nextjs": "5.15.9",
     "@playwright/test": "^1.59.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",

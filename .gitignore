@@ -22,6 +22,9 @@ supabase/.branches/
 # Netlify
 .netlify
 
+# Local Caddy CA exports (one-shot artifact for OS/browser trust install)
+caddy-root-ca.crt
+
 # TypeScript
 *.tsbuildinfo
 

@@ -1,3 +1,9 @@
+# Project name pinned so volumes are shared across git worktrees. Without
+# this, docker compose names the project after the parent directory; each
+# worktree gets its own caddy_data volume, each with its own CA, and the
+# browser hits SEC_ERROR_BAD_SIGNATURE when switching between them.
+name: rentingapp
+
 services:
   caddy:
     image: caddy:2-alpine

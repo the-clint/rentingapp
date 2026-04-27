@@ -65,5 +65,7 @@ jobs:
           STRIPE_SECRET_KEY: sk_test_ci_build_only_QzX8mK2aRv9nLf4Jh7Dc3PnW6eYy5tT1
           STRIPE_WEBHOOK_SECRET: whsec_ci_build_only_QzX8mK2aRv9nLf4Jh7Dc3PnW6eYy5tT1
           TWILIO_ACCOUNT_SID: ACciBuildOnlyQzX8mK2aRv9nLf4Jh7Dc3PnW6eYy5tT1
+          TWILIO_VERIFY_SERVICE_SID: VAciBuildOnlyQzX8mK2aRv9nLf4Jh7Dc3PnW6eYy5tT1
           TWILIO_AUTH_TOKEN: ci_build_only_QzX8mK2aRv9nLf4Jh7Dc3PnW6eYy5tT1
           TWILIO_PHONE_NUMBER: "+15555550123"
+          TURNSTILE_SECRET_KEY: ci_build_only_turnstile_QzX8mK2aRv9nLf4Jh7Dc3PnW6eYy5tT1

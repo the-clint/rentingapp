@@ -1,0 +1,6 @@
+{
+  "name": "sync-resolved-env",
+  "private": true,
+  "type": "module",
+  "main": "./index.js"
+}

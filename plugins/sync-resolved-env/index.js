@@ -1,5 +1,3 @@
-"use strict";
-
 /**
  * Local Netlify Build Plugin: sync-resolved-env
  *
@@ -25,7 +23,7 @@
  *   - APP_ENV             — build-only flag
  */
 
-const { execFileSync } = require("node:child_process");
+import { execFileSync } from "node:child_process";
 
 const NETLIFY_API = "https://api.netlify.com/api/v1";
 const NEVER_SYNC = new Set([
@@ -81,135 +79,133 @@ function resolveEnvViaVarlock() {
   return out;
 }
 
-module.exports = {
-  onPreBuild: async ({ constants, utils }) => {
-    if (process.env.NETLIFY !== "true") {
-      console.log(
-        "[sync-resolved-env] not running on Netlify (NETLIFY!=true), skipping.",
-      );
-      return;
-    }
-
-    const token = process.env.NETLIFY_AUTH_TOKEN;
-    if (!token) {
-      utils.build.failBuild(
-        "[sync-resolved-env] NETLIFY_AUTH_TOKEN missing. Add a Netlify PAT in Site settings → Environment variables, scoped to Builds. See docs/bitwarden-secrets-setup.md.",
-      );
-      return;
-    }
-
-    const siteId = constants.SITE_ID || process.env.SITE_ID;
-    const buildContext = process.env.CONTEXT;
-    if (!siteId || !buildContext) {
-      utils.build.failBuild(
-        `[sync-resolved-env] missing SITE_ID (${!!siteId}) or CONTEXT (${!!buildContext}).`,
-      );
-      return;
-    }
-
-    let resolved;
-    try {
-      resolved = resolveEnvViaVarlock();
-    } catch (err) {
-      utils.build.failBuild(
-        `[sync-resolved-env] varlock load failed: ${err.message}`,
-      );
-      return;
-    }
-
-    let site;
-    try {
-      site = await netlifyFetch(`/sites/${siteId}`, { token });
-    } catch (err) {
-      utils.build.failBuild(
-        `[sync-resolved-env] failed to fetch site info: ${err.message}`,
-      );
-      return;
-    }
-    const accountId = site.account_id || site.account_slug;
-    if (!accountId) {
-      utils.build.failBuild(
-        "[sync-resolved-env] could not determine account_id from site.",
-      );
-      return;
-    }
-
-    let existing;
-    try {
-      existing = await netlifyFetch(
-        `/accounts/${accountId}/env?site_id=${siteId}`,
-        { token },
-      );
-    } catch (err) {
-      utils.build.failBuild(
-        `[sync-resolved-env] failed to list env vars: ${err.message}`,
-      );
-      return;
-    }
-    const existingByKey = new Map(
-      Array.isArray(existing) ? existing.map((v) => [v.key, v]) : [],
-    );
-
-    let created = 0;
-    let updated = 0;
-    let unchanged = 0;
-    const errors = [];
-
-    for (const { key, value, isSensitive } of resolved) {
-      try {
-        const current = existingByKey.get(key);
-        if (current) {
-          const valueForCtx = (current.values || []).find(
-            (v) => v.context === buildContext,
-          );
-          const valueForAll = (current.values || []).find(
-            (v) => v.context === "all",
-          );
-          const effective = valueForCtx?.value ?? valueForAll?.value;
-          if (effective === value) {
-            unchanged++;
-            continue;
-          }
-          await netlifyFetch(
-            `/accounts/${accountId}/env/${encodeURIComponent(key)}?site_id=${siteId}`,
-            {
-              method: "PATCH",
-              token,
-              body: { context: buildContext, value },
-            },
-          );
-          updated++;
-        } else {
-          await netlifyFetch(
-            `/accounts/${accountId}/env?site_id=${siteId}`,
-            {
-              method: "POST",
-              token,
-              body: [
-                {
-                  key,
-                  scopes: ["functions", "runtime"],
-                  values: [{ value, context: buildContext }],
-                  is_secret: isSensitive,
-                },
-              ],
-            },
-          );
-          created++;
-        }
-      } catch (err) {
-        errors.push(`${key}: ${err.message}`);
-      }
-    }
-
+export async function onPreBuild({ constants, utils }) {
+  if (process.env.NETLIFY !== "true") {
     console.log(
-      `[sync-resolved-env] context=${buildContext}: created=${created}, updated=${updated}, unchanged=${unchanged}`,
+      "[sync-resolved-env] not running on Netlify (NETLIFY!=true), skipping.",
     );
+    return;
+  }
 
-    if (errors.length) {
-      utils.build.failBuild(
-        `[sync-resolved-env] ${errors.length} env var sync failure(s):\n  - ${errors.join("\n  - ")}`,
-      );
+  const token = process.env.NETLIFY_AUTH_TOKEN;
+  if (!token) {
+    utils.build.failBuild(
+      "[sync-resolved-env] NETLIFY_AUTH_TOKEN missing. Add a Netlify PAT in Site settings → Environment variables, scoped to Builds. See docs/bitwarden-secrets-setup.md.",
+    );
+    return;
+  }
+
+  const siteId = constants.SITE_ID || process.env.SITE_ID;
+  const buildContext = process.env.CONTEXT;
+  if (!siteId || !buildContext) {
+    utils.build.failBuild(
+      `[sync-resolved-env] missing SITE_ID (${!!siteId}) or CONTEXT (${!!buildContext}).`,
+    );
+    return;
+  }
+
+  let resolved;
+  try {
+    resolved = resolveEnvViaVarlock();
+  } catch (err) {
+    utils.build.failBuild(
+      `[sync-resolved-env] varlock load failed: ${err.message}`,
+    );
+    return;
+  }
+
+  let site;
+  try {
+    site = await netlifyFetch(`/sites/${siteId}`, { token });
+  } catch (err) {
+    utils.build.failBuild(
+      `[sync-resolved-env] failed to fetch site info: ${err.message}`,
+    );
+    return;
+  }
+  const accountId = site.account_id || site.account_slug;
+  if (!accountId) {
+    utils.build.failBuild(
+      "[sync-resolved-env] could not determine account_id from site.",
+    );
+    return;
+  }
+
+  let existing;
+  try {
+    existing = await netlifyFetch(
+      `/accounts/${accountId}/env?site_id=${siteId}`,
+      { token },
+    );
+  } catch (err) {
+    utils.build.failBuild(
+      `[sync-resolved-env] failed to list env vars: ${err.message}`,
+    );
+    return;
+  }
+  const existingByKey = new Map(
+    Array.isArray(existing) ? existing.map((v) => [v.key, v]) : [],
+  );
+
+  let created = 0;
+  let updated = 0;
+  let unchanged = 0;
+  const errors = [];
+
+  for (const { key, value, isSensitive } of resolved) {
+    try {
+      const current = existingByKey.get(key);
+      if (current) {
+        const valueForCtx = (current.values || []).find(
+          (v) => v.context === buildContext,
+        );
+        const valueForAll = (current.values || []).find(
+          (v) => v.context === "all",
+        );
+        const effective = valueForCtx?.value ?? valueForAll?.value;
+        if (effective === value) {
+          unchanged++;
+          continue;
+        }
+        await netlifyFetch(
+          `/accounts/${accountId}/env/${encodeURIComponent(key)}?site_id=${siteId}`,
+          {
+            method: "PATCH",
+            token,
+            body: { context: buildContext, value },
+          },
+        );
+        updated++;
+      } else {
+        await netlifyFetch(
+          `/accounts/${accountId}/env?site_id=${siteId}`,
+          {
+            method: "POST",
+            token,
+            body: [
+              {
+                key,
+                scopes: ["functions", "runtime"],
+                values: [{ value, context: buildContext }],
+                is_secret: isSensitive,
+              },
+            ],
+          },
+        );
+        created++;
+      }
+    } catch (err) {
+      errors.push(`${key}: ${err.message}`);
     }
-  },
-};
+  }
+
+  console.log(
+    `[sync-resolved-env] context=${buildContext}: created=${created}, updated=${updated}, unchanged=${unchanged}`,
+  );
+
+  if (errors.length) {
+    utils.build.failBuild(
+      `[sync-resolved-env] ${errors.length} env var sync failure(s):\n  - ${errors.join("\n  - ")}`,
+    );
+  }
+}

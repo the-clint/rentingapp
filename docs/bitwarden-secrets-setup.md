@@ -268,9 +268,17 @@ Treat `BWS_SECRETS_TOKEN` as a CI secret, and always pair it with an explicit `A
 
 - **GitHub Actions (build/test CI):** `.github/workflows/ci.yml` sets `APP_ENV: development` at the job level and overrides every `@sensitive` env var with a distinctive placeholder — varlock never calls BWS in CI, so the dev UUIDs in `.env.development` are never resolved. The `BWS_SECRETS_TOKEN` placeholder exists only to satisfy the `@initBitwarden` format validator.
 - **Netlify (build + runtime):** `APP_ENV` is pinned per deploy context in `netlify.toml` — don't set it manually in the UI. What you DO set in **Site configuration → Environment variables**:
-  - `BWS_SECRETS_TOKEN=<prod machine-account token>`, scoped to the **Production** context.
-  - `BWS_SECRETS_TOKEN=<preview machine-account token>`, scoped to **Deploy Previews** + **Branch Deploys**.
-  Netlify's per-context scoping lets the same variable name resolve to different values depending on the deploy. Varlock reads the token at build time, pulls the matching BWS project's secrets, and bakes them into the build. Rotating a secret is: edit it in Bitwarden → trigger a Netlify redeploy for that context.
+  - `BWS_SECRETS_TOKEN=<prod machine-account token>`, scoped to the **Production** context, **Builds** scope only.
+  - `BWS_SECRETS_TOKEN=<preview machine-account token>`, scoped to **Deploy Previews** + **Branch Deploys**, **Builds** scope only.
+  - `NETLIFY_AUTH_TOKEN=<personal access token>`, scoped to **All deploy contexts**, **Builds** scope only. See [Why NETLIFY_AUTH_TOKEN is required](#why-netlify_auth_token-is-required) below.
+
+  Netlify's per-context scoping lets the same variable name resolve to different values depending on the deploy. The `sync-resolved-env` build plugin (`plugins/sync-resolved-env/`) reads `BWS_SECRETS_TOKEN` and `NETLIFY_AUTH_TOKEN` at build time, calls varlock to pull the matching BWS project's secrets, and pushes each resolved value into Netlify's env-var store via the Netlify API with `functions` scope and the current deploy context. The deployed Next.js function then reads them via plain `process.env.X`. Rotating a secret is: edit it in Bitwarden → trigger a Netlify redeploy for that context.
+
+### Why NETLIFY_AUTH_TOKEN is required
+
+`netlify.toml` env vars and build-time `process.env` mutations are **not visible to deployed functions at runtime** — only env vars stored via Netlify's UI/CLI/API with `functions` scope are. The `sync-resolved-env` build plugin uses the Netlify API to write resolved values into that store on every build, so secrets stay out of the deploy artifact and remain UI-visible / rotatable.
+
+Create the token at <https://app.netlify.com/user/applications#personal-access-tokens>. The plugin only needs site env-var write access on this site, so a single short-description PAT is fine. Rotate alongside your other Netlify credentials.
 
 Use **separate machine accounts per environment**, scoped to separate BWS projects, so a leaked dev/preview/CI token can't reach production secrets. Rotate each account independently.
 

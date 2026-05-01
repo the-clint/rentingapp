@@ -185,7 +185,10 @@ export async function onPreBuild({ constants, utils }) {
             body: [
               {
                 key,
-                scopes: ["functions", "runtime"],
+                // Omit `scopes` — explicit scopes are a paid-tier feature
+                // ("Upgrade your Netlify account to set specific scopes").
+                // Default behavior on free tier is "all scopes", which is
+                // what we want: the function runtime can read them.
                 values: [{ value, context: buildContext }],
                 is_secret: isSensitive,
               },

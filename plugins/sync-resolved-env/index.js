@@ -152,7 +152,7 @@ export async function onPreBuild({ constants, utils }) {
   let unchanged = 0;
   const errors = [];
 
-  for (const { key, value, isSensitive } of resolved) {
+  for (const { key, value } of resolved) {
     try {
       const current = existingByKey.get(key);
       if (current) {
@@ -185,12 +185,16 @@ export async function onPreBuild({ constants, utils }) {
             body: [
               {
                 key,
-                // Omit `scopes` — explicit scopes are a paid-tier feature
-                // ("Upgrade your Netlify account to set specific scopes").
-                // Default behavior on free tier is "all scopes", which is
-                // what we want: the function runtime can read them.
+                // `scopes` and `is_secret` are both paid-tier features:
+                //   - "Upgrade your Netlify account to set specific scopes"
+                //   - With is_secret=true, post_processing must be excluded
+                //     from scopes — but excluding requires the paid scopes
+                //     feature. So is_secret is effectively unusable on free
+                //     tier without paid scopes.
+                // Default (omit both) yields all-scope, non-secret env vars
+                // — values appear in plaintext in the Netlify UI but are
+                // available to functions, which is what we need.
                 values: [{ value, context: buildContext }],
-                is_secret: isSensitive,
               },
             ],
           },

@@ -69,6 +69,17 @@ AGENTS.md                       # Agent behavior rules and conventions
 - **Branch naming:** `type/short-description` (e.g., `feat/listing-search`)
 - Atomic, bisectable commits
 
+## Deployment
+
+Two-track promotion model with two protected branches:
+
+- **`main`** → Production context on Netlify → `everything.rent`. Pinned to the `everything-rent-prod` BWS project. Only accepts PRs from `preview`.
+- **`preview`** → Branch-deploy context on Netlify → `preview.everything.rent`. Pinned to the `everything-rent-preview` BWS project and the cloud preview Supabase. Accepts PRs from any feature branch.
+
+Flow: `feature/* → preview → main`. There are no ephemeral per-PR deploy-previews; review against the single stable preview URL. Branch protection on both branches requires PR + passing CI before merge.
+
+`netlify.toml` sets `APP_ENV` per context; `.env.preview` and `.env.production` are committed and resolved at build time by varlock + the `sync-resolved-env` plugin against the matching BWS project. See `docs/bitwarden-secrets-setup.md` for the full runbook.
+
 ## Core Integrations
 
 - **Stripe** — Payment holds (authorize at booking, capture on completion/no-show, release on cancellation), transaction fees

@@ -1,11 +1,20 @@
 # Everything.Rent — Netlify build configuration
 # ==============================================
+# Two-track deployment model:
+#   - `main` branch    → Production context    → everything.rent
+#   - `preview` branch → Branch-deploy context → preview.everything.rent
+#
+# Both branches are protected in GitHub. Feature branches PR into `preview`;
+# `preview` is the only branch that can PR into `main`. Deploy Previews
+# (ephemeral per-PR URLs) are disabled in the Netlify UI — there is exactly
+# one stable preview URL.
+#
 # Secrets are NOT set here. This file only configures build behavior and the
 # `APP_ENV` flag that tells varlock which Bitwarden project to resolve against
 # at build time. The machine-account token (`BWS_SECRETS_TOKEN`) is configured
 # per deploy context in the Netlify UI:
-#   - Production context: points at the `everything-rent-prod` BWS project.
-#   - Deploy-preview + Branch-deploy contexts: point at `everything-rent-dev`.
+#   - Production context:    points at the `everything-rent-prod` BWS project.
+#   - Branch-deploy context: points at the `everything-rent-preview` BWS project.
 #
 # See docs/bitwarden-secrets-setup.md for the full runbook.
 
@@ -29,14 +38,12 @@
 [[plugins]]
   package = "./plugins/sync-resolved-env"
 
-# Production deploys (main branch → live site).
+# Production deploys (`main` branch → everything.rent).
 [context.production.environment]
   APP_ENV = "production"
 
-# Pull-request preview deploys.
-[context.deploy-preview.environment]
-  APP_ENV = "preview"
-
-# Non-main branch deploys (same secrets as deploy-preview).
+# Preview deploys (`preview` branch → preview.everything.rent). Only the
+# `preview` branch is allowlisted as a branch-deploy in Netlify Site settings,
+# so this context fires for that branch and nothing else.
 [context.branch-deploy.environment]
   APP_ENV = "preview"

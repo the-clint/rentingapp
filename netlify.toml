@@ -19,16 +19,6 @@
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Resolves env vars via varlock+BWS at build time and pushes them into
-# Netlify's env-var store with `functions` scope so the deployed Next.js
-# function reads them at runtime via plain `process.env.X`. Required because
-# `[context.*.environment]` blocks above are NOT visible to functions at
-# runtime — only API/UI-set env vars with `functions` scope are.
-# Requires NETLIFY_AUTH_TOKEN in Site env (Builds scope only). See
-# docs/bitwarden-secrets-setup.md.
-[[plugins]]
-  package = "./plugins/sync-resolved-env"
-
 # Production deploys (main branch → live site).
 [context.production.environment]
   APP_ENV = "production"

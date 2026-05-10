@@ -44,9 +44,7 @@
     "zod": "^4.3.6"
   },
   "overrides": {
-    "next": {
-      "@next/env": "npm:@varlock/nextjs-integration@^1.1.0"
-    }
+    "@next/env": "npm:@varlock/nextjs-integration@^1.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

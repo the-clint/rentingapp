@@ -16,7 +16,7 @@ import Stripe from "stripe";
 // Pinned API version for deterministic Stripe behavior across releases.
 // Bumping this is an intentional change — tests + types will surface the
 // difference. Matches the pinned SDK version in package.json (stripe@22).
-export const STRIPE_API_VERSION = "2026-03-25.dahlia" as const;
+export const STRIPE_API_VERSION = "2026-04-22.dahlia" as const;
 
 let cachedClient: Stripe | null = null;
 

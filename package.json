@@ -11,7 +11,7 @@
     "test:watch": "vitest",
     "test:e2e": "varlock run -- node node_modules/@playwright/test/cli.js test",
     "test:e2e:cleanup": "varlock run -- node tests/e2e/helpers/cleanup-cli.mjs",
-    "postinstall": "node scripts/patch-varlock-windows.mjs && node scripts/install-git-hooks.mjs",
+    "postinstall": "node scripts/install-git-hooks.mjs",
     "supabase:start": "npx supabase start",
     "supabase:stop": "npx supabase stop",
     "supabase:restart": "npx supabase stop && npx supabase start",
@@ -28,8 +28,8 @@
     "@stripe/stripe-js": "^9.1.0",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
-    "@varlock/bitwarden-plugin": "^0.0.6",
-    "@varlock/nextjs-integration": "^0.3.2",
+    "@varlock/bitwarden-plugin": "^1.0.0",
+    "@varlock/nextjs-integration": "^1.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.511.0",
@@ -40,12 +40,12 @@
     "react-dom": "^19.0.0",
     "stripe": "^22.0.1",
     "tailwind-merge": "^3.3.0",
-    "varlock": "^0.7.2",
+    "varlock": "^1.1.0",
     "zod": "^4.3.6"
   },
   "overrides": {
     "next": {
-      "@next/env": "npm:@varlock/nextjs-integration@^0.3.2"
+      "@next/env": "npm:@varlock/nextjs-integration@^1.1.0"
     }
   },
   "devDependencies": {

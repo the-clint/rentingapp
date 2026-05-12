@@ -43,7 +43,17 @@ export async function signUp(formData: FormData): Promise<Result<{ userId: strin
   });
 
   if (signUpError) {
-    return err("SIGNUP_ERROR", signUpError.message);
+    console.error("[signUp] supabase.auth.signUp error", {
+      name: signUpError.name,
+      status: signUpError.status,
+      code: signUpError.code,
+      message: signUpError.message,
+    });
+    const detail =
+      signUpError.message && signUpError.message !== "{}"
+        ? signUpError.message
+        : `${signUpError.name ?? "AuthError"}${signUpError.status ? ` (${signUpError.status})` : ""}${signUpError.code ? ` [${signUpError.code}]` : ""}`;
+    return err("SIGNUP_ERROR", detail);
   }
 
   if (!data.user) {

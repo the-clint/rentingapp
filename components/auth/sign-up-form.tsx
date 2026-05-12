@@ -32,7 +32,7 @@ export function SignUpForm({
         setError(result.error.message);
         return;
       }
-      router.push("/dashboard");
+      router.push("/auth/sign-up-success");
     });
   };
 

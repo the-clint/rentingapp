@@ -38,7 +38,7 @@ export async function signUp(formData: FormData): Promise<Result<{ userId: strin
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
-      emailRedirectTo: `${baseUrl}/auth/callback`,
+      emailRedirectTo: `${baseUrl}/auth/callback?next=/auth/verified`,
     },
   });
 

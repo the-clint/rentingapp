@@ -29,7 +29,7 @@ npx create-next-app@latest rentingapp -e with-supabase
 2. shadcn/ui already initialized — aligns with UX spec's design system choice
 3. Next.js Route Handlers provide a built-in API layer for Stripe webhooks, Twilio webhooks, and booking logic — no separate backend needed
 4. Supabase provides PostgreSQL (database), Auth, Storage (listing photos), and Realtime (availability updates) under one managed service
-5. Hosting is zero-config for Next.js on Netlify via `@netlify/plugin-nextjs` — cheapest path to production *(2026-04-19: originally chose Vercel; later swapped to Netlify pre-production — see `architecture.md` and `sprint-change-proposal-2026-04-19.md`.)*
+5. Hosting is zero-config for Next.js on Netlify via `@netlify/plugin-nextjs` — cheapest path to production
 
 ## What the Starter Provides
 

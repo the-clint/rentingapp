@@ -649,7 +649,7 @@ Varlock's leak scan (`varlock scan`) is intentionally NOT part of CI — it runs
 - PRs → Netlify creates a Deploy Preview
 - Env vars configured in Netlify Site configuration (production) and `.env.local` (local dev)
 
-> **2026-04-19 decision:** Switched host from Vercel to Netlify prior to first production deploy. Driver: operator preference. Next.js 15 App Router is supported via `@netlify/plugin-nextjs`; scheduled jobs (e.g. Story 4-5 return reminders) run on Netlify Scheduled Functions.
+Next.js 15 App Router is supported on Netlify via `@netlify/plugin-nextjs`; scheduled jobs (e.g. Story 4-5 return reminders) run on Netlify Scheduled Functions.
 
 ## Architecture Validation Results
 

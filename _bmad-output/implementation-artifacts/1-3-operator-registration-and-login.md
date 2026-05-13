@@ -98,7 +98,7 @@ export default function signUp(...) { }  // WRONG
 export async function signUp() {
   const supabase = await createClient();
 }
-// WRONG — causes session leakage on any serverless runtime (Netlify Functions, Vercel, etc.) that reuses module state across invocations
+// WRONG — causes session leakage on any serverless runtime (e.g. Netlify Functions) that reuses module state across invocations
 const supabase = await createClient();
 ```
 

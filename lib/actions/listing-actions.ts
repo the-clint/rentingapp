@@ -19,6 +19,8 @@
  * invisibility.
  */
 
+import { revalidatePath } from "next/cache";
+
 import { createClient } from "@/lib/supabase/server";
 import { ok, err, type Result } from "@/lib/utils/result";
 import { listingSchema, type PhotoInput } from "@/lib/schemas/listing-schema";
@@ -215,6 +217,9 @@ export async function updateListing(
   if (update.error) {
     return err("DATABASE_ERROR", update.error.message);
   }
+
+  revalidatePath(`/listings/${listingId}`);
+  revalidatePath("/listings");
 
   return ok({ listingId });
 }

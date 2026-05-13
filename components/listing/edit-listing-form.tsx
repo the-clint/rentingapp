@@ -136,11 +136,11 @@ export function EditListingForm({
         return;
       }
       // Navigation IS the success signal: the operator lands back on the
-      // detail page with the refreshed data. No dead in-place banner — the
-      // previous implementation dispatched a success message that never
-      // rendered because router.push unmounts the form immediately.
+      // detail page with the refreshed data. Cache invalidation is handled
+      // server-side via revalidatePath in `updateListing`; calling
+      // router.refresh() here on Next.js 16 cancels the in-flight push and
+      // leaves the user stuck on /edit.
       router.push(`/listings/${listingId}`);
-      router.refresh();
     });
   };
 

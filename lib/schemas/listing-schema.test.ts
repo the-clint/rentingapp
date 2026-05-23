@@ -7,7 +7,10 @@ function makeValidInput(overrides: Partial<ListingInput> = {}): ListingInput {
     description:
       "A quiet, portable inverter generator perfect for camping or backup power.",
     dailyRateCents: 7500,
-    pickupLocation: "Salt Lake City, UT",
+    addressStreet: "123 Main St",
+    addressCity: "Salt Lake City",
+    addressState: "UT",
+    addressZip: "84101",
     pickupInstructions: "",
     photos: [
       { path: "op-1/draft-1/photo-1.jpg", isHero: true, position: 0 },
@@ -56,13 +59,13 @@ describe("listingSchema", () => {
     }
   });
 
-  it("rejects an empty pickupLocation", () => {
+  it("rejects an empty street address", () => {
     const parsed = listingSchema.safeParse(
-      makeValidInput({ pickupLocation: "" }),
+      makeValidInput({ addressStreet: "" }),
     );
     expect(parsed.success).toBe(false);
     if (!parsed.success) {
-      expect(parsed.error.issues[0].message).toBe("Pickup location is required");
+      expect(parsed.error.issues[0].message).toBe("Street address is required");
     }
   });
 

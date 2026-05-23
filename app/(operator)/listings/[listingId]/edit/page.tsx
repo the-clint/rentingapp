@@ -17,7 +17,10 @@ interface ListingRow {
   name: string;
   description: string;
   daily_rate_cents: number;
-  pickup_location: string;
+  address_street: string;
+  address_city: string;
+  address_state: string;
+  address_zip: string;
   pickup_instructions: string | null;
   photos: Array<{ path: string; isHero: boolean; position: number }> | null;
 }
@@ -40,7 +43,7 @@ async function ListingEditBody({
   const { data: listing } = await supabase
     .from("listings")
     .select(
-      "id, name, description, daily_rate_cents, pickup_location, pickup_instructions, photos",
+      "id, name, description, daily_rate_cents, address_street, address_city, address_state, address_zip, pickup_instructions, photos",
     )
     .eq("id", listingId)
     .eq("operator_id", user.id)
@@ -55,7 +58,10 @@ async function ListingEditBody({
     name: listing.name,
     description: listing.description,
     dailyRateCents: listing.daily_rate_cents,
-    pickupLocation: listing.pickup_location,
+    addressStreet: listing.address_street,
+    addressCity: listing.address_city,
+    addressState: listing.address_state,
+    addressZip: listing.address_zip,
     pickupInstructions: listing.pickup_instructions ?? "",
   };
 

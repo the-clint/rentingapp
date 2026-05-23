@@ -15,7 +15,10 @@ export interface DetailsDraft {
   name: string;
   description: string;
   dailyRateCents: number | null;
-  pickupLocation: string;
+  addressStreet: string;
+  addressCity: string;
+  addressState: string;
+  addressZip: string;
   pickupInstructions: string;
 }
 
@@ -23,7 +26,10 @@ export type FieldKey =
   | "name"
   | "description"
   | "dailyRateCents"
-  | "pickupLocation"
+  | "addressStreet"
+  | "addressCity"
+  | "addressState"
+  | "addressZip"
   | "pickupInstructions";
 
 /**
@@ -54,7 +60,10 @@ export function areDetailsValid(details: DetailsDraft): boolean {
     validateField("name", details.name) ||
     validateField("description", details.description) ||
     validateField("dailyRateCents", details.dailyRateCents) ||
-    validateField("pickupLocation", details.pickupLocation)
+    validateField("addressStreet", details.addressStreet) ||
+    validateField("addressCity", details.addressCity) ||
+    validateField("addressState", details.addressState) ||
+    validateField("addressZip", details.addressZip)
   ) {
     return false;
   }
@@ -154,25 +163,106 @@ export function ListingDetailsFields({
         />
       </div>
 
-      <div className="grid gap-2">
-        <Label htmlFor="listing-pickup-location">Pickup location</Label>
-        <Input
-          id="listing-pickup-location"
-          name="pickupLocation"
-          value={details.pickupLocation}
-          onChange={(e) => onDetailChange("pickupLocation", e.target.value)}
-          onBlur={(e) => onBlur("pickupLocation", e.target.value)}
-          aria-describedby="listing-pickup-location-error"
-        />
-        {errors.pickupLocation && (
-          <p
-            id="listing-pickup-location-error"
-            className="text-sm text-destructive"
-          >
-            {errors.pickupLocation}
-          </p>
-        )}
-      </div>
+      <fieldset className="grid gap-space-3">
+        <legend className="text-h3 font-semibold text-neutral-900">
+          Pickup address
+        </legend>
+        <p className="text-sm text-neutral-700">
+          The full street address is only revealed to renters after their
+          booking is confirmed. The public listing page shows only city, state,
+          and ZIP.
+        </p>
+
+        <div className="grid gap-2">
+          <Label htmlFor="listing-address-street">Street address</Label>
+          <Input
+            id="listing-address-street"
+            name="addressStreet"
+            autoComplete="street-address"
+            value={details.addressStreet}
+            onChange={(e) => onDetailChange("addressStreet", e.target.value)}
+            onBlur={(e) => onBlur("addressStreet", e.target.value)}
+            aria-describedby="listing-address-street-error"
+          />
+          {errors.addressStreet && (
+            <p
+              id="listing-address-street-error"
+              className="text-sm text-destructive"
+            >
+              {errors.addressStreet}
+            </p>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 gap-space-3 sm:grid-cols-[1fr_6rem_8rem]">
+          <div className="grid gap-2">
+            <Label htmlFor="listing-address-city">City</Label>
+            <Input
+              id="listing-address-city"
+              name="addressCity"
+              autoComplete="address-level2"
+              value={details.addressCity}
+              onChange={(e) => onDetailChange("addressCity", e.target.value)}
+              onBlur={(e) => onBlur("addressCity", e.target.value)}
+              aria-describedby="listing-address-city-error"
+            />
+            {errors.addressCity && (
+              <p
+                id="listing-address-city-error"
+                className="text-sm text-destructive"
+              >
+                {errors.addressCity}
+              </p>
+            )}
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="listing-address-state">State</Label>
+            <Input
+              id="listing-address-state"
+              name="addressState"
+              autoComplete="address-level1"
+              maxLength={2}
+              value={details.addressState}
+              onChange={(e) =>
+                onDetailChange("addressState", e.target.value.toUpperCase())
+              }
+              onBlur={(e) => onBlur("addressState", e.target.value)}
+              aria-describedby="listing-address-state-error"
+            />
+            {errors.addressState && (
+              <p
+                id="listing-address-state-error"
+                className="text-sm text-destructive"
+              >
+                {errors.addressState}
+              </p>
+            )}
+          </div>
+
+          <div className="grid gap-2">
+            <Label htmlFor="listing-address-zip">ZIP</Label>
+            <Input
+              id="listing-address-zip"
+              name="addressZip"
+              autoComplete="postal-code"
+              inputMode="numeric"
+              value={details.addressZip}
+              onChange={(e) => onDetailChange("addressZip", e.target.value)}
+              onBlur={(e) => onBlur("addressZip", e.target.value)}
+              aria-describedby="listing-address-zip-error"
+            />
+            {errors.addressZip && (
+              <p
+                id="listing-address-zip-error"
+                className="text-sm text-destructive"
+              >
+                {errors.addressZip}
+              </p>
+            )}
+          </div>
+        </div>
+      </fieldset>
 
       <div className="grid gap-2">
         <Label htmlFor="listing-pickup-instructions">

@@ -8,7 +8,10 @@ function emptyDetails(): DetailsDraft {
     name: "",
     description: "",
     dailyRateCents: null,
-    pickupLocation: "",
+    addressStreet: "",
+    addressCity: "",
+    addressState: "UT",
+    addressZip: "",
     pickupInstructions: "",
   };
 }
@@ -19,7 +22,10 @@ function validDetails(): DetailsDraft {
     description:
       "A quiet, portable inverter generator perfect for camping or backup power.",
     dailyRateCents: 7500,
-    pickupLocation: "Salt Lake City, UT",
+    addressStreet: "123 Main St",
+    addressCity: "Salt Lake City",
+    addressState: "UT",
+    addressZip: "84101",
     pickupInstructions: "",
   };
 }
@@ -37,7 +43,10 @@ describe("DetailsStep", () => {
     expect(screen.getByLabelText("Equipment name")).toBeInTheDocument();
     expect(screen.getByLabelText("Description")).toBeInTheDocument();
     expect(screen.getByLabelText("Daily rate")).toBeInTheDocument();
-    expect(screen.getByLabelText("Pickup location")).toBeInTheDocument();
+    expect(screen.getByLabelText("Street address")).toBeInTheDocument();
+    expect(screen.getByLabelText("City")).toBeInTheDocument();
+    expect(screen.getByLabelText("State")).toBeInTheDocument();
+    expect(screen.getByLabelText("ZIP")).toBeInTheDocument();
     expect(screen.getByLabelText("Pickup instructions")).toBeInTheDocument();
   });
 

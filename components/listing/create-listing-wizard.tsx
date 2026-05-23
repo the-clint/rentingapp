@@ -38,7 +38,10 @@ const EMPTY_DETAILS: DetailsDraft = {
   name: "",
   description: "",
   dailyRateCents: null,
-  pickupLocation: "",
+  addressStreet: "",
+  addressCity: "",
+  addressState: "UT",
+  addressZip: "",
   pickupInstructions: "",
 };
 
@@ -99,7 +102,10 @@ export function CreateListingWizard() {
         ? "0"
         : String(state.details.dailyRateCents),
     );
-    fd.set("pickupLocation", state.details.pickupLocation);
+    fd.set("addressStreet", state.details.addressStreet);
+    fd.set("addressCity", state.details.addressCity);
+    fd.set("addressState", state.details.addressState);
+    fd.set("addressZip", state.details.addressZip);
     fd.set("pickupInstructions", state.details.pickupInstructions);
     fd.set(
       "photos",

@@ -27,11 +27,25 @@ export const listingFieldsSchema = z.object({
     .number()
     .int("Daily rate must be a whole number of cents")
     .min(100, "Daily rate must be at least $1.00"),
-  pickupLocation: z
+  addressStreet: z
     .string()
     .trim()
-    .min(3, "Pickup location is required")
-    .max(120, "Pickup location must be 120 characters or fewer"),
+    .min(1, "Street address is required")
+    .max(120, "Street address must be 120 characters or fewer"),
+  addressCity: z
+    .string()
+    .trim()
+    .min(1, "City is required")
+    .max(80, "City must be 80 characters or fewer"),
+  addressState: z
+    .string()
+    .trim()
+    .length(2, "Use the 2-letter state code (e.g. UT)")
+    .transform((v) => v.toUpperCase()),
+  addressZip: z
+    .string()
+    .trim()
+    .regex(/^[0-9]{5}(-[0-9]{4})?$/, "ZIP must be 5 digits (or ZIP+4)"),
   pickupInstructions: z
     .string()
     .trim()

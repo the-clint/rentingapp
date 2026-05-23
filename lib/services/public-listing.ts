@@ -31,7 +31,15 @@ export interface PublicListing {
   name: string;
   description: string;
   dailyRateCents: number;
-  pickupLocation: string;
+  /**
+   * Public-safe location label, e.g. "Provo, UT 84601". The street address is
+   * intentionally omitted — full pickup details are only revealed to a renter
+   * after their booking is confirmed (see lib/services/renter-rentals.ts).
+   */
+  publicLocation: string;
+  addressCity: string;
+  addressState: string;
+  addressZip: string;
   photos: PublicListingPhoto[];
 }
 
@@ -42,7 +50,9 @@ interface PublicListingRow {
   name: string;
   description: string;
   daily_rate_cents: number;
-  pickup_location: string;
+  address_city: string;
+  address_state: string;
+  address_zip: string;
   photos: Array<{ path: string; isHero: boolean; position: number }> | null;
 }
 
@@ -64,7 +74,7 @@ export async function fetchPublicListing(
   const { data, error } = await supabase
     .from("listings")
     .select(
-      "id, name, description, daily_rate_cents, pickup_location, photos",
+      "id, name, description, daily_rate_cents, address_city, address_state, address_zip, photos",
     )
     .eq("id", listingId)
     .eq("status", "published")
@@ -88,12 +98,22 @@ export async function fetchPublicListing(
       .publicUrl,
   }));
 
+  const publicLocation = [
+    data.address_city,
+    [data.address_state, data.address_zip].filter(Boolean).join(" "),
+  ]
+    .filter((s) => s && s.trim().length > 0)
+    .join(", ");
+
   return ok({
     id: data.id,
     name: data.name,
     description: data.description,
     dailyRateCents: data.daily_rate_cents,
-    pickupLocation: data.pickup_location,
+    publicLocation,
+    addressCity: data.address_city,
+    addressState: data.address_state,
+    addressZip: data.address_zip,
     photos,
   });
 }

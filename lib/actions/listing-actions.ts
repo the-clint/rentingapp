@@ -224,6 +224,60 @@ export async function updateListing(
   return ok({ listingId });
 }
 
+const AD_COPY_MAX = 10000;
+
+export async function saveAdCopy(
+  listingId: string,
+  adCopy: string,
+): Promise<Result<null>> {
+  const trimmed = adCopy.trim();
+  if (trimmed.length > AD_COPY_MAX) {
+    return err(
+      "VALIDATION_ERROR",
+      `Ad copy must be ${AD_COPY_MAX.toLocaleString()} characters or fewer`,
+    );
+  }
+
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return err("UNAUTHENTICATED", "You must be signed in to save ad copy");
+  }
+
+  const owned = await supabase
+    .from("listings")
+    .select("id")
+    .eq("id", listingId)
+    .eq("operator_id", user.id)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (owned.error) {
+    return err("DATABASE_ERROR", owned.error.message);
+  }
+  if (!owned.data) {
+    return err("NOT_FOUND", "Listing not found");
+  }
+
+  const update = await supabase
+    .from("listings")
+    .update({ ad_copy: trimmed.length > 0 ? trimmed : null })
+    .eq("id", listingId)
+    .eq("operator_id", user.id);
+
+  if (update.error) {
+    return err("DATABASE_ERROR", update.error.message);
+  }
+
+  revalidatePath(`/listings/${listingId}`);
+
+  return ok(null);
+}
+
 /**
  * Soft-delete a listing by setting `deleted_at` to the current timestamp.
  *

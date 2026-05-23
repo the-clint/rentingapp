@@ -34,6 +34,13 @@ vi.mock("qrcode", () => ({
   default: { toDataURL: (...args: unknown[]) => toDataURLMock(...args) },
 }));
 
+const saveAdCopyMock = vi
+  .fn()
+  .mockResolvedValue({ success: true, data: null });
+vi.mock("@/lib/actions/listing-actions", () => ({
+  saveAdCopy: (...args: unknown[]) => saveAdCopyMock(...args),
+}));
+
 import { PostingAssistantDialog } from "./posting-assistant-dialog";
 
 const sampleListing = {
@@ -60,6 +67,8 @@ function setupClipboard(reject = false) {
 describe("PostingAssistantDialog", () => {
   beforeEach(() => {
     replaceMock.mockReset();
+    saveAdCopyMock.mockClear();
+    saveAdCopyMock.mockResolvedValue({ success: true, data: null });
     pathnameMock.mockReturnValue("/listings/test-id");
   });
 
@@ -86,7 +95,7 @@ describe("PostingAssistantDialog", () => {
     expect(dialog?.hasAttribute("open")).toBe(true);
   });
 
-  it("renders three platform sections + booking link row when open", () => {
+  it("renders a single ad copy section + booking link row when open", () => {
     setupClipboard();
     render(
       <PostingAssistantDialog
@@ -99,16 +108,14 @@ describe("PostingAssistantDialog", () => {
       screen.getByRole("button", { name: /^posting assistant$/i }),
     );
 
-    expect(screen.getByText(/KSL Classifieds/)).toBeInTheDocument();
-    expect(screen.getByText(/Facebook Marketplace/)).toBeInTheDocument();
-    expect(screen.getByText(/Craigslist/)).toBeInTheDocument();
+    expect(screen.getByText(/^Ad copy$/)).toBeInTheDocument();
     expect(
       screen.getByText("Booking link", { selector: "label" }),
     ).toBeInTheDocument();
     expect(screen.getByText(bookingUrl)).toBeInTheDocument();
   });
 
-  it("copies KSL ad copy to the clipboard and shows 'Copied!' for 2 seconds", async () => {
+  it("copies the ad copy to the clipboard and shows 'Copied!' for 2 seconds", async () => {
     vi.useFakeTimers();
     const writeText = setupClipboard();
     render(
@@ -122,11 +129,9 @@ describe("PostingAssistantDialog", () => {
       screen.getByRole("button", { name: /^posting assistant$/i }),
     );
 
-    const kslTextarea = screen.getByLabelText(
-      /KSL Classifieds ad copy/i,
-    ) as HTMLTextAreaElement;
-    const kslCard = kslTextarea.closest("article")!;
-    const copyButton = kslCard.querySelector("button")!;
+    const adTextarea = screen.getByLabelText(/^Ad copy$/i) as HTMLTextAreaElement;
+    const adCard = adTextarea.closest("article")!;
+    const copyButton = adCard.querySelector("button")!;
     await act(async () => {
       fireEvent.click(copyButton);
     });
@@ -137,15 +142,13 @@ describe("PostingAssistantDialog", () => {
     expect(copiedText).toContain(bookingUrl);
     expect(copiedText).toContain("Kubota Mini Excavator");
 
-    // "Copied!" label is visible.
-    expect(kslCard.textContent).toContain("Copied!");
+    expect(adCard.textContent).toContain("Copied!");
 
-    // Advance past the 2s revert timer.
     await act(async () => {
       vi.advanceTimersByTime(2000);
     });
-    expect(kslCard.textContent).not.toContain("Copied!");
-    expect(kslCard.textContent).toContain("Copy");
+    expect(adCard.textContent).not.toContain("Copied!");
+    expect(adCard.textContent).toContain("Copy");
   });
 
   it("shows inline error when the clipboard rejects and does not set Copied!", async () => {
@@ -161,18 +164,16 @@ describe("PostingAssistantDialog", () => {
       screen.getByRole("button", { name: /^posting assistant$/i }),
     );
 
-    const kslTextarea = screen.getByLabelText(
-      /KSL Classifieds ad copy/i,
-    ) as HTMLTextAreaElement;
-    const kslCard = kslTextarea.closest("article")!;
-    const copyButton = kslCard.querySelector("button")!;
+    const adTextarea = screen.getByLabelText(/^Ad copy$/i) as HTMLTextAreaElement;
+    const adCard = adTextarea.closest("article")!;
+    const copyButton = adCard.querySelector("button")!;
 
     await act(async () => {
       fireEvent.click(copyButton);
     });
 
     expect(writeText).toHaveBeenCalledTimes(1);
-    expect(kslCard.textContent).not.toContain("Copied!");
+    expect(adCard.textContent).not.toContain("Copied!");
     expect(
       screen.getByText(
         /Copy failed — select the text and press Ctrl\+C manually\./,
@@ -225,9 +226,6 @@ describe("PostingAssistantDialog", () => {
 
   it("auto-opens once when initialOpen is true and scrubs ?posted=1 on close", async () => {
     setupClipboard();
-    // Emulate the detail page URL with posted=1. Wrap the entire test body
-    // in try/finally so an assertion throw cannot leak the stubbed
-    // window.location into subsequent tests.
     const originalLocation = window.location;
     Object.defineProperty(window, "location", {
       writable: true,
@@ -252,7 +250,6 @@ describe("PostingAssistantDialog", () => {
       const dialog = document.querySelector("dialog");
       expect(dialog?.hasAttribute("open")).toBe(true);
 
-      // Close the dialog — should trigger router.replace(pathname).
       const closeButton = screen.getByRole("button", {
         name: /close posting assistant/i,
       });
@@ -268,5 +265,78 @@ describe("PostingAssistantDialog", () => {
         value: originalLocation,
       });
     }
+  });
+
+  it("Save button is disabled until the ad copy is edited and calls saveAdCopy on click", async () => {
+    setupClipboard();
+    render(
+      <PostingAssistantDialog
+        listing={sampleListing}
+        bookingUrl={bookingUrl}
+        listingId="test-id"
+      />,
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: /^posting assistant$/i }),
+    );
+
+    const saveButton = screen.getByRole("button", { name: /^Save$/ });
+    expect(saveButton).toBeDisabled();
+
+    const textarea = screen.getByLabelText(/^Ad copy$/i) as HTMLTextAreaElement;
+    await act(async () => {
+      fireEvent.change(textarea, { target: { value: "Custom ad text" } });
+    });
+    expect(saveButton).not.toBeDisabled();
+
+    await act(async () => {
+      fireEvent.click(saveButton);
+    });
+    expect(saveAdCopyMock).toHaveBeenCalledWith("test-id", "Custom ad text");
+  });
+
+  it("uses savedAdCopy as the initial textarea value when provided", () => {
+    setupClipboard();
+    render(
+      <PostingAssistantDialog
+        listing={sampleListing}
+        bookingUrl={bookingUrl}
+        listingId="test-id"
+        savedAdCopy="Persisted custom copy"
+      />,
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: /^posting assistant$/i }),
+    );
+    const textarea = screen.getByLabelText(/^Ad copy$/i) as HTMLTextAreaElement;
+    expect(textarea.value).toBe("Persisted custom copy");
+  });
+
+  it("shows an error message when saveAdCopy fails", async () => {
+    setupClipboard();
+    saveAdCopyMock.mockResolvedValueOnce({
+      success: false,
+      error: { code: "DATABASE_ERROR", message: "Save blew up" },
+    });
+    render(
+      <PostingAssistantDialog
+        listing={sampleListing}
+        bookingUrl={bookingUrl}
+        listingId="test-id"
+      />,
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: /^posting assistant$/i }),
+    );
+
+    const textarea = screen.getByLabelText(/^Ad copy$/i) as HTMLTextAreaElement;
+    await act(async () => {
+      fireEvent.change(textarea, { target: { value: "Edited" } });
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: /^Save$/ }));
+    });
+
+    expect(screen.getByRole("alert").textContent).toContain("Save blew up");
   });
 });

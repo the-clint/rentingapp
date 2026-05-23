@@ -100,7 +100,7 @@ async function BookingPageBody({ params, searchParams }: BookingPageProps) {
         </p>
         <p className="flex items-center gap-space-2 text-body text-neutral-700">
           <MapPin className="h-4 w-4 shrink-0" aria-hidden="true" />
-          <span>{listing.pickupLocation}</span>
+          <span>{listing.publicLocation}</span>
         </p>
       </div>
 

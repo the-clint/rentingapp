@@ -49,7 +49,10 @@ function initialDetails(): DetailsDraft {
     description:
       "A quiet, portable inverter generator perfect for camping or backup power.",
     dailyRateCents: 7500,
-    pickupLocation: "Salt Lake City, UT",
+    addressStreet: "123 Main St",
+    addressCity: "Salt Lake City",
+    addressState: "UT",
+    addressZip: "84101",
     pickupInstructions: "",
   };
 }
@@ -80,9 +83,10 @@ describe("EditListingForm", () => {
       "A quiet, portable inverter generator perfect for camping or backup power.",
     );
     expect(screen.getByLabelText("Daily rate")).toHaveValue("75.00");
-    expect(screen.getByLabelText("Pickup location")).toHaveValue(
-      "Salt Lake City, UT",
-    );
+    expect(screen.getByLabelText("Street address")).toHaveValue("123 Main St");
+    expect(screen.getByLabelText("City")).toHaveValue("Salt Lake City");
+    expect(screen.getByLabelText("State")).toHaveValue("UT");
+    expect(screen.getByLabelText("ZIP")).toHaveValue("84101");
   });
 
   it("enables Save changes when the form is valid", () => {
@@ -120,7 +124,10 @@ describe("EditListingForm", () => {
     expect(id).toBe("listing-1");
     expect(fd.get("name")).toBe("Honda EU2200i Generator");
     expect(fd.get("dailyRateCents")).toBe("7500");
-    expect(fd.get("pickupLocation")).toBe("Salt Lake City, UT");
+    expect(fd.get("addressStreet")).toBe("123 Main St");
+    expect(fd.get("addressCity")).toBe("Salt Lake City");
+    expect(fd.get("addressState")).toBe("UT");
+    expect(fd.get("addressZip")).toBe("84101");
     expect(fd.get("pickupInstructions")).toBe("");
     const photos = JSON.parse(String(fd.get("photos"))) as unknown[];
     expect(photos.length).toBe(1);

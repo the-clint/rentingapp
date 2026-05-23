@@ -62,7 +62,9 @@ describe("fetchPublicListing", () => {
         name: "Honda Generator",
         description: "Quiet inverter generator.",
         daily_rate_cents: 7500,
-        pickup_location: "Salt Lake City, UT",
+        address_city: "Salt Lake City",
+        address_state: "UT",
+        address_zip: "84101",
         photos: [
           { path: "op-1/listing-1/b.jpg", isHero: false, position: 1 },
           { path: "op-1/listing-1/a.jpg", isHero: true, position: 0 },
@@ -79,7 +81,7 @@ describe("fetchPublicListing", () => {
     expect(result.data?.id).toBe("listing-1");
     expect(result.data?.name).toBe("Honda Generator");
     expect(result.data?.dailyRateCents).toBe(7500);
-    expect(result.data?.pickupLocation).toBe("Salt Lake City, UT");
+    expect(result.data?.publicLocation).toBe("Salt Lake City, UT 84101");
     // Sorted by position ascending so the hero (position 0) is first.
     expect(result.data?.photos[0].path).toBe("op-1/listing-1/a.jpg");
     expect(result.data?.photos[0].url).toBe(
@@ -120,13 +122,17 @@ describe("fetchPublicListing", () => {
     expect(result.error.message).toBe("connection reset");
   });
 
-  it("does NOT select pickup_instructions (anon has no column grant)", async () => {
+  it("does NOT select pickup_instructions or full street address (anon has no column grant)", async () => {
     maybeSingleMock.mockResolvedValue({ data: null, error: null });
     await fetchPublicListing("listing-1");
     const selectArg = selectMock.mock.calls[0]?.[0] as string | undefined;
     expect(selectArg).toBeDefined();
     expect(selectArg).not.toContain("pickup_instructions");
-    expect(selectArg).toContain("pickup_location");
+    expect(selectArg).not.toContain("address_street");
+    expect(selectArg).not.toContain("pickup_location");
+    expect(selectArg).toContain("address_city");
+    expect(selectArg).toContain("address_state");
+    expect(selectArg).toContain("address_zip");
   });
 
   it("handles a null photos array defensively", async () => {
@@ -136,7 +142,9 @@ describe("fetchPublicListing", () => {
         name: "Honda Generator",
         description: "Quiet inverter generator.",
         daily_rate_cents: 7500,
-        pickup_location: "Salt Lake City, UT",
+        address_city: "Salt Lake City",
+        address_state: "UT",
+        address_zip: "84101",
         photos: null,
       },
       error: null,

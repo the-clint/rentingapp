@@ -33,6 +33,10 @@ interface ListingInsertRow {
   name: string;
   description: string;
   daily_rate_cents: number;
+  address_street: string;
+  address_city: string;
+  address_state: string;
+  address_zip: string;
   pickup_location: string;
   pickup_instructions: string | null;
   photos: PhotoInput[];
@@ -49,16 +53,41 @@ interface ListingUpdateRow {
   name: string;
   description: string;
   daily_rate_cents: number;
+  address_street: string;
+  address_city: string;
+  address_state: string;
+  address_zip: string;
   pickup_location: string;
   pickup_instructions: string | null;
   photos: PhotoInput[];
+}
+
+/**
+ * Combine the structured address parts into the legacy `pickup_location`
+ * column. The DB still stores this concatenated string because authenticated
+ * post-booking surfaces (renter dashboard, check-in flow, operator views)
+ * read it directly. The anon column grant in 00018 excludes it, so the
+ * public booking page never sees the street.
+ */
+function formatFullAddress(parts: {
+  addressStreet: string;
+  addressCity: string;
+  addressState: string;
+  addressZip: string;
+}): string {
+  const cityStateZip = `${parts.addressCity}, ${parts.addressState} ${parts.addressZip}`.trim();
+  if (!parts.addressStreet) return cityStateZip;
+  return `${parts.addressStreet}, ${cityStateZip}`;
 }
 
 function parseListingFormData(formData: FormData): Result<{
   name: string;
   description: string;
   dailyRateCents: number;
-  pickupLocation: string;
+  addressStreet: string;
+  addressCity: string;
+  addressState: string;
+  addressZip: string;
   pickupInstructions: string;
   photos: PhotoInput[];
 }> {
@@ -73,7 +102,10 @@ function parseListingFormData(formData: FormData): Result<{
     name: String(formData.get("name") ?? ""),
     description: String(formData.get("description") ?? ""),
     dailyRateCents: Number(formData.get("dailyRateCents") ?? 0),
-    pickupLocation: String(formData.get("pickupLocation") ?? ""),
+    addressStreet: String(formData.get("addressStreet") ?? ""),
+    addressCity: String(formData.get("addressCity") ?? ""),
+    addressState: String(formData.get("addressState") ?? ""),
+    addressZip: String(formData.get("addressZip") ?? ""),
     pickupInstructions: String(formData.get("pickupInstructions") ?? ""),
     photos: parsedPhotos,
   };
@@ -87,7 +119,10 @@ function parseListingFormData(formData: FormData): Result<{
     name: parsed.data.name,
     description: parsed.data.description,
     dailyRateCents: parsed.data.dailyRateCents,
-    pickupLocation: parsed.data.pickupLocation,
+    addressStreet: parsed.data.addressStreet,
+    addressCity: parsed.data.addressCity,
+    addressState: parsed.data.addressState,
+    addressZip: parsed.data.addressZip,
     pickupInstructions: parsed.data.pickupInstructions ?? "",
     photos: parsed.data.photos,
   });
@@ -123,7 +158,11 @@ export async function createListing(
     name: parsed.data.name,
     description: parsed.data.description,
     daily_rate_cents: parsed.data.dailyRateCents,
-    pickup_location: parsed.data.pickupLocation,
+    address_street: parsed.data.addressStreet,
+    address_city: parsed.data.addressCity,
+    address_state: parsed.data.addressState,
+    address_zip: parsed.data.addressZip,
+    pickup_location: formatFullAddress(parsed.data),
     pickup_instructions:
       parsed.data.pickupInstructions.length > 0
         ? parsed.data.pickupInstructions
@@ -200,7 +239,11 @@ export async function updateListing(
     name: parsed.data.name,
     description: parsed.data.description,
     daily_rate_cents: parsed.data.dailyRateCents,
-    pickup_location: parsed.data.pickupLocation,
+    address_street: parsed.data.addressStreet,
+    address_city: parsed.data.addressCity,
+    address_state: parsed.data.addressState,
+    address_zip: parsed.data.addressZip,
+    pickup_location: formatFullAddress(parsed.data),
     pickup_instructions:
       parsed.data.pickupInstructions.length > 0
         ? parsed.data.pickupInstructions

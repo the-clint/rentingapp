@@ -181,7 +181,10 @@ function buildFormData(overrides: Record<string, string> = {}): FormData {
     "A quiet, portable inverter generator perfect for camping or backup power.",
   );
   fd.set("dailyRateCents", "7500");
-  fd.set("pickupLocation", "Salt Lake City, UT");
+  fd.set("addressStreet", "123 Main St");
+  fd.set("addressCity", "Salt Lake City");
+  fd.set("addressState", "UT");
+  fd.set("addressZip", "84101");
   fd.set("pickupInstructions", "");
   fd.set(
     "photos",

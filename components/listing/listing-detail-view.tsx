@@ -22,6 +22,7 @@ export interface ListingDetailViewData {
   pickup_location: string;
   pickup_instructions: string | null;
   photos: ListingDetailPhoto[];
+  ad_copy: string | null;
 }
 
 interface ListingDetailViewProps {
@@ -105,6 +106,7 @@ export function ListingDetailView({
           }}
           bookingUrl={bookingUrl}
           listingId={listing.id}
+          savedAdCopy={listing.ad_copy}
           initialOpen={initialAssistantOpen}
         />
         <DeleteListingDialog

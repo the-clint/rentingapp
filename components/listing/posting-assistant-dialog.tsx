@@ -1,18 +1,23 @@
 "use client";
 
-import { Check, Copy, Megaphone, X } from "lucide-react";
+import { Check, Copy, ExternalLink, Megaphone, RotateCcw, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 
 import { BookingQrCode } from "@/components/booking/booking-qr-code";
 import { Button } from "@/components/ui/button";
+import { saveAdCopy } from "@/lib/actions/listing-actions";
 import {
   generatePostingCopy,
   type ListingForTemplates,
-  type PostingPlatform,
 } from "@/lib/utils/posting-templates";
 
-type CopyTarget = PostingPlatform | "link";
+type CopyTarget = "ad" | "link";
+type SaveState =
+  | { status: "idle" }
+  | { status: "saving" }
+  | { status: "saved" }
+  | { status: "error"; message: string };
 
 interface PostingAssistantDialogProps {
   listing: {
@@ -23,28 +28,15 @@ interface PostingAssistantDialogProps {
   };
   bookingUrl: string;
   listingId: string;
+  savedAdCopy?: string | null;
   initialOpen?: boolean;
 }
 
-interface PlatformSection {
-  platform: PostingPlatform;
-  heading: string;
-  copy: string;
-}
-
-/**
- * Native <dialog>-based posting assistant. Generates platform-tailored ad
- * copy for KSL, Facebook Marketplace, and Craigslist, and exposes the
- * renter booking link with a copy button. No new dependencies — everything
- * is built on `react`, `next`, `lucide-react`, and the pure template
- * generator in `lib/utils/posting-templates.ts`.
- *
- * Story 2.5.
- */
 export function PostingAssistantDialog({
   listing,
   bookingUrl,
   listingId,
+  savedAdCopy = null,
   initialOpen = false,
 }: PostingAssistantDialogProps) {
   const router = useRouter();
@@ -53,15 +45,8 @@ export function PostingAssistantDialog({
   const [copiedTarget, setCopiedTarget] = useState<CopyTarget | null>(null);
   const [erroredTarget, setErroredTarget] = useState<CopyTarget | null>(null);
   const [hasConsumedInitialOpen, setHasConsumedInitialOpen] = useState(false);
-  // Tracks the "Copied!" auto-revert timer so we can clear it on unmount,
-  // on a subsequent copy, or on a failed copy. Without this, Strict Mode's
-  // double-invoke schedules two overlapping timers and rapid Copy clicks
-  // stack timers that silently fight over `copiedTarget`.
   const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Auto-open exactly once when `initialOpen` is true (e.g. on
-  // `?posted=1`). The `hasConsumedInitialOpen` guard prevents re-opens on
-  // subsequent renders while the prop is still true.
   useEffect(() => {
     if (initialOpen && !hasConsumedInitialOpen && dialogRef.current) {
       dialogRef.current.showModal();
@@ -69,9 +54,6 @@ export function PostingAssistantDialog({
     }
   }, [initialOpen, hasConsumedInitialOpen]);
 
-  // Cleanup: clear any pending "Copied!" revert timer when the dialog
-  // component unmounts. This prevents a setState-on-unmounted warning in
-  // edge cases where the parent unmounts mid-revert.
   useEffect(() => {
     return () => {
       if (copiedTimerRef.current !== null) {
@@ -94,8 +76,6 @@ export function PostingAssistantDialog({
   const handleClose = () => {
     setCopiedTarget(null);
     setErroredTarget(null);
-    // Scrub `?posted=1` from the URL so a later `router.refresh()` or a
-    // parent re-render does not re-trigger the auto-open flag.
     if (
       hasConsumedInitialOpen &&
       typeof window !== "undefined" &&
@@ -105,8 +85,6 @@ export function PostingAssistantDialog({
     }
   };
 
-  // Backdrop click: the native <dialog> reports the dialog element itself
-  // as the click target when the user clicks outside the content box.
   const handleBackdropClick = (
     event: React.MouseEvent<HTMLDialogElement>,
   ) => {
@@ -116,9 +94,6 @@ export function PostingAssistantDialog({
   };
 
   async function handleCopy(key: CopyTarget, text: string) {
-    // Cancel any in-flight revert timer before starting a new copy — an
-    // operator rapidly clicking Copy on two cards should show the latest
-    // "Copied!" marker without the previous timer clearing it prematurely.
     if (copiedTimerRef.current !== null) {
       clearTimeout(copiedTimerRef.current);
       copiedTimerRef.current = null;
@@ -144,23 +119,43 @@ export function PostingAssistantDialog({
     pickupLocation: listing.pickup_location,
   };
 
-  const sections: PlatformSection[] = [
-    {
-      platform: "ksl",
-      heading: "KSL Classifieds",
-      copy: generatePostingCopy(listingForTemplates, "ksl", bookingUrl),
-    },
-    {
-      platform: "facebook",
-      heading: "Facebook Marketplace",
-      copy: generatePostingCopy(listingForTemplates, "facebook", bookingUrl),
-    },
-    {
-      platform: "craigslist",
-      heading: "Craigslist",
-      copy: generatePostingCopy(listingForTemplates, "craigslist", bookingUrl),
-    },
-  ];
+  const defaultAdCopy = generatePostingCopy(listingForTemplates, bookingUrl);
+  const [adCopy, setAdCopy] = useState<string>(savedAdCopy ?? defaultAdCopy);
+  const [saveState, setSaveState] = useState<SaveState>({ status: "idle" });
+  const [isSaving, startSaving] = useTransition();
+  const savedSnapshotRef = useRef<string>(savedAdCopy ?? defaultAdCopy);
+  const isDirty = adCopy !== savedSnapshotRef.current;
+
+  // When the saved copy prop changes (e.g. after revalidatePath), resync
+  // unless the operator has unsaved edits.
+  useEffect(() => {
+    const next = savedAdCopy ?? defaultAdCopy;
+    if (!isDirty) {
+      setAdCopy(next);
+      savedSnapshotRef.current = next;
+    }
+  }, [savedAdCopy, defaultAdCopy, isDirty]);
+
+  function handleSave() {
+    setSaveState({ status: "saving" });
+    startSaving(async () => {
+      const result = await saveAdCopy(listingId, adCopy);
+      if (result.success) {
+        savedSnapshotRef.current = adCopy;
+        setSaveState({ status: "saved" });
+        setTimeout(() => {
+          setSaveState((s) => (s.status === "saved" ? { status: "idle" } : s));
+        }, 2000);
+      } else {
+        setSaveState({ status: "error", message: result.error.message });
+      }
+    });
+  }
+
+  function handleResetToDefault() {
+    setAdCopy(defaultAdCopy);
+    setSaveState({ status: "idle" });
+  }
 
   return (
     <>
@@ -174,9 +169,9 @@ export function PostingAssistantDialog({
         onClick={handleBackdropClick}
         onClose={handleClose}
         aria-labelledby="posting-assistant-dialog-title"
-        className="max-w-4xl w-[min(94vw,56rem)] rounded-lg border border-border bg-card text-foreground p-space-6 shadow-lg backdrop:bg-black/50"
+        className="max-w-4xl w-[min(94vw,56rem)] rounded-lg border border-border bg-card text-foreground p-space-8 shadow-lg backdrop:bg-black/50 m-auto"
       >
-        <div className="flex flex-col gap-space-5">
+        <div className="flex flex-col gap-space-8">
           <header className="flex items-start justify-between gap-space-4">
             <div className="flex flex-col gap-space-1">
               <h2
@@ -186,8 +181,9 @@ export function PostingAssistantDialog({
                 Posting assistant
               </h2>
               <p className="text-sm text-neutral-700">
-                Copy ad text for each classifieds platform, share your booking
-                link, or print the QR code.
+                Copy ad text to paste anywhere — KSL, Facebook Marketplace,
+                Craigslist, and more. Share your booking link or print the QR
+                code.
               </p>
             </div>
             <Button
@@ -220,6 +216,7 @@ export function PostingAssistantDialog({
                   type="button"
                   variant="outline"
                   onClick={() => handleCopy("link", bookingUrl)}
+                  className="w-fit"
                 >
                   {copiedTarget === "link" ? (
                     <>
@@ -250,75 +247,121 @@ export function PostingAssistantDialog({
             />
           </section>
 
-          <section className="grid gap-space-4 md:grid-cols-3">
-            {sections.map((section) => (
-              <PlatformCopyCard
-                key={section.platform}
-                platform={section.platform}
-                heading={section.heading}
-                copy={section.copy}
-                copied={copiedTarget === section.platform}
-                errored={erroredTarget === section.platform}
-                onCopy={() => handleCopy(section.platform, section.copy)}
-              />
-            ))}
-          </section>
+          <article className="flex flex-col gap-space-3 rounded-lg border border-border bg-card p-space-4">
+            <h3 className="text-h3 font-semibold">Ad copy</h3>
+            <div className="flex flex-wrap gap-space-2">
+              <span className="text-sm text-neutral-500 self-center mr-space-1">
+                Post on:
+              </span>
+              <Button asChild type="button" variant="outline" size="sm">
+                <a
+                  href="https://classifieds.ksl.com/post"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                  KSL
+                </a>
+              </Button>
+              <Button asChild type="button" variant="outline" size="sm">
+                <a
+                  href="https://www.facebook.com/marketplace/create/item"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                  Facebook Marketplace
+                </a>
+              </Button>
+              <Button asChild type="button" variant="outline" size="sm">
+                <a
+                  href="https://post.craigslist.org/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                  Craigslist
+                </a>
+              </Button>
+            </div>
+            <textarea
+              id="posting-assistant-ad-copy"
+              value={adCopy}
+              onChange={(e) => {
+                setAdCopy(e.target.value);
+                if (saveState.status !== "idle") {
+                  setSaveState({ status: "idle" });
+                }
+              }}
+              rows={12}
+              aria-label="Ad copy"
+              className="w-full resize-y rounded-md border border-border bg-muted p-space-2 font-mono text-sm"
+            />
+            <div className="flex flex-wrap items-center justify-end gap-space-2">
+              {adCopy !== defaultAdCopy && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleResetToDefault}
+                  className="mr-auto"
+                >
+                  <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                  Reset to default
+                </Button>
+              )}
+              {saveState.status === "saved" && (
+                <span
+                  className="text-xs text-neutral-500"
+                  aria-live="polite"
+                >
+                  Saved
+                </span>
+              )}
+              {saveState.status === "error" && (
+                <span
+                  className="text-xs text-destructive"
+                  role="alert"
+                >
+                  {saveState.message}
+                </span>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleCopy("ad", adCopy)}
+              >
+                {copiedTarget === "ad" ? (
+                  <>
+                    <Check className="h-4 w-4" aria-hidden="true" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4" aria-hidden="true" />
+                    Copy
+                  </>
+                )}
+              </Button>
+              <Button
+                type="button"
+                onClick={handleSave}
+                disabled={!isDirty || isSaving}
+              >
+                {isSaving ? "Saving…" : "Save"}
+              </Button>
+            </div>
+            <span className="sr-only" aria-live="polite">
+              {copiedTarget === "ad" ? "Copied ad copy" : ""}
+            </span>
+            {erroredTarget === "ad" && (
+              <p className="text-xs text-destructive" role="alert">
+                Copy failed — select the text and press Ctrl+C manually.
+              </p>
+            )}
+          </article>
         </div>
       </dialog>
     </>
-  );
-}
-
-interface PlatformCopyCardProps {
-  platform: PostingPlatform;
-  heading: string;
-  copy: string;
-  copied: boolean;
-  errored: boolean;
-  onCopy: () => void;
-}
-
-function PlatformCopyCard({
-  platform,
-  heading,
-  copy,
-  copied,
-  errored,
-  onCopy,
-}: PlatformCopyCardProps) {
-  const textareaId = `posting-assistant-${platform}-copy`;
-  return (
-    <article className="flex flex-col gap-space-3 rounded-lg border border-border bg-card p-space-4">
-      <h3 className="text-h3 font-semibold">{heading}</h3>
-      <textarea
-        id={textareaId}
-        readOnly
-        value={copy}
-        rows={8}
-        aria-label={`${heading} ad copy`}
-        className="w-full resize-none rounded-md border border-border bg-muted p-space-2 font-mono text-sm"
-      />
-      <Button type="button" variant="outline" onClick={onCopy}>
-        {copied ? (
-          <>
-            <Check className="h-4 w-4" aria-hidden="true" />
-            Copied!
-          </>
-        ) : (
-          <>
-            <Copy className="h-4 w-4" aria-hidden="true" />
-            Copy
-          </>
-        )}
-      </Button>
-      <span className="sr-only" aria-live="polite">
-        {copied ? `Copied ${heading} ad copy` : ""}
-      </span>
-      {errored && (
-        <p className="text-xs text-destructive" role="alert">
-          Copy failed — select the text and press Ctrl+C manually.
-        </p>
-      )}
-    </article>
   );
 }

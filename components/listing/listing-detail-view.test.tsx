@@ -73,6 +73,7 @@ function sampleListing(): ListingDetailViewData {
         url: "https://example/thumb.jpg",
       },
     ],
+    ad_copy: null,
   };
 }
 

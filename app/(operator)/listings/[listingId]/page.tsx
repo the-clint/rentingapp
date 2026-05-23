@@ -47,6 +47,7 @@ interface ListingRow {
   pickup_location: string;
   pickup_instructions: string | null;
   photos: Array<{ path: string; isHero: boolean; position: number }> | null;
+  ad_copy: string | null;
 }
 
 async function ListingDetailBody({
@@ -71,7 +72,7 @@ async function ListingDetailBody({
   const { data: listing } = await supabase
     .from("listings")
     .select(
-      "id, name, description, daily_rate_cents, pickup_location, pickup_instructions, photos",
+      "id, name, description, daily_rate_cents, pickup_location, pickup_instructions, photos, ad_copy",
     )
     .eq("id", listingId)
     .eq("operator_id", user.id)
@@ -101,6 +102,7 @@ async function ListingDetailBody({
     pickup_location: listing.pickup_location,
     pickup_instructions: listing.pickup_instructions,
     photos,
+    ad_copy: listing.ad_copy,
   };
 
   return (

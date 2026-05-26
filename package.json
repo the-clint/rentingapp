@@ -16,7 +16,8 @@
     "supabase:stop": "npx supabase stop",
     "supabase:restart": "npx supabase stop && npx supabase start",
     "supabase:reset": "npx supabase db reset",
-    "supabase:status": "npx supabase status"
+    "supabase:status": "npx supabase status",
+    "db:push": "node scripts/db-push.mjs"
   },
   "dependencies": {
     "@marsidev/react-turnstile": "1.5.0",

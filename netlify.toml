@@ -10,7 +10,12 @@
 # See docs/bitwarden-secrets-setup.md for the full runbook.
 
 [build]
-  command = "npm run build"
+  # `db:push` applies pending Supabase migrations to the cloud project for the
+  # current APP_ENV before the Next.js build runs, so a deploy never ships
+  # code that expects a schema that hasn't been applied yet. Wrapped in
+  # `varlock run` so the SUPABASE_* secrets are resolved from BWS per env.
+  # If the migration step fails, the deploy fails — by design.
+  command = "varlock run -- npm run db:push && npm run build"
   publish = ".next"
 
 [build.environment]
